@@ -1,0 +1,28 @@
+{
+  "name": "rflux-presentation",
+  "version": "1.0.0",
+  "description": "",
+  "main": false,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "jspm": {
+    "dependencies": {
+      "baconjs": "npm:baconjs@^0.7.84",
+      "react": "npm:react@^15.1.0",
+      "react-dom": "npm:react-dom@^15.1.0",
+      "react-motion": "npm:react-motion@^0.4.3"
+    },
+    "devDependencies": {
+      "babel": "npm:babel-core@^5.8.24",
+      "babel-runtime": "npm:babel-runtime@^5.8.24",
+      "core-js": "npm:core-js@^1.1.4"
+    }
+  },
+  "dependencies": {
+    "jspm": "^0.16.13"
+  },
+  "private": true
+}

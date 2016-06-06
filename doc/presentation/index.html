@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+
+    <title>FRP and ReactJS</title>
+
+    <meta name="description" content="FRP and ReactJS">
+    <meta name="author" content="Uriel Avalos">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/simple.css" id="theme">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+    <link rel="stylesheet" href="node_modules/highlight.js/styles/vs.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+
+    <style>
+      .reveal pre {
+        font-size: 1em;
+      }
+      .reveal pre code {
+        padding: 1em;
+        max-height: 800px;
+      }
+      .reveal h1 { font-size: 3em }
+
+      input {
+          border: 5px solid white;
+          -webkit-box-shadow:
+            inset 0 0 8px  rgba(0,0,0,0.1),
+                  0 0 16px rgba(0,0,0,0.1);
+          -moz-box-shadow:
+            inset 0 0 8px  rgba(0,0,0,0.1),
+                  0 0 16px rgba(0,0,0,0.1);
+          box-shadow:
+            inset 0 0 8px  rgba(0,0,0,0.1),
+                  0 0 16px rgba(0,0,0,0.1);
+          padding: 15px;
+          background: rgba(255,255,255,0.5);
+          margin: 0 0 10px 0;
+        font-size: 1em;
+      }
+    </style>
+
+    <!--[if lt IE 9]>
+    <script src="lib/js/html5shiv.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <div class="reveal">
+
+      <!-- Any section element inside of this container is displayed as a slide -->
+      <div class="slides">
+
+        <section>
+          <h1><div>ReactJS + FRP:</div><div>Using Functional Reactive Programming to replace Flux</div></h1>
+          <h3>Uriel Avalos</h3>
+        </section>
+
+        <section data-markdown>
+          <script type="text/template">
+            ## What is Functional Programming?
+
+            <ul style="color: transparent; text-shadow: 0 0 5px rgba(0,0,0,0.4);">
+              <li>first class functions</li>
+              <li>higher order functions</li>
+              <li>closures</li>
+              <li>pattern matching</li>
+              <li>single assignment</li>
+              <li>lazy evaluation</li>
+              <li>garbage collection</li>
+              <li>type inference</li>
+              <li>tail call optimization</li>
+              <li>list comprehensions</li>
+            </ul>
+          </script>
+        </section>
+
+        <section>
+          <h2> Pure Functions </h2>
+          <section></section>
+          <section data-markdown contenteditable>
+            <script type="text/template">
+              ```javascript
+              function square(x) {
+                return x * x * databaseValue()
+              }
+              ```
+            </script>
+          </section>
+          <section data-markdown contenteditable>
+            <script type="text/template">
+              ```javascript
+              function square(x) {
+                x.val = x.val * x.val
+                return x.val
+              }
+              ```
+            </script>
+          </section>
+          <section data-markdown contenteditable>
+            <script type="text/template">
+              ```javascript
+              function square(x) {
+                global = x
+                return x * x
+              }
+              ```
+            </script>
+          </section>
+          <section data-markdown>
+            <script type="text/template">
+              always evaluate to the same result in any context.
+
+              no side effects
+
+              no hidden dependencies
+            </script>
+          </section>
+        </section>
+
+        <section>
+          <h2>What is Functional <em>Reactive</em> Programming?</h2>
+          <section data-markdown>
+            <script type="text/template">
+              FP with **asynchronous data streams**
+            </script>
+          </section>
+          <section data-state="buttonStream">
+            <div id="buttonStream"></div>
+          </section>
+
+        </section>
+
+        <section>
+          <h2>Understanding FRP</h2>
+          <section></section>
+          <section data-markdown contenteditable>
+            <script type="text/template">
+              ## `#map`
+
+              ```javascript
+              ['a', 'b', 'c', 'd', 'e']
+                .map(x => x.toUpperCase())
+
+              // [A, B, C, D, E]
+              ```
+            </script>
+          </section>
+          <section data-state="mapStream">
+            <div id="mapStream"></div>
+          </section>
+          <section>
+            <h2><code>#reduce/scan</code></h2>
+            <pre><code class="hljs lang-javascript" data-trim contenteditable>
+//
+//                current
+//                value
+//                |
+[1, 2, 3, 4, 5] //|
+  .reduce((total, x) => total + x, 0)
+//           ^                     ^
+//      accumulator             start
+            </code></pre>
+          </section>
+          <section data-state="scanStream">
+            <div id="scanStream"></div>
+          </section>
+          <section>
+            <pre><code class="hljs lang-javascript" data-trim contenteditable>
+inputStream
+  .map(x => x.toUpperCase())
+  .onValue(x => this.setState({x}))
+            </code></pre>
+          </section>
+        </section>
+
+        <section>
+          <h2>State in FRP?</h2>
+          <section></section>
+          <section data-markdown contenteditable>
+            <script type="text/template">
+              ```javascript
+              function factorial(n, acc = 1) {
+                if (n == 0) return acc
+                return factorial(n - 1, n * acc)
+              }
+              ```
+            </script>
+          </section>
+          <section data-markdown contenteditable>
+            <script type="text/template">
+              ```javascript
+              const todoStream =
+                someStream.scan(todos, action) {
+                  if (action.type === 'update') {
+                    const todo = action.payload
+                    todos[todo.id] = todo
+                  }
+                  return todos
+                 }
+              ```
+            </script>
+          </section>
+        </section>
+
+        <section>
+          <h2>One-Way Data Flow</h2>
+          <section></section>
+          <section data-markdown contenteditable>
+            <script type="text/template">
+            ```javascript
+            const AppDispatcher = new Bacon.Bus()
+            ```
+            </script>
+          </section>
+          <section data-markdown contenteditable>
+            <script type="text/template">
+            ```javascript
+            const AppDispatcher = new Bacon.Bus()
+
+            AppDispatcher.push({
+              type: 'update',
+              payload: todo
+            })
+            ```
+            </script>
+          </section>
+          <section data-markdown contenteditable>
+            <script type="text/template">
+            ```javascript
+            const AppDispatcher = new Bacon.Bus()
+
+            AppDispatcher.push({type: 'update', payload: todo})
+
+            const todoStream =
+              AppDispatcher.scan((todos, action)=>{
+                if (action.type === 'update')
+                  return updateTodo(todos, action.payload)
+                return todos
+              })
+
+            function updateTodo(todos, todo) {
+              todos[todo.id] = todo
+              return todos
+            }
+            ```
+            </script>
+          </section>
+          <section>
+            <img data-src="https://facebook.github.io/flux/img/flux-simple-f8-diagram-with-client-action-1300w.png">
+          </section>
+        </section>
+
+        <section>
+          <h2>Action Functions</h2>
+          <section></section>
+          <section data-markdown contenteditable>
+            <script type="text/template">
+              ```javascript
+              AppDispatcher.push({
+                type: 'update', payload: todo
+              })
+              ```
+            </script>
+          </section>
+          <section data-markdown contenteditable>
+            <script type="text/template">
+              ```javascript
+              function updateTodo(todo) {
+                AppDispatcher.push({
+                  type: 'update', payload: todo
+                })
+              }
+              ```
+            </script>
+          </section>
+          <section data-markdown contenteditable>
+            <script type="text/template">
+              ```javascript
+              function updateTodo(AppDispatcher, todo) {
+                AppDispatcher.push({
+                  type: 'update', payload: todo
+                })
+              }
+              ```
+            </script>
+          </section>
+          <section data-markdown contenteditable>
+            <script type="text/template">
+              ```javascript
+              function updateTodo(todo) {
+                return {
+                  type: 'update',
+                  payload: todo
+                }
+              }
+              ```
+            </script>
+          </section>
+        </section>
+
+        <section>
+          <h2>Immutability</h2>
+          <section data-markdown>
+            <script type="text/template">
+              ```javascript
+              function1(todos) {
+                delete todo[1]
+              }
+
+              function2(todos) {
+                todo[1].foo = //...
+              }
+              ```
+            </script>
+          </section>
+          <section data-markdown>
+            <script type="text/template">
+              ### Object.assign / object spread operator
+              ```javascript
+              function updateTodo(todos, todo) {
+                return {...todos, [todo.id]: todo}
+              }
+              ```
+            </script>
+          </section>
+          <section data-markdown>
+            <script type="text/template">
+              ### Immutable.js
+            </script>
+          </section>
+        </section>
+
+        <section>
+          <H2>Complex Actions && SideEffects</h2>
+          <section></section>
+          <section data-markdown contenteditable>
+            <script type="text/template">
+              ```javascript
+              onChange(todo) {
+                updateTodo(todo)
+                  .flatMap(todo => persist(todo))
+                  .onValue(
+                    todo => this.setState({todo}))
+              }
+              ```
+            </script>
+          </section>
+          <section data-markdown contenteditable>
+            <script type="text/template">
+              ```javascript
+              onChange(todo) { this.bus.push(todo) }
+
+              componentWillMount() {
+                this.bus
+                  .flatMap(todo => updateTodo(todo))
+                  .flatMapConcat(
+                    todo => persist(todo))
+                  .onValue(
+                    todo => this.setState({todo}))
+              }
+              ```
+            </script>
+          </section>
+          <section data-markdown contenteditable>
+            <script type="text/template">
+              ```javascript
+              function updateTodo(todos, todo) {
+                return {...todos, [todo.id]: todo}
+                // call persist?
+              }
+              ```
+            </script>
+          </section>
+          <section data-markdown contenteditable>
+            <script type="text/template">
+              ```javascript
+              function updateTodo(todos, todo) {
+                const newTodos = {
+                  ...todos, [todo.id]: todo}
+
+                return {
+                  todos: newTodos,
+                  sideEffects: [
+                    {type: 'persist', payload: todo}
+                  ]
+                }
+              }
+              ```
+            </script>
+          </section>
+          <section data-markdown>
+            <script type="text/template">
+              ```javascript
+              todoStream.onValue(state => {
+                state.sideEffects.forEach(
+                  s => AppDispatcher.push(s)
+                )
+              })
+              ```
+            </script>
+          </section>
+        </section>
+
+        <section>
+          <h2>Complex SideEffects?</h2>
+          <section></section>
+          <section data-markdown>
+            <script type="text/template">
+              - SideEffectsBus
+              - `listen`
+              - `callFunction`
+              - `pushAction`
+            </script>
+          </section>
+          <section data-markdown contenteditable>
+            <script type="text/template">
+              ```javascript
+              function persist() {
+                listen('persist')
+                  .flatMap(todo =>
+                    callFunction(Api.save, todo))
+                  .onValue(() =>
+                    pushAction('todoPersisted'))
+              }
+              ```
+            </script>
+          </section>
+          <section data-markdown contenteditable>
+            <script type="text/template">
+              ```javascript
+              function persist() {
+                listen('persist')
+                 .flatMap(todo => Bacon.retry({
+                  source: () =>
+                    callFunction(Api.save, todo),
+                  retries: 5
+                 )}))
+                 .onError(e =>
+                  pushAction({type: 'persistError', payload: e})
+                 .onValue(() =>
+                  pushAction({type: 'todoPersisted'}))
+              }
+              ```
+            </script>
+          </section>
+        </section>
+        <section data-markdown>
+          <script type="text/template">
+          - https://github.com/awesome-editor/awesome-editor/tree/master/src/rflux
+          - https://github.com/frankandrobot/rflux - coming soon!
+          - twitter: echoes2099
+          </script>
+        </section>
+      </div>
+
+    </div>
+
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
+
+    <script>
+
+      // More info https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+        // More info https://github.com/hakimel/reveal.js#dependencies
+        dependencies: [
+          { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+          { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+          { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+          { src: 'plugin/zoom-js/zoom.js', async: true },
+          { src: 'plugin/notes/notes.js', async: true }
+        ]
+      });
+
+    </script>
+    <script src="jspm_packages/system.js"></script>
+    <script src="config.js"></script>
+    <script>
+      System.import('./src/presentation.js')
+    </script>
+  </body>
+</html>

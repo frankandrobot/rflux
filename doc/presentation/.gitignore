@@ -1,0 +1,11 @@
+/jspm_packages
+/**/jspm_packages
+/repo
+/npm-debug.log
+/.idea
+/node_modules
+/**/node_modules
+/queue.config.json
+/queue-error.log
+*-compiled.js
+*-compiled.js.map
