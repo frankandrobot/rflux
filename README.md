@@ -1,6 +1,6 @@
 # rflux
 
-Lightweight ReactJS Flux/Redux replacement using Functional Reactive Programming with KefirJS.
+ReactJS Flux/Redux reimagined using Functional Reactive Programming with KefirJS.
 
 Code coming soon. For now, you can checkout a working (older) version over at:
 
