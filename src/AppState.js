@@ -1,4 +1,4 @@
-import Kefir from 'kefirjs'
+import Kefir from 'kefir'
 
 import AppDispatcher from './AppDispatcher'
 import createStore from './createStore'
@@ -65,5 +65,3 @@ export function registerSideEffects(channel, {SideEffects, SideEffectActionFunct
 }
 
 export default AppState
-
-

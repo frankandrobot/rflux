@@ -1,4 +1,4 @@
-import Kefir from 'kefirjs'
+import Kefir from 'kefir'
 
 
 export default function kefirEmitter() {
@@ -9,4 +9,3 @@ export default function kefirEmitter() {
 
   return emitter
 }
-
