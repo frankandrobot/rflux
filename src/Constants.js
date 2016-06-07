@@ -1,4 +1,4 @@
-import createTypes from 'support/createTypes'
+import createTypes from './support/createTypes'
 
 
 export const Channels = createTypes([

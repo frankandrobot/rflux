@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.ActionTypes = exports.Channels = undefined;
 
-var _createTypes = require('support/createTypes');
+var _createTypes = require('./support/createTypes');
 
 var _createTypes2 = _interopRequireDefault(_createTypes);
 
