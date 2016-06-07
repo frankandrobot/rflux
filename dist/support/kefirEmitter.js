@@ -11,21 +11,12 @@ var _kefir2 = _interopRequireDefault(_kefir);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
-  * A pool makes an amazing bus. It has one flat (bug),
-  * it's first event is undefined.
-  */
 function kefirEmitter() {
 
   var emitter = _kefir2.default.pool();
-  var skipFirst = emitter.filter(function (x) {
-    return x;
-  });
 
-  skipFirst.emit = function (message) {
-    debugger;emitter.plug(_kefir2.default.constant(message));
-  };
-
-  return skipFirst;
+  return Object.assign(emitter, { emit: function emit(message) {
+      return emitter.plug(_kefir2.default.constant(message));
+    } });
 }
 //# sourceMappingURL=kefirEmitter.js.map

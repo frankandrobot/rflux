@@ -81,6 +81,7 @@ function _bindStoreObservable(channel, Reducers) {
         return cast(handler(state, action.payload), StateWithSideEffects)
 
       }, initialState)
+      .skip(1)
 }
 
 /**

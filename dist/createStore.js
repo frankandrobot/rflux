@@ -96,7 +96,7 @@ function _bindStoreObservable(channel, Reducers) {
 
       // always return a StateWithSideEffects
       return (0, _cast2.default)(handler(state, action.payload), _StateWithSideEffects.StateWithSideEffects);
-    }, initialState);
+    }, initialState).skip(1);
   };
 }
 
