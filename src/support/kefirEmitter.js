@@ -8,9 +8,9 @@ import Kefir from 'kefir'
 export default function kefirEmitter() {
 
   const emitter = Kefir.pool()
-  const skipFirst = emitter.skip(1)
+  const skipFirst = emitter.filter(x => x)
 
-  skipFirst.emit = message => emitter.plug(Kefir.constant(message))
+  skipFirst.emit = message => {debugger; emitter.plug(Kefir.constant(message))}
 
   return skipFirst
 }

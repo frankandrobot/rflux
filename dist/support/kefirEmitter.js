@@ -18,10 +18,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function kefirEmitter() {
 
   var emitter = _kefir2.default.pool();
-  var skipFirst = emitter.skip(1);
+  var skipFirst = emitter.filter(function (x) {
+    return x;
+  });
 
   skipFirst.emit = function (message) {
-    return emitter.plug(_kefir2.default.constant(message));
+    debugger;emitter.plug(_kefir2.default.constant(message));
   };
 
   return skipFirst;
