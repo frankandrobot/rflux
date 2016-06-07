@@ -9,9 +9,9 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 exports.registerStore = registerStore;
 exports.registerSideEffects = registerSideEffects;
 
-var _kefirjs = require('kefirjs');
+var _kefir = require('kefir');
 
-var _kefirjs2 = _interopRequireDefault(_kefirjs);
+var _kefir2 = _interopRequireDefault(_kefir);
 
 var _AppDispatcher = require('./AppDispatcher');
 
@@ -63,7 +63,7 @@ function registerStore(channel, _ref) {
   var storeObservables = _storeInfo.map(function (x) {
     return x.observable;
   });
-  var appStateObservable = _kefirjs2.default.combine(storeObservables, function () {
+  var appStateObservable = _kefir2.default.combine(storeObservables, function () {
     for (var _len = arguments.length, observables = Array(_len), _key = 0; _key < _len; _key++) {
       observables[_key] = arguments[_key];
     }

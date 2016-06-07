@@ -5,18 +5,18 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = kefirEmitter;
 
-var _kefirjs = require('kefirjs');
+var _kefir = require('kefir');
 
-var _kefirjs2 = _interopRequireDefault(_kefirjs);
+var _kefir2 = _interopRequireDefault(_kefir);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function kefirEmitter() {
 
-  var emitter = _kefirjs2.default.pool();
+  var emitter = _kefir2.default.pool();
 
   emitter.emit = function (message) {
-    return emitter.plug(_kefirjs2.default.constant(message));
+    return emitter.plug(_kefir2.default.constant(message));
   };
 
   return emitter;

@@ -33,6 +33,15 @@ function _bindSideEffectsObservable(channel, SideEffectHandlers) {
   };
 }
 
+/**
+  * SideEffectActionFunctions are optional but if you pass these,
+  * then every SideEffect must have a corresponding action function.
+  *
+  * @param channel
+  * @param SideEffects - map whose keys are the names of the side effects
+  * @param SideEffectActionFunctions - (optional) map of action functions
+  * @param SideEffectHandlers - map of handler functions
+  */
 function createSideEffects(channel, _ref) {
   var SideEffects = _ref.SideEffects;
   var SideEffectActionFunctions = _ref.SideEffectActionFunctions;
@@ -41,14 +50,17 @@ function createSideEffects(channel, _ref) {
 
   (0, _assert2.default)(typeof channel === 'string', 'Needs a channel and it needs to be a string');
   (0, _assert2.default)(SideEffects, 'Need SideEffects');
-  (0, _assert2.default)(SideEffectActionFunctions, 'Need SideEffectActionFunctions');
   (0, _assert2.default)(SideEffectHandlers, 'Need SideEffectHandlers');
 
   //every side effect must map to an action function and handler
   Object.keys(SideEffects).forEach(function (action) {
-    (0, _assert2.default)(SideEffectActionFunctions[action], 'Channel ' + channel + ' is missing side effect action function for ' + action);
+    if (SideEffectActionFunctions) {
+      (0, _assert2.default)(SideEffectActionFunctions[action], 'Channel ' + channel + ' is missing side effect action function for ' + action);
+    }
     (0, _assert2.default)(SideEffectHandlers[action], 'Channel ' + channel + ' is missing side effect handler for ' + action);
   });
+
+  SideEffectActionFunctions = SideEffectActionFunctions || {};
 
   return function (AppDispatcher, AppState) {
     return {

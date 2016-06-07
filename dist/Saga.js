@@ -17,7 +17,7 @@ var _kefir = require('kefir');
 
 var _kefir2 = _interopRequireDefault(_kefir);
 
-var _kefirEmitter = require('support/kefirEmitter');
+var _kefirEmitter = require('./support/kefirEmitter');
 
 var _kefirEmitter2 = _interopRequireDefault(_kefirEmitter);
 
