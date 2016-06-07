@@ -115,8 +115,8 @@ export default function createStore(channel, {Actions, Reducers, ActionFunctions
 
   //every action must have an action function and a reducer
   Object.keys(Actions).forEach(action => {
-    assert(ActionFunctions[action], `Channel ${channel} is missing action function for ${action}`)
-    assert(Reducers[action], `Channel ${channel} is missing reducer for ${action}`)
+    assert(ActionFunctions[action], `Channel ${channel} is missing action function "${action}"`)
+    assert(Reducers[action], `Channel ${channel} is missing reducer "${action}"`)
   })
 
   //need an initial state; otherwise defaults to {}

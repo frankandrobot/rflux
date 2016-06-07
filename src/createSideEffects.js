@@ -40,9 +40,9 @@ export default function createSideEffects(channel, {SideEffects, SideEffectActio
   //every side effect must map to an action function and handler
   Object.keys(SideEffects).forEach(action => {
     if (SideEffectActionFunctions) {
-      assert(SideEffectActionFunctions[action], `Channel ${channel} is missing side effect action function for ${action}`)
+      assert(SideEffectActionFunctions[action], `Channel ${channel} is missing side effect action function "${action}"`)
     }
-    assert(SideEffectHandlers[action], `Channel ${channel} is missing side effect handler for ${action}`)
+    assert(SideEffectHandlers[action], `Channel ${channel} is missing side effect handler "${action}"`)
   })
 
   SideEffectActionFunctions = SideEffectActionFunctions || {}

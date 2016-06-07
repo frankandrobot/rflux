@@ -137,8 +137,8 @@ function createStore(channel, _ref) {
 
   //every action must have an action function and a reducer
   Object.keys(Actions).forEach(function (action) {
-    (0, _assert2.default)(ActionFunctions[action], 'Channel ' + channel + ' is missing action function for ' + action);
-    (0, _assert2.default)(Reducers[action], 'Channel ' + channel + ' is missing reducer for ' + action);
+    (0, _assert2.default)(ActionFunctions[action], 'Channel ' + channel + ' is missing action function "' + action + '"');
+    (0, _assert2.default)(Reducers[action], 'Channel ' + channel + ' is missing reducer "' + action + '"');
   });
 
   //need an initial state; otherwise defaults to {}

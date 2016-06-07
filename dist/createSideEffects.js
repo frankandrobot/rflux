@@ -55,9 +55,9 @@ function createSideEffects(channel, _ref) {
   //every side effect must map to an action function and handler
   Object.keys(SideEffects).forEach(function (action) {
     if (SideEffectActionFunctions) {
-      (0, _assert2.default)(SideEffectActionFunctions[action], 'Channel ' + channel + ' is missing side effect action function for ' + action);
+      (0, _assert2.default)(SideEffectActionFunctions[action], 'Channel ' + channel + ' is missing side effect action function "' + action + '"');
     }
-    (0, _assert2.default)(SideEffectHandlers[action], 'Channel ' + channel + ' is missing side effect handler for ' + action);
+    (0, _assert2.default)(SideEffectHandlers[action], 'Channel ' + channel + ' is missing side effect handler "' + action + '"');
   });
 
   SideEffectActionFunctions = SideEffectActionFunctions || {};
