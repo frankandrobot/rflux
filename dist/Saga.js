@@ -57,6 +57,8 @@ function put(action) {
   setTimeout(function () {
     return _AppDispatcher2.default.emit(action);
   }, 0);
+
+  return _kefir2.default.constant(action); // streamified so we can chain together
 }
 
 function call(fn) {

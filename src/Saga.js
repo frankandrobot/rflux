@@ -26,6 +26,8 @@ const callObservable = sideEffects
 export function put(action) {
 
   setTimeout(() => AppDispatcher.emit(action), 0)
+
+  return Kefir.constant(action) // streamified so we can chain together
 }
 
 export function call(fn, ...args) {
