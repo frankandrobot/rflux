@@ -322,6 +322,9 @@ Roughly speaking, this code
 - stops listening to the pending auth task (if any) when logging out
 - stores the auth token after authorizing
 - clears the auth token after logout or login error occurs
+- `flatMapLatest` picks the last auth request, so we can log in as many times as we want
+  without waiting for the auth to finish.
+- `takeUntilBy` discards the auth stream whenever a logout event happens.
 
 Note that this code handles multiple login requests!
 
@@ -348,7 +351,3 @@ Crazy edge case
 authorizeStream: ----a---a--------------->
    logoutStream: -l---------l------------>
 ```
-
-- `flatMapLatest` picks the last auth request, so we can log in as many times as we want
-  without waiting for the auth to finish.
-- `takeUntilBy` discards the auth stream whenever a logout event happens.

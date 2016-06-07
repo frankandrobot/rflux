@@ -1,0 +1,1 @@
+{"version":3,"sources":["support/cast.js"],"names":[],"mappings":";;;;;kBAAwB,I;AAAT,SAAS,IAAT,CAAc,GAAd,EAAmB,KAAnB,EAA0B;;AAEvC,SAAO,eAAe,KAAf,GAAuB,GAAvB,GAA6B,IAAI,KAAJ,CAAU,GAAV,CAApC;AACD","file":"cast.js","sourcesContent":["export default function cast(obj, Class) {\n\n  return obj instanceof Class ? obj : new Class(obj)\n}\n"]}
