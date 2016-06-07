@@ -45,7 +45,7 @@ export function registerStore(channel, {Actions, Reducers, ActionFunctions, Acti
 
   // setup one-way data flow + side effects
   store.observable.onValue(state =>
-    state.sideEffects.forEach(sideEffect => setTimeout(() => AppDispatcher.emit(sideEffect), 0))
+    (state.sideEffects || []).forEach(sideEffect => setTimeout(() => AppDispatcher.emit(sideEffect), 0))
   )
 }
 

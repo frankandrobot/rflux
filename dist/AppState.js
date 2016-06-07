@@ -80,7 +80,7 @@ function registerStore(channel, _ref) {
 
   // setup one-way data flow + side effects
   store.observable.onValue(function (state) {
-    return state.sideEffects.forEach(function (sideEffect) {
+    return (state.sideEffects || []).forEach(function (sideEffect) {
       return setTimeout(function () {
         return _AppDispatcher2.default.emit(sideEffect);
       }, 0);
