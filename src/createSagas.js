@@ -4,12 +4,28 @@ import {result} from './Saga'
 import {bindActionFunctions} from './createStore'
 
 
-function _bindSagaHandlers(SagaHandlers) {
+export function bindSagaHandler(channel, sagaName, sagaHandler) {
 
-  return Object.keys(SagaHandlers).reduce(
-    (handlers, handler) => Object.assign(handlers, {[handler]: SagaHandlers[handler]()}),
-    {}
-  )
+  return AppDispatcher =>
+  
+    AppDispatcher
+      .filter(x => x.channel === channel && x.actionType === sagaName)
+      .flatMap(x => sagaHandler(x.payload))
+}
+
+function _bindSagaHandlers(channel, SagaHandlers) {
+
+  return AppDispatcher =>
+
+    Object.keys(SagaHandlers).reduce(
+      (observables, handlerName) => {
+        const handler = SagaHandlers[handlerName]
+        const observable = bindSagaHandler(channel, handlerName, handler)(AppDispatcher)
+
+        return Object.assign(observables, {[handlerName]: observable})
+      },
+      {}
+    )
 }
 
 /**
@@ -39,7 +55,7 @@ export default function createSagas(channel, {Sagas, SagaActionFunctions, SagaHa
 
   return AppDispatcher => ({
     name: channel,
-    handlers: _bindSagaHandlers(SagaHandlers),
+    observables: _bindSagaHandlers(channel, SagaHandlers)(AppDispatcher),
     actionFunctions: bindActionFunctions(SagaActionFunctions)(AppDispatcher)
   })
 }

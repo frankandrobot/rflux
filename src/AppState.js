@@ -62,7 +62,7 @@ export function registerSagas(channel, {Sagas, SagaActionFunctions, SagaHandlers
   // setup one-way data flow
   const callback = () => undefined
 
-  Object.keys(sagas.handlers).forEach(handler => sagas.handlers[handler].onValue(callback))
+  Object.keys(sagas.observables).forEach(obs => sagas.observables[obs].onValue(callback))
 }
 
 export default AppState

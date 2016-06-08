@@ -7,7 +7,7 @@ Object.defineProperty(exports, "__esModule", {
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 exports.registerStore = registerStore;
-exports.registerSideEffects = registerSideEffects;
+exports.registerSagas = registerSagas;
 
 var _kefir = require('kefir');
 
@@ -21,9 +21,9 @@ var _createStore = require('./createStore');
 
 var _createStore2 = _interopRequireDefault(_createStore);
 
-var _createSideEffects = require('./createSideEffects');
+var _createSagas = require('./createSagas');
 
-var _createSideEffects2 = _interopRequireDefault(_createSideEffects);
+var _createSagas2 = _interopRequireDefault(_createSagas);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -32,7 +32,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 var AppState = {};
 
 var _storeInfo = [];
-var _sideEffectsInfo = [];
+var _sagaInfo = [];
 
 /**
  * See #createStore for docs.
@@ -88,24 +88,27 @@ function registerStore(channel, _ref) {
   });
 }
 
-function registerSideEffects(channel, _ref2) {
-  var SideEffects = _ref2.SideEffects;
-  var SideEffectActionFunctions = _ref2.SideEffectActionFunctions;
-  var SideEffectHandlers = _ref2.SideEffectHandlers;
+function registerSagas(channel, _ref2) {
+  var Sagas = _ref2.Sagas;
+  var SagaActionFunctions = _ref2.SagaActionFunctions;
+  var SagaHandlers = _ref2.SagaHandlers;
 
 
-  var sideEffectsFunction = (0, _createSideEffects2.default)(channel, { SideEffects: SideEffects, SideEffectActionFunctions: SideEffectActionFunctions, SideEffectHandlers: SideEffectHandlers });
-  var sideEffects = sideEffectsFunction(_AppDispatcher2.default, AppState);
+  var sagas = (0, _createSagas2.default)(channel, { Sagas: Sagas, SagaActionFunctions: SagaActionFunctions, SagaHandlers: SagaHandlers })(_AppDispatcher2.default);
 
-  // store side effects
-  _sideEffectsInfo.push(sideEffects);
+  // store
+  _sagaInfo.push(sagas);
 
-  // add side effect action functions to app state
-  Object.assign(AppState, sideEffects.sideEffects);
+  // add action functions to app state
+  Object.assign(AppState, sagas.actionFunctions);
 
   // setup one-way data flow
-  sideEffects.observable.onValue(function () {
+  var callback = function callback() {
     return undefined;
+  };
+
+  Object.keys(sagas.observables).forEach(function (obs) {
+    return sagas.observables[obs].onValue(callback);
   });
 }
 
