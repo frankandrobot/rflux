@@ -2,13 +2,13 @@ import Kefir from 'kefir'
 
 import AppDispatcher from './AppDispatcher'
 import createStore from './createStore'
-import createSideEffects from './createSideEffects'
+import createSagas from './createSagas'
 
 
 const AppState = {}
 
 const _storeInfo = []
-const _sideEffectsInfo = []
+const _sagaInfo = []
 
 /**
  * See #createStore for docs.
@@ -49,19 +49,20 @@ export function registerStore(channel, {Actions, Reducers, ActionFunctions, Acti
   )
 }
 
-export function registerSideEffects(channel, {SideEffects, SideEffectActionFunctions, SideEffectHandlers}) {
+export function registerSagas(channel, {Sagas, SagaActionFunctions, SagaHandlers}) {
 
-  const sideEffectsFunction = createSideEffects(channel, {SideEffects, SideEffectActionFunctions, SideEffectHandlers})
-  const sideEffects = sideEffectsFunction(AppDispatcher, AppState)
+  const sagas = createSagas(channel, {Sagas, SagaActionFunctions, SagaHandlers})(AppDispatcher)
 
-  // store side effects
-  _sideEffectsInfo.push(sideEffects)
+  // store
+  _sagaInfo.push(sagas)
 
-  // add side effect action functions to app state
-  Object.assign(AppState, sideEffects.sideEffects)
+  // add action functions to app state
+  Object.assign(AppState, sagas.actionFunctions)
 
   // setup one-way data flow
-  sideEffects.observable.onValue(() => undefined)
+  const callback = () => undefined
+
+  Object.keys(sagas.handlers).forEach(handler => sagas.handlers[handler].onValue(callback))
 }
 
 export default AppState
