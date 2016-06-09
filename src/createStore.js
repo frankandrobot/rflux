@@ -4,9 +4,10 @@ import assert from './support/assert'
 import {StateWithSideEffects} from './StateWithSideEffects'
 
 
-function _bindActionFunctionToAppDispatcher(AppDispatcher, actionFunction) {
+function _bindActionFunctionToAppDispatcher(actionFunction) {
 
-  return (...args) => AppDispatcher.emit({...actionFunction(...args)})
+  return AppDispatcher =>
+    (...args) => AppDispatcher.emit({...actionFunction(...args)})
 }
 
 /**
@@ -17,13 +18,15 @@ function _bindActionFunctionToAppDispatcher(AppDispatcher, actionFunction) {
  * @returns {Function}
  * @private
  */
-export function bindActionFunctions(ActionFunctions) {
+export function bindActionFunctions(Actions, ActionFunctions) {
 
   return AppDispatcher =>
 
-    Object.keys(ActionFunctions).reduce(
-      (storeActions, action) =>
-        ({...storeActions, [action]: _bindActionFunctionToAppDispatcher(AppDispatcher, ActionFunctions[action])}),
+    Object.keys(Actions).reduce(
+      (storeActions, action) => ({
+        ...storeActions,
+        [action]: _bindActionFunctionToAppDispatcher(ActionFunctions[action])(AppDispatcher)
+      }),
       {}
     )
 }
@@ -134,7 +137,7 @@ export default function createStore(channel, {Actions, Reducers, ActionFunctions
       name: channel,
       observable: storeWithSideEffectsObservable,
       store: {
-        ...bindActionFunctions(ActionFunctions)(AppDispatcher),
+        ...bindActionFunctions(Actions, ActionFunctions)(AppDispatcher),
         ..._bindActionObservables(ActionObservables)(storeObservable),
         [`${channel}Observable`]: storeObservable
       }

@@ -13,11 +13,11 @@ export function bindSagaHandler(channel, sagaName, sagaHandler) {
       .flatMap(x => sagaHandler(x.payload))
 }
 
-function _bindSagaHandlers(channel, SagaHandlers) {
+function _bindSagaHandlers(channel, Sagas, SagaHandlers) {
 
   return AppDispatcher =>
 
-    Object.keys(SagaHandlers).reduce(
+    Object.keys(Sagas).reduce(
       (observables, handlerName) => {
         const handler = SagaHandlers[handlerName]
         const observable = bindSagaHandler(channel, handlerName, handler)(AppDispatcher)
@@ -55,7 +55,7 @@ export default function createSagas(channel, {Sagas, SagaActionFunctions, SagaHa
 
   return AppDispatcher => ({
     name: channel,
-    observables: _bindSagaHandlers(channel, SagaHandlers)(AppDispatcher),
-    actionFunctions: bindActionFunctions(SagaActionFunctions)(AppDispatcher)
+    observables: _bindSagaHandlers(channel, Sagas, SagaHandlers)(AppDispatcher),
+    actionFunctions: bindActionFunctions(Sagas, SagaActionFunctions)(AppDispatcher)
   })
 }
