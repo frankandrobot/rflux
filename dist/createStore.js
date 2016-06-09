@@ -23,10 +23,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-function _bindActionFunctionToAppDispatcher(AppDispatcher, actionFunction) {
+function _bindActionFunctionToAppDispatcher(actionFunction) {
 
-  return function () {
-    return AppDispatcher.emit(_extends({}, actionFunction.apply(undefined, arguments)));
+  return function (AppDispatcher) {
+    return function () {
+      return AppDispatcher.emit(_extends({}, actionFunction.apply(undefined, arguments)));
+    };
   };
 }
 
@@ -38,11 +40,11 @@ function _bindActionFunctionToAppDispatcher(AppDispatcher, actionFunction) {
  * @returns {Function}
  * @private
  */
-function bindActionFunctions(ActionFunctions) {
+function bindActionFunctions(Actions, ActionFunctions) {
 
   return function (AppDispatcher) {
-    return Object.keys(ActionFunctions).reduce(function (storeActions, action) {
-      return _extends({}, storeActions, _defineProperty({}, action, _bindActionFunctionToAppDispatcher(AppDispatcher, ActionFunctions[action])));
+    return Object.keys(Actions).reduce(function (storeActions, action) {
+      return _extends({}, storeActions, _defineProperty({}, action, _bindActionFunctionToAppDispatcher(ActionFunctions[action])(AppDispatcher)));
     }, {});
   };
 }
@@ -156,7 +158,7 @@ function createStore(channel, _ref) {
     return {
       name: channel,
       observable: storeWithSideEffectsObservable,
-      store: _extends({}, bindActionFunctions(ActionFunctions)(AppDispatcher), _bindActionObservables(ActionObservables)(storeObservable), _defineProperty({}, channel + 'Observable', storeObservable))
+      store: _extends({}, bindActionFunctions(Actions, ActionFunctions)(AppDispatcher), _bindActionObservables(ActionObservables)(storeObservable), _defineProperty({}, channel + 'Observable', storeObservable))
     };
   };
 }
