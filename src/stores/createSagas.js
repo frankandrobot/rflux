@@ -10,6 +10,11 @@ export function bindSagaHandler(channel, sagaName, sagaHandler) {
     AppDispatcher
       .filter(x => x.channel === channel && x.actionType === sagaName)
       .flatMap(x => sagaHandler(x.payload))
+      .map(result => {
+        // emit the result back to the app dispatcher for time travel.
+        setTimeout(() => AppDispatcher.emit({channel, actionType: `${sagaName}Result`, payload: result}), 0)
+        return result
+      })
 }
 
 function _bindSagaHandlers(channel, Sagas, SagaHandlers) {
@@ -17,14 +22,23 @@ function _bindSagaHandlers(channel, Sagas, SagaHandlers) {
   return AppDispatcher =>
 
     Object.keys(Sagas).reduce(
-      (observables, handlerName) => {
-        const handler = SagaHandlers[handlerName]
-        const observable = bindSagaHandler(channel, handlerName, handler)(AppDispatcher)
+      (observables, saga) => {
 
-        return Object.assign(observables, {[handlerName]: observable})
+        const handler = SagaHandlers[saga]
+        const observable = bindSagaHandler(channel, saga, handler)(AppDispatcher)
+
+        return Object.assign(observables, {[saga]: observable})
       },
       {}
     )
+}
+
+function _bindSagaResultObservables(sagas) {
+
+  return Object.keys(sagas).reduce(
+    (observables, saga) => Object.assign(observables, {[`${saga}ResultObservable`]: sagas[saga]}),
+    {}
+  )
 }
 
 /**
@@ -52,9 +66,15 @@ export default function createSagas(channel, {Sagas, SagaActionFunctions, SagaHa
 
   SagaActionFunctions = SagaActionFunctions || {}
 
-  return AppDispatcher => ({
-    name: channel,
-    observables: _bindSagaHandlers(channel, Sagas, SagaHandlers)(AppDispatcher),
-    actionFunctions: bindActionFunctions(Sagas, SagaActionFunctions)(AppDispatcher)
-  })
+  return AppDispatcher => {
+
+    const observables = _bindSagaHandlers(channel, Sagas, SagaHandlers)(AppDispatcher)
+
+    return {
+      name: channel,
+      observables,
+      actionFunctions: bindActionFunctions(Sagas, SagaActionFunctions)(AppDispatcher),
+      resultObservables: _bindSagaResultObservables(observables)
+    }
+  }
 }

@@ -56,8 +56,8 @@ export function registerSagas(channel, {Sagas, SagaActionFunctions, SagaHandlers
   // store
   _sagaInfo.push(sagas)
 
-  // add action functions to app state
-  Object.assign(AppState, sagas.actionFunctions)
+  // add action functions and result observables to app state
+  Object.assign(AppState, sagas.actionFunctions, sagas.resultObservables)
 
   // setup one-way data flow
   const callback = () => undefined

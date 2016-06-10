@@ -2,16 +2,14 @@ import Kefir from 'kefir'
 
 import kefirEmitter from '../utils/kefirEmitter'
 import isObservable from '../internal/isObservable'
+import uuid from '../internal/uuid'
 
 import AppDispatcher from './../appdispatcher/AppDispatcher'
-import {Channels, ActionTypes} from './../Constants'
 
 
 export const sideEffects = kefirEmitter()
 
-// instead of taking a dep on uuid, create a practically infinite sequence of ids.
-let _callId = 0
-let _nextCallId = () => ++_callId % Number.MAX_SAFE_INTEGER
+
 
 const callObservable = sideEffects
   .filter(action => action.action === 'CALL')
@@ -35,28 +33,11 @@ export function put(action) {
 
 export function call(fn, ...args) {
 
-  const callId = _nextCallId()
+  const callId = uuid()
 
   setTimeout(() => sideEffects.emit({action: 'CALL', payload: {fn, args, callId}}), 0)
 
   return callObservable.filter(fn => fn.callId === callId).map(fn => fn.rslt).take(1)
-}
-
-export function result(__sideEffectCallId) {
-
-  return rslt => {
-
-    const action = {
-      channel: Channels.system,
-      actionType: ActionTypes.sideEffectResult,
-      __sideEffectCallId,
-      payload: rslt
-    }
-
-    setTimeout(() => sideEffects.emit({action: 'PUT', payload: action}), 0)
-
-    return rslt
-  }
 }
 
 export function listen(channel, actionType) {
