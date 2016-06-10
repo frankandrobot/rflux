@@ -1,1 +1,0 @@
-{"version":3,"sources":["support/kefirUtils.js"],"names":[],"mappings":";;;;;QAGgB,Y,GAAA,Y;;AAHhB;;AAGO,SAAS,YAAT,CAAsB,GAAtB,EAA2B;;AAEhC,SAAO,OAAO,gCAAd;AACD","file":"kefirUtils.js","sourcesContent":["import {Observable} from 'kefir'\n\n\nexport function isObservable(obj) {\n\n  return obj && obj instanceof Observable\n}\n"]}

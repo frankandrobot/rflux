@@ -11,11 +11,9 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _lodash = require('lodash');
+var _isObservable = require('../internal/isObservable');
 
-var _lodash2 = _interopRequireDefault(_lodash);
-
-var _kefirUtils = require('./support/kefirUtils');
+var _isObservable2 = _interopRequireDefault(_isObservable);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -39,13 +37,13 @@ function createContainer() {
 
 
   var observables = Object.keys(childProps).filter(function (prop) {
-    return (0, _kefirUtils.isObservable)(childProps[prop]);
+    return (0, _isObservable2.default)(childProps[prop]);
   }).map(function (prop) {
     return { property: prop, observable: childProps[prop] };
   });
 
   var nonObservableProps = Object.keys(childProps).filter(function (prop) {
-    return !(0, _kefirUtils.isObservable)(childProps[prop]);
+    return !(0, _isObservable2.default)(childProps[prop]);
   }).reduce(function (total, prop) {
     return Object.assign(total, _defineProperty({}, prop, childProps[prop]));
   }, {});
@@ -54,7 +52,9 @@ function createContainer() {
   var propTypes = _parentDefaultProps$p === undefined ? {} : _parentDefaultProps$p;
   var _parentDefaultProps$g = parentDefaultProps.getDefaultProps;
 
-  var _getDefaultProps = _parentDefaultProps$g === undefined ? _lodash2.default.noop : _parentDefaultProps$g;
+  var _getDefaultProps = _parentDefaultProps$g === undefined ? function () {
+    return undefined;
+  } : _parentDefaultProps$g;
 
   return function (StatelessFunctionalComponent) {
     return _react2.default.createClass({

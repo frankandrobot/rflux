@@ -1,0 +1,1 @@
+{"version":3,"sources":["internal/assert.js"],"names":[],"mappings":";;;;;kBAAwB,M;AAAT,SAAS,MAAT,CAAgB,SAAhB,EAA2B,OAA3B,EAAoC;;AAEjD,MAAI,CAAC,SAAL,EAAgB;AAAE,UAAM,IAAI,KAAJ,CAAU,OAAV,CAAN;AAA0B;AAC7C","file":"assert.js","sourcesContent":["export default function assert(condition, message) {\n\n  if (!condition) { throw new Error(message) }\n}\n"]}

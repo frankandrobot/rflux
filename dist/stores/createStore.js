@@ -9,11 +9,11 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 exports.bindActionFunctions = bindActionFunctions;
 exports.default = createStore;
 
-var _cast = require('./support/cast');
+var _cast = require('../internal/cast');
 
 var _cast2 = _interopRequireDefault(_cast);
 
-var _assert = require('./support/assert');
+var _assert = require('../internal/assert');
 
 var _assert2 = _interopRequireDefault(_assert);
 

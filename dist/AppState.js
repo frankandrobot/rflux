@@ -13,15 +13,15 @@ var _kefir = require('kefir');
 
 var _kefir2 = _interopRequireDefault(_kefir);
 
-var _AppDispatcher = require('./AppDispatcher');
+var _AppDispatcher = require('./appdispatcher/AppDispatcher');
 
 var _AppDispatcher2 = _interopRequireDefault(_AppDispatcher);
 
-var _createStore = require('./createStore');
+var _createStore = require('./stores/createStore');
 
 var _createStore2 = _interopRequireDefault(_createStore);
 
-var _createSagas = require('./createSagas');
+var _createSagas = require('./stores/createSagas');
 
 var _createSagas2 = _interopRequireDefault(_createSagas);
 
@@ -99,8 +99,8 @@ function registerSagas(channel, _ref2) {
   // store
   _sagaInfo.push(sagas);
 
-  // add action functions to app state
-  Object.assign(AppState, sagas.actionFunctions);
+  // add action functions and result observables to app state
+  Object.assign(AppState, sagas.actionFunctions, sagas.resultObservables);
 
   // setup one-way data flow
   var callback = function callback() {

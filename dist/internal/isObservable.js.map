@@ -1,0 +1,1 @@
+{"version":3,"sources":["internal/isObservable.js"],"names":[],"mappings":";;;;;kBAGwB,Y;;AAHxB;;AAGe,SAAS,YAAT,CAAsB,GAAtB,EAA2B;;AAExC,SAAO,OAAO,gCAAd;AACD","file":"isObservable.js","sourcesContent":["import {Observable} from 'kefir'\n\n\nexport default function isObservable(obj) {\n\n  return obj && obj instanceof Observable\n}\n"]}

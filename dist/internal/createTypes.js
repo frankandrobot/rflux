@@ -11,6 +11,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * All this does is save typing when creating actionTypes.
  * If I'm not mistaken keymirror does the same thing
  *
+ * @deprecated use keymirror package
  * @param actions
  * @returns {*}
  */

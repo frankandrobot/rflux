@@ -6,11 +6,9 @@ Object.defineProperty(exports, "__esModule", {
 exports.bindSagaHandler = bindSagaHandler;
 exports.default = createSagas;
 
-var _assert = require('./support/assert');
+var _assert = require('../internal/assert');
 
 var _assert2 = _interopRequireDefault(_assert);
-
-var _Saga = require('./Saga');
 
 var _createStore = require('./createStore');
 
@@ -25,6 +23,12 @@ function bindSagaHandler(channel, sagaName, sagaHandler) {
       return x.channel === channel && x.actionType === sagaName;
     }).flatMap(function (x) {
       return sagaHandler(x.payload);
+    }).map(function (result) {
+      // emit the result back to the app dispatcher for time travel.
+      setTimeout(function () {
+        return AppDispatcher.emit({ channel: channel, actionType: sagaName + 'Result', payload: result });
+      }, 0);
+      return result;
     });
   };
 }
@@ -32,13 +36,21 @@ function bindSagaHandler(channel, sagaName, sagaHandler) {
 function _bindSagaHandlers(channel, Sagas, SagaHandlers) {
 
   return function (AppDispatcher) {
-    return Object.keys(Sagas).reduce(function (observables, handlerName) {
-      var handler = SagaHandlers[handlerName];
-      var observable = bindSagaHandler(channel, handlerName, handler)(AppDispatcher);
+    return Object.keys(Sagas).reduce(function (observables, saga) {
 
-      return Object.assign(observables, _defineProperty({}, handlerName, observable));
+      var handler = SagaHandlers[saga];
+      var observable = bindSagaHandler(channel, saga, handler)(AppDispatcher);
+
+      return Object.assign(observables, _defineProperty({}, saga, observable));
     }, {});
   };
+}
+
+function _bindSagaResultObservables(sagas) {
+
+  return Object.keys(sagas).reduce(function (observables, saga) {
+    return Object.assign(observables, _defineProperty({}, saga + 'ResultObservable', sagas[saga]));
+  }, {});
 }
 
 /**
@@ -71,10 +83,14 @@ function createSagas(channel, _ref) {
   SagaActionFunctions = SagaActionFunctions || {};
 
   return function (AppDispatcher) {
+
+    var observables = _bindSagaHandlers(channel, Sagas, SagaHandlers)(AppDispatcher);
+
     return {
       name: channel,
-      observables: _bindSagaHandlers(channel, Sagas, SagaHandlers)(AppDispatcher),
-      actionFunctions: (0, _createStore.bindActionFunctions)(Sagas, SagaActionFunctions)(AppDispatcher)
+      observables: observables,
+      actionFunctions: (0, _createStore.bindActionFunctions)(Sagas, SagaActionFunctions)(AppDispatcher),
+      resultObservables: _bindSagaResultObservables(observables)
     };
   };
 }

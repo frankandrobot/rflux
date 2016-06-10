@@ -12,7 +12,9 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _kefirUtils = require('./support/kefirUtils');
+var _isObservable = require('../internal/isObservable');
+
+var _isObservable2 = _interopRequireDefault(_isObservable);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -135,7 +137,7 @@ function _setupObservables(component, props) {
 function _observables(props) {
 
   return Object.keys(props).filter(function (prop) {
-    return (0, _kefirUtils.isObservable)(props[prop]);
+    return (0, _isObservable2.default)(props[prop]);
   }).map(function (prop) {
     return { property: prop, observable: props[prop] };
   }) || [];
@@ -174,7 +176,7 @@ function _unsubscribe(observables, callbacks) {
 function _normalProps(props) {
 
   return Object.keys(props).filter(function (prop) {
-    return !(0, _kefirUtils.isObservable)(props[prop]) && prop !== 'children';
+    return !(0, _isObservable2.default)(props[prop]) && prop !== 'children';
   }).reduce(function (total, prop) {
     return Object.assign(total, _defineProperty({}, prop, props[prop]));
   }, {});

@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _kefirEmitter = require('./support/kefirEmitter');
+var _kefirEmitter = require('../utils/kefirEmitter');
 
 var _kefirEmitter2 = _interopRequireDefault(_kefirEmitter);
 

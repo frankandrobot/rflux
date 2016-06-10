@@ -6,28 +6,27 @@ Object.defineProperty(exports, "__esModule", {
 exports.sideEffects = undefined;
 exports.put = put;
 exports.call = call;
-exports.result = result;
 exports.listen = listen;
-
-var _uuid = require('uuid');
-
-var _uuid2 = _interopRequireDefault(_uuid);
 
 var _kefir = require('kefir');
 
 var _kefir2 = _interopRequireDefault(_kefir);
 
-var _kefirEmitter = require('./support/kefirEmitter');
+var _kefirEmitter = require('../utils/kefirEmitter');
 
 var _kefirEmitter2 = _interopRequireDefault(_kefirEmitter);
 
-var _kefirUtils = require('./support/kefirUtils');
+var _isObservable = require('../internal/isObservable');
 
-var _AppDispatcher = require('./AppDispatcher');
+var _isObservable2 = _interopRequireDefault(_isObservable);
+
+var _uuid = require('../internal/uuid');
+
+var _uuid2 = _interopRequireDefault(_uuid);
+
+var _AppDispatcher = require('./../appdispatcher/AppDispatcher');
 
 var _AppDispatcher2 = _interopRequireDefault(_AppDispatcher);
-
-var _Constants = require('./Constants');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -41,12 +40,12 @@ var callObservable = sideEffects.filter(function (action) {
   return action.payload;
 }).flatMap(function (action) {
 
-  var uuid = action.uuid;
+  var callId = action.callId;
   var result = action.fn.apply(action, _toConsumableArray(action.args));
-  var resultObservable = (0, _kefirUtils.isObservable)(result) ? result : _kefir2.default.constant(result);
+  var resultObservable = (0, _isObservable2.default)(result) ? result : _kefir2.default.constant(result);
 
   return resultObservable.map(function (rslt) {
-    return { uuid: uuid, rslt: rslt };
+    return { callId: callId, rslt: rslt };
   });
 }).onValue(function () {
   return undefined;
@@ -66,36 +65,17 @@ function call(fn) {
     args[_key - 1] = arguments[_key];
   }
 
-  var id = _uuid2.default.v4();
+  var callId = (0, _uuid2.default)();
 
   setTimeout(function () {
-    return sideEffects.emit({ action: 'CALL', payload: { fn: fn, args: args, uuid: id } });
+    return sideEffects.emit({ action: 'CALL', payload: { fn: fn, args: args, callId: callId } });
   }, 0);
 
   return callObservable.filter(function (fn) {
-    return fn.uuid === id;
+    return fn.callId === callId;
   }).map(function (fn) {
     return fn.rslt;
   }).take(1);
-}
-
-function result(__sideEffectCallId) {
-
-  return function (rslt) {
-
-    var action = {
-      channel: _Constants.Channels.system,
-      actionType: _Constants.ActionTypes.sideEffectResult,
-      __sideEffectCallId: __sideEffectCallId,
-      payload: rslt
-    };
-
-    setTimeout(function () {
-      return sideEffects.emit({ action: 'PUT', payload: action });
-    }, 0);
-
-    return rslt;
-  };
 }
 
 function listen(channel, actionType) {
