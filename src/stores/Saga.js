@@ -1,7 +1,7 @@
 import uuid from 'uuid'
 import Kefir from 'kefir'
 
-import kefirEmitter from '../internal/kefirEmitter'
+import kefirEmitter from '../utils/kefirEmitter'
 import isObservable from '../internal/isObservable'
 
 import AppDispatcher from './../appdispatcher/AppDispatcher'
