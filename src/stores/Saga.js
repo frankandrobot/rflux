@@ -1,4 +1,3 @@
-import uuid from 'uuid'
 import Kefir from 'kefir'
 
 import kefirEmitter from '../utils/kefirEmitter'
@@ -10,16 +9,20 @@ import {Channels, ActionTypes} from './../Constants'
 
 export const sideEffects = kefirEmitter()
 
+// instead of taking a dep on uuid, create a practically infinite sequence of ids.
+let _callId = 0
+let _nextCallId = () => ++_callId % Number.MAX_SAFE_INTEGER
+
 const callObservable = sideEffects
   .filter(action => action.action === 'CALL')
   .map(action => action.payload)
   .flatMap(action => {
 
-    const uuid = action.uuid
+    const callId = action.callId
     const result = action.fn(...action.args)
     const resultObservable = isObservable(result) ? result : Kefir.constant(result)
 
-    return resultObservable.map(rslt => ({uuid, rslt}))
+    return resultObservable.map(rslt => ({callId, rslt}))
   })
   .onValue(() => undefined)
 
@@ -32,11 +35,11 @@ export function put(action) {
 
 export function call(fn, ...args) {
 
-  const id = uuid.v4()
+  const callId = _nextCallId()
 
-  setTimeout(() => sideEffects.emit({action: 'CALL', payload: {fn, args, uuid: id}}), 0)
+  setTimeout(() => sideEffects.emit({action: 'CALL', payload: {fn, args, callId}}), 0)
 
-  return callObservable.filter(fn => fn.uuid === id).map(fn => fn.rslt).take(1)
+  return callObservable.filter(fn => fn.callId === callId).map(fn => fn.rslt).take(1)
 }
 
 export function result(__sideEffectCallId) {
