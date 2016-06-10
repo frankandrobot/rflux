@@ -1,4 +1,4 @@
-import kefirEmitter from './../support/kefirEmitter'
+import kefirEmitter from '../internal/kefirEmitter'
 
 
 /**

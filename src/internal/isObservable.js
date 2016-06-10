@@ -1,7 +1,7 @@
 import {Observable} from 'kefir'
 
 
-export function isObservable(obj) {
+export default function isObservable(obj) {
 
   return obj && obj instanceof Observable
 }

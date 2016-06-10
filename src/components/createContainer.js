@@ -1,7 +1,6 @@
 import React from 'react'
-import _ from 'lodash'
 
-import {isObservable} from './../support/kefirUtils'
+import isObservable from '../internal/isObservable'
 
 
 /**
@@ -26,7 +25,7 @@ export default function createContainer(childProps = {}, parentDefaultProps = {}
     .filter(prop => !isObservable(childProps[prop]))
     .reduce((total, prop) => Object.assign(total, {[prop]: childProps[prop]}), {})
 
-  const {propTypes = {}, getDefaultProps = _.noop} = parentDefaultProps
+  const {propTypes = {}, getDefaultProps = () => undefined} = parentDefaultProps
 
   return StatelessFunctionalComponent => React.createClass({
 

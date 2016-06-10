@@ -1,7 +1,7 @@
 /* eslint no-use-before-define:0 */
 import React from 'react'
 
-import {isObservable} from './../support/kefirUtils'
+import isObservable from '../internal/isObservable'
 
 
 /**

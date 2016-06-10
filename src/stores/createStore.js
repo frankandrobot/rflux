@@ -1,5 +1,5 @@
-import cast from './../support/cast'
-import assert from './../support/assert'
+import cast from '../internal/cast'
+import assert from '../internal/assert'
 
 import {StateWithSideEffects} from './StateWithSideEffects'
 
