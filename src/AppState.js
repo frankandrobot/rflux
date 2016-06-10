@@ -1,8 +1,8 @@
 import Kefir from 'kefir'
 
-import AppDispatcher from './AppDispatcher'
-import createStore from './createStore'
-import createSagas from './createSagas'
+import AppDispatcher from './appdispatcher/AppDispatcher'
+import createStore from './stores/createStore'
+import createSagas from './stores/createSagas'
 
 
 const AppState = {}

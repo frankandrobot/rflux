@@ -1,7 +1,7 @@
 import React from 'react'
 import _ from 'lodash'
 
-import {isObservable} from './support/kefirUtils'
+import {isObservable} from './../support/kefirUtils'
 
 
 /**

@@ -1,4 +1,4 @@
-import assert from './support/assert'
+import assert from './../support/assert'
 
 import {result} from './Saga'
 import {bindActionFunctions} from './createStore'
