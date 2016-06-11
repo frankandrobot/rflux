@@ -80,11 +80,26 @@ function _bindStoreObservable(channel, Reducers) {
           throw new Error(`Channel ${channel} does not support ${action.actionType}`)
         }
 
+        const result = payload => AppDispatcher.emit({channel, actionType: `${action.actionType}Result`, payload})
+
         // always return a StateWithSideEffects
-        return cast(handler(state, action.payload), StateWithSideEffects)
+        return cast(handler(state, action.payload, result), StateWithSideEffects)
 
       }, initialState)
       .skip(1)
+}
+
+function _bindResultObservables(channel, Actions) {
+
+  return AppDispatcher =>
+
+    Object.key(Actions).reduce(
+      (observables, action) => Object.assign(observables, {
+        [`${action}ResultObservable`]:
+          AppDispatcher.filter(x => x.channel === channel && x.actionType === `${action}Result`)
+      }),
+      {}
+    )
 }
 
 /**
@@ -139,6 +154,7 @@ export default function createStore(channel, {Actions, Reducers, ActionFunctions
       store: {
         ...bindActionFunctions(Actions, ActionFunctions)(AppDispatcher),
         ..._bindActionObservables(ActionObservables)(storeObservable),
+        ..._bindResultObservables(channel, Actions)(AppDispatcher),
         [`${channel}Observable`]: storeObservable
       }
     }

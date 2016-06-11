@@ -27,6 +27,7 @@
   },
   "scripts": {
     "dependo": "node node_modules/dependo/bin/dependo -f es6 src/rflux > dependencies.html",
+    "dist": "gulp build && git add dist && git commit -a -m \"[dist]\" && git push origin",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Uriel Avalos <uri@frankandrobot.com>",

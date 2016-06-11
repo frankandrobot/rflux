@@ -6,7 +6,7 @@ import {bindActionFunctions} from './createStore'
 export function bindSagaHandler(channel, sagaName, sagaHandler) {
 
   return AppDispatcher =>
-  
+
     AppDispatcher
       .filter(x => x.channel === channel && x.actionType === sagaName)
       .flatMap(x => sagaHandler(x.payload))
