@@ -96,9 +96,24 @@ function _bindStoreObservable(channel, Reducers) {
         throw new Error('Channel ' + channel + ' does not support ' + action.actionType);
       }
 
+      var result = function result(payload) {
+        return AppDispatcher.emit({ channel: channel, actionType: action.actionType + 'Result', payload: payload });
+      };
+
       // always return a StateWithSideEffects
-      return (0, _cast2.default)(handler(state, action.payload), _StateWithSideEffects.StateWithSideEffects);
+      return (0, _cast2.default)(handler(state, action.payload, result), _StateWithSideEffects.StateWithSideEffects);
     }, initialState).skip(1);
+  };
+}
+
+function _bindResultObservables(channel, Actions) {
+
+  return function (AppDispatcher) {
+    return Object.key(Actions).reduce(function (observables, action) {
+      return Object.assign(observables, _defineProperty({}, action + 'ResultObservable', AppDispatcher.filter(function (x) {
+        return x.channel === channel && x.actionType === action + 'Result';
+      })));
+    }, {});
   };
 }
 
@@ -158,7 +173,7 @@ function createStore(channel, _ref) {
     return {
       name: channel,
       observable: storeWithSideEffectsObservable,
-      store: _extends({}, bindActionFunctions(Actions, ActionFunctions)(AppDispatcher), _bindActionObservables(ActionObservables)(storeObservable), _defineProperty({}, channel + 'Observable', storeObservable))
+      store: _extends({}, bindActionFunctions(Actions, ActionFunctions)(AppDispatcher), _bindActionObservables(ActionObservables)(storeObservable), _bindResultObservables(channel, Actions)(AppDispatcher), _defineProperty({}, channel + 'Observable', storeObservable))
     };
   };
 }
