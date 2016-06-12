@@ -11,12 +11,12 @@ import {removeObservableState, setupObservableState} from '../internal/Container
  * The use case is when you don't need access to other parts of the state.
  *
  * @param defaultState - the default container state
- * @param initialObservableState - passed to child container as props
+ * @param getInitialObservableState - passed to child container as props
  * @param containerDefaults - default props and propTypes of parent container
  * @returns {Function}
  */
 export default function createContainer(
-  {initialState = () => ({}), initialObservableState = () => ({}), containerDefaults = {}}) {
+  {getInitialState = () => ({}), getInitialObservableState = () => ({}), containerDefaults = {}}) {
 
   const {propTypes = {}, getDefaultProps = () => undefined} = containerDefaults
 
@@ -25,7 +25,7 @@ export default function createContainer(
     propTypes: propTypes,
 
     getInitialState() {
-      return initialState.call(this)
+      return getInitialState.call(this)
     },
 
     getDefaultProps() {
@@ -34,7 +34,7 @@ export default function createContainer(
 
     componentWillMount() {
 
-      const _initialObservableState = initialObservableState.call(this)
+      const _initialObservableState = getInitialObservableState.call(this)
 
       this._observableState = observableState(_initialObservableState)
       this._nonObservableState = nonObservableState(_initialObservableState)
