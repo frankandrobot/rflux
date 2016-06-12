@@ -109,7 +109,7 @@ function _bindStoreObservable(channel, Reducers) {
 function _bindResultObservables(channel, Actions) {
 
   return function (AppDispatcher) {
-    return Object.key(Actions).reduce(function (observables, action) {
+    return Object.keys(Actions).reduce(function (observables, action) {
       return Object.assign(observables, _defineProperty({}, action + 'ResultObservable', AppDispatcher.filter(function (x) {
         return x.channel === channel && x.actionType === action + 'Result';
       })));

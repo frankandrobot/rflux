@@ -93,7 +93,7 @@ function _bindResultObservables(channel, Actions) {
 
   return AppDispatcher =>
 
-    Object.key(Actions).reduce(
+    Object.keys(Actions).reduce(
       (observables, action) => Object.assign(observables, {
         [`${action}ResultObservable`]:
           AppDispatcher.filter(x => x.channel === channel && x.actionType === `${action}Result`)
