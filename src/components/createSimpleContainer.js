@@ -15,9 +15,8 @@ import {removeObservableState, setupObservableState} from '../internal/Container
  * @param containerDefaults - default props and propTypes of parent container
  * @returns {Function}
  */
-export default function createContainer(initialState = () => ({}),
-                                        initialObservableState = () => ({}),
-                                        containerDefaults = {}) {
+export default function createContainer(
+  {initialState = () => ({}), initialObservableState = () => ({}), containerDefaults = {}}) {
 
   const {propTypes = {}, getDefaultProps = () => undefined} = containerDefaults
 

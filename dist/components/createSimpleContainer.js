@@ -26,14 +26,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param containerDefaults - default props and propTypes of parent container
  * @returns {Function}
  */
-function createContainer() {
-  var initialState = arguments.length <= 0 || arguments[0] === undefined ? function () {
+function createContainer(_ref) {
+  var _ref$initialState = _ref.initialState;
+  var initialState = _ref$initialState === undefined ? function () {
     return {};
-  } : arguments[0];
-  var initialObservableState = arguments.length <= 1 || arguments[1] === undefined ? function () {
+  } : _ref$initialState;
+  var _ref$initialObservabl = _ref.initialObservableState;
+  var initialObservableState = _ref$initialObservabl === undefined ? function () {
     return {};
-  } : arguments[1];
-  var containerDefaults = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+  } : _ref$initialObservabl;
+  var _ref$containerDefault = _ref.containerDefaults;
+  var containerDefaults = _ref$containerDefault === undefined ? {} : _ref$containerDefault;
   var _containerDefaults$pr = containerDefaults.propTypes;
   var propTypes = _containerDefaults$pr === undefined ? {} : _containerDefaults$pr;
   var _containerDefaults$ge = containerDefaults.getDefaultProps;
