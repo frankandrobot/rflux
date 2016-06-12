@@ -37,14 +37,16 @@ function _subscribe(observableStateList, callbacks) {
   });
 }
 
-function setupObservableState(component, observableState) {
+function setupObservableState(component, observableState, initialState) {
+
+  initialState = initialState || component.state || {};
 
   var callbacks = observableState.map(function (prop) {
     return _callback(component, prop);
   });
 
   //set default state first before setting up listeners
-  component.setState(component.state || {}, function () {
+  component.setState(initialState, function () {
     return _subscribe(observableState, callbacks);
   });
 

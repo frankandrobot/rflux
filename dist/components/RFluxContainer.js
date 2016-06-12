@@ -79,7 +79,7 @@ var RFluxContainer = function (_React$Component) {
     key: 'componentWillMount',
     value: function componentWillMount() {
 
-      this._callbacks = (0, _ContainerHelpers.setupObservableState)(this, this._observableState);
+      this._callbacks = (0, _ContainerHelpers.setupObservableState)(this, this._observableState, this.props.children.type.defaultProps);
     }
   }, {
     key: 'componentWillUnmount',
