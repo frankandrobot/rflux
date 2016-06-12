@@ -32,7 +32,7 @@ export default class RFluxDangerouslySlowContainer extends React.Component {
     this.normalProps = nonObservableState(this.props)
     this.observables = observableState(this, this.props)
 
-    setupObservableState(this, this.observables)
+    setupObservableState(this, this.observables, this.props.children.type.defaultProps)
   }
 
   componentWillReceiveProps(nextProps) {
@@ -44,7 +44,7 @@ export default class RFluxDangerouslySlowContainer extends React.Component {
 
     //subscribe new
     this.observables = observableState(nextProps)
-    setupObservableState(this, nextProps)
+    setupObservableState(this, nextProps, this.props.children.type.defaultProps)
   }
 
   componentWillUnmount() {
