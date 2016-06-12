@@ -22,19 +22,21 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * The use case is when you don't need access to other parts of the state.
  *
  * @param defaultState - the default container state
- * @param initialObservableState - passed to child container as props
+ * @param getInitialObservableState - passed to child container as props
  * @param containerDefaults - default props and propTypes of parent container
  * @returns {Function}
  */
 function createContainer(_ref) {
-  var _ref$initialState = _ref.initialState;
-  var initialState = _ref$initialState === undefined ? function () {
+  var _ref$getInitialState = _ref.getInitialState;
+
+  var _getInitialState = _ref$getInitialState === undefined ? function () {
     return {};
-  } : _ref$initialState;
-  var _ref$initialObservabl = _ref.initialObservableState;
-  var initialObservableState = _ref$initialObservabl === undefined ? function () {
+  } : _ref$getInitialState;
+
+  var _ref$getInitialObserv = _ref.getInitialObservableState;
+  var getInitialObservableState = _ref$getInitialObserv === undefined ? function () {
     return {};
-  } : _ref$initialObservabl;
+  } : _ref$getInitialObserv;
   var _ref$containerDefault = _ref.containerDefaults;
   var containerDefaults = _ref$containerDefault === undefined ? {} : _ref$containerDefault;
   var _containerDefaults$pr = containerDefaults.propTypes;
@@ -51,14 +53,14 @@ function createContainer(_ref) {
       propTypes: propTypes,
 
       getInitialState: function getInitialState() {
-        return initialState.call(this);
+        return _getInitialState.call(this);
       },
       getDefaultProps: function getDefaultProps() {
         return _getDefaultProps();
       },
       componentWillMount: function componentWillMount() {
 
-        var _initialObservableState = initialObservableState.call(this);
+        var _initialObservableState = getInitialObservableState.call(this);
 
         this._observableState = (0, _ContainerHelpers.observableState)(_initialObservableState);
         this._nonObservableState = (0, _ContainerHelpers.nonObservableState)(_initialObservableState);
