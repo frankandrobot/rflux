@@ -50,7 +50,7 @@ export default class RFluxContainer extends React.Component {
 
   componentWillMount() {
 
-    this._callbacks = setupObservableState(this, this._observableState)
+    this._callbacks = setupObservableState(this, this._observableState, this.props.children.type.defaultProps)
   }
 
   componentWillUnmount() {
@@ -67,4 +67,3 @@ export default class RFluxContainer extends React.Component {
     }
   }
 }
-

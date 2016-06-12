@@ -17,13 +17,15 @@ function _subscribe(observableStateList, callbacks) {
   observableStateList.forEach((obj, i) => obj.observable.onValue(callbacks[i]))
 }
 
-export function setupObservableState(component, observableState) {
+export function setupObservableState(component, observableState, initialState) {
+
+  initialState = initialState || component.state || {}
 
   const callbacks = observableState.map(prop => _callback(component, prop))
 
   //set default state first before setting up listeners
   component.setState(
-    component.state || {},
+    initialState,
     () => _subscribe(observableState, callbacks)
   )
 
