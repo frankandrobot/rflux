@@ -66,26 +66,29 @@ function _bindActionObservables(ActionObservables) {
  */
 function _bindStoreObservable(channel, Reducers) {
 
-  const initialState = Reducers.initialState || {}
+  const initialState = new StateWithSideEffects(Reducers.initialState || {})
 
   return AppDispatcher =>
 
     AppDispatcher
       .filter(x => x.channel === channel)
-      .scan((state, action) => {
+      .scan(
+        (state, action) => {
 
-        const handler = Reducers[action.actionType]
+          const handler = Reducers[action.actionType]
 
-        if (!handler) {
-          throw new Error(`Channel ${channel} does not support ${action.actionType}`)
-        }
+          if (!handler) {
+            throw new Error(`Channel ${channel} does not support ${action.actionType}`)
+          }
 
-        const result = payload => AppDispatcher.emit({channel, actionType: `${action.actionType}Result`, payload})
+          const result = payload => AppDispatcher.emit({channel, actionType: `${action.actionType}Result`, payload})
 
-        // always return a StateWithSideEffects
-        return cast(handler(state, action.payload, result), StateWithSideEffects)
+          // always return a StateWithSideEffects
+          return cast(handler(state, action.payload, result), StateWithSideEffects)
 
-      }, initialState)
+        },
+        initialState
+      )
       .skip(1)
 }
 
@@ -95,8 +98,7 @@ function _bindResultObservables(channel, Actions) {
 
     Object.keys(Actions).reduce(
       (observables, action) => Object.assign(observables, {
-        [`${action}ResultObservable`]:
-          AppDispatcher.filter(x => x.channel === channel && x.actionType === `${action}Result`)
+        [`${action}ResultObservable`]: AppDispatcher.filter(x => x.channel === channel && x.actionType === `${action}Result`)
       }),
       {}
     )
