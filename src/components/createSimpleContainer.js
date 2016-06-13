@@ -5,20 +5,35 @@ import {removeObservableState, setupObservableState} from '../internal/Container
 
 
 /**
- * If a prop is an observable, create a listener and pass the observed values as props.
- * Otherwise, pass the prop into the child component, which must be a stateless functional component.
+ * The container passes React props and state to its child as props.
+ * The main feature is that it converts observables into *values*...
+ * while automagically managing the observer lifecycle.
  *
- * The use case is when you don't need access to other parts of the state.
+ * Do NOT use anonymous functions to define getInitialState, getObservableState, getDefaultProps!
  *
- * @param getInitialState - the default container state
- * @param getObservableState - passed to child container as props
- * @param containerDefaults - default props and propTypes of parent container
+ * ```javascript
+ * createContainer({
+ *   getObservableState() {
+ *     return {
+ *       value: observable.map(x => x.foo)
+ *     }
+ *   }
+ * })(Child)
+ *
+ * const Child = value => <div>{value}</div> //gets the value of the observable as a prop!
+ * ```
+ *
+ * @param getInitialState - container initial state. Passed to child as props.
+ * @param getObservableState - pass observables here. Observable *values* passed to child as props
+ * @param getDefaultProps - container default props. Passed to child as props.
+ * @param propTypes - container propTypes.
  * @returns {Function}
  */
-export default function createContainer(
-  {getInitialState = () => ({}), getObservableState = () => ({}), containerDefaults = {}}) {
-
-  const {propTypes = {}, getDefaultProps = () => undefined} = containerDefaults
+export default function createContainer({
+  getInitialState = () => ({}),
+  getObservableState = () => ({}),
+  getDefaultProps = () => ({}),
+  propTypes = {}}) {
 
   return StatelessFunctionalComponent => React.createClass({
 
