@@ -20,13 +20,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * a callback maps a "val" to the obj property on the Component state
  *
  * @param component
- * @param observableState
+ * @param prop
  * @private
  */
-function _callback(component, observableStateProp) {
+function _callback(component, prop) {
 
   return function (val) {
-    return component.setState(_defineProperty({}, observableStateProp.name, val));
+    return component.setState(_defineProperty({}, prop.name, val));
   };
 }
 
@@ -37,17 +37,17 @@ function _subscribe(observableStateList, callbacks) {
   });
 }
 
-function setupObservableState(component, observableState, initialState) {
+function setupObservableState(component, observableStateList, initialState) {
 
   initialState = initialState || component.state || {};
 
-  var callbacks = observableState.map(function (prop) {
+  var callbacks = observableStateList.map(function (prop) {
     return _callback(component, prop);
   });
 
   //set default state first before setting up listeners
   component.setState(initialState, function () {
-    return _subscribe(observableState, callbacks);
+    return _subscribe(observableStateList, callbacks);
   });
 
   return callbacks;

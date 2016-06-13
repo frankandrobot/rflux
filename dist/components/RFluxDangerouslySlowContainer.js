@@ -70,7 +70,7 @@ var RFluxDangerouslySlowContainer = function (_React$Component) {
 
       //subscribe new
       this.observables = (0, _ContainerHelpers.observableState)(nextProps);
-      (0, _ContainerHelpers.setupObservableState)(this, nextProps, this.props.children.type.defaultProps);
+      (0, _ContainerHelpers.setupObservableState)(this, this.observables, this.props.children.type.defaultProps);
     }
   }, {
     key: 'componentWillUnmount',
