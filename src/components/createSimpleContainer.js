@@ -9,6 +9,9 @@ import {removeObservableState, setupObservableState} from '../internal/Container
  * The main feature is that it converts observables into *values*...
  * while automagically managing the observer lifecycle.
  *
+ * Since container props and state both get mapped as child props,
+ * please be aware that state overriddes props with the same name.
+ *
  * Do NOT use anonymous functions to define getInitialState, getObservableState, getDefaultProps!
  *
  * ```javascript
@@ -64,7 +67,7 @@ export default function createContainer({
     },
 
     render() {
-      return <StatelessFunctionalComponent {...this.state} {...this.props} />
+      return <StatelessFunctionalComponent {...this.props} {...this.state} />
     }
   })
 }
