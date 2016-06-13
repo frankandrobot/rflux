@@ -97,7 +97,7 @@ function _bindStoreObservable(channel, Reducers) {
       }
 
       var result = function result(payload) {
-        return AppDispatcher.emit({ channel: channel, actionType: action.actionType + 'Result', payload: payload });
+        return (0, _StateWithSideEffects.sideEffects)({ channel: channel, actionType: action.actionType + 'Result', payload: payload });
       };
 
       // always return a StateWithSideEffects

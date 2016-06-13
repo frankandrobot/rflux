@@ -68,7 +68,7 @@ var RFluxContainer = function (_React$Component) {
     var noop = function noop() {
       return {};
     };
-    var initialState = (_this.getInitialObservableState || noop)();
+    var initialState = (_this.getInitialObservableState || noop).call(_this);
 
     _this._observableState = (0, _ContainerHelpers.observableState)(initialState);
     _this._nonObservableState = (0, _ContainerHelpers.nonObservableState)(initialState);
