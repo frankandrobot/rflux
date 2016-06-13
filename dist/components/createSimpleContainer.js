@@ -20,6 +20,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * The main feature is that it converts observables into *values*...
  * while automagically managing the observer lifecycle.
  *
+ * Since container props and state both get mapped as child props,
+ * please be aware that state overriddes props with the same name.
+ *
  * Do NOT use anonymous functions to define getInitialState, getObservableState, getDefaultProps!
  *
  * ```javascript
@@ -87,7 +90,7 @@ function createContainer(_ref) {
         (0, _ContainerHelpers.removeObservableState)(this._observableState, this._callbacks);
       },
       render: function render() {
-        return _react2.default.createElement(StatelessFunctionalComponent, _extends({}, this.state, this.props));
+        return _react2.default.createElement(StatelessFunctionalComponent, _extends({}, this.props, this.state));
       }
     });
   };
