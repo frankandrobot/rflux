@@ -73,7 +73,7 @@ function _bindStoreObservable(channel, Reducers) {
     AppDispatcher
       .filter(x => x.channel === channel)
       .scan(
-        (state, action) => {
+        (stateWithSideEffects, action) => {
 
           const handler = Reducers[action.actionType]
 
@@ -84,7 +84,7 @@ function _bindStoreObservable(channel, Reducers) {
           const result = payload => sideEffects({channel, actionType: `${action.actionType}Result`, payload})
 
           // always return a StateWithSideEffects
-          return cast(handler(state, action.payload, result), StateWithSideEffects)
+          return cast(handler(stateWithSideEffects.state, action.payload, result), StateWithSideEffects)
 
         },
         initialState
