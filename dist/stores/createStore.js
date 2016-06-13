@@ -88,7 +88,7 @@ function _bindStoreObservable(channel, Reducers) {
   return function (AppDispatcher) {
     return AppDispatcher.filter(function (x) {
       return x.channel === channel;
-    }).scan(function (state, action) {
+    }).scan(function (stateWithSideEffects, action) {
 
       var handler = Reducers[action.actionType];
 
@@ -101,7 +101,7 @@ function _bindStoreObservable(channel, Reducers) {
       };
 
       // always return a StateWithSideEffects
-      return (0, _cast2.default)(handler(state, action.payload, result), _StateWithSideEffects.StateWithSideEffects);
+      return (0, _cast2.default)(handler(stateWithSideEffects.state, action.payload, result), _StateWithSideEffects.StateWithSideEffects);
     }, initialState);
   };
 }
