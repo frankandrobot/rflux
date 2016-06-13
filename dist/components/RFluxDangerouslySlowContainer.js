@@ -55,7 +55,7 @@ var RFluxDangerouslySlowContainer = function (_React$Component) {
     value: function componentWillMount() {
 
       this.normalProps = (0, _ContainerHelpers.nonObservableState)(this.props);
-      this.observables = (0, _ContainerHelpers.observableState)(this, this.props);
+      this.observables = (0, _ContainerHelpers.observableState)(this.props);
       this.callbacks = (0, _ContainerHelpers.setupObservableState)(this, this.observables, this.props.children.type.defaultProps);
     }
   }, {
