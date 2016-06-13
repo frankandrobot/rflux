@@ -56,8 +56,7 @@ var RFluxDangerouslySlowContainer = function (_React$Component) {
 
       this.normalProps = (0, _ContainerHelpers.nonObservableState)(this.props);
       this.observables = (0, _ContainerHelpers.observableState)(this, this.props);
-
-      (0, _ContainerHelpers.setupObservableState)(this, this.observables, this.props.children.type.defaultProps);
+      this.callbacks = (0, _ContainerHelpers.setupObservableState)(this, this.observables, this.props.children.type.defaultProps);
     }
   }, {
     key: 'componentWillReceiveProps',
@@ -70,7 +69,7 @@ var RFluxDangerouslySlowContainer = function (_React$Component) {
 
       //subscribe new
       this.observables = (0, _ContainerHelpers.observableState)(nextProps);
-      (0, _ContainerHelpers.setupObservableState)(this, this.observables, this.props.children.type.defaultProps);
+      this.callbacks = (0, _ContainerHelpers.setupObservableState)(this, this.observables, this.props.children.type.defaultProps);
     }
   }, {
     key: 'componentWillUnmount',
