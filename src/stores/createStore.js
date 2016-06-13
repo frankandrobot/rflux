@@ -1,7 +1,7 @@
 import cast from '../internal/cast'
 import assert from '../internal/assert'
 
-import {StateWithSideEffects} from './StateWithSideEffects'
+import {StateWithSideEffects, sideEffects} from './StateWithSideEffects'
 
 
 function _bindActionFunctionToAppDispatcher(actionFunction) {
@@ -81,7 +81,7 @@ function _bindStoreObservable(channel, Reducers) {
             throw new Error(`Channel ${channel} does not support ${action.actionType}`)
           }
 
-          const result = payload => AppDispatcher.emit({channel, actionType: `${action.actionType}Result`, payload})
+          const result = payload => sideEffects({channel, actionType: `${action.actionType}Result`, payload})
 
           // always return a StateWithSideEffects
           return cast(handler(state, action.payload, result), StateWithSideEffects)
