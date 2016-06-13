@@ -37,9 +37,9 @@ export default function createContainer(
       const _observableState = getObservableState.call(this)
       const _nonObservableState = nonObservableState(_observableState)
 
-      this.setState(..._nonObservableState)
+      this.setState(_nonObservableState)
 
-      this._observableState = _observableState(_observableState)
+      this._observableState = observableState(_observableState)
       this._callbacks = setupObservableState(this, this._observableState)
     },
 
