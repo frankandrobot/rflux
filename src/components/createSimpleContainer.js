@@ -10,13 +10,13 @@ import {removeObservableState, setupObservableState} from '../internal/Container
  *
  * The use case is when you don't need access to other parts of the state.
  *
- * @param defaultState - the default container state
- * @param getInitialObservableState - passed to child container as props
+ * @param getInitialState - the default container state
+ * @param getObservableState - passed to child container as props
  * @param containerDefaults - default props and propTypes of parent container
  * @returns {Function}
  */
 export default function createContainer(
-  {getInitialState = () => ({}), getInitialObservableState = () => ({}), containerDefaults = {}}) {
+  {getInitialState = () => ({}), getObservableState = () => ({}), containerDefaults = {}}) {
 
   const {propTypes = {}, getDefaultProps = () => undefined} = containerDefaults
 
@@ -34,11 +34,16 @@ export default function createContainer(
 
     componentWillMount() {
 
-      const _initialObservableState = getInitialObservableState.call(this)
+      const observableState = getObservableState.call(this)
+      const nonObservableState = nonObservableState(observableState)
 
-      this._observableState = observableState(_initialObservableState)
-      this._nonObservableState = nonObservableState(_initialObservableState)
+      if (Object.keys(nonObservableState).length) {
+        console.warn(
+          'Passed non-observable state in #getObservableState. Use #getInitialState. ' +
+          `It will have no effect: ${nonObservableState}`)
+      }
 
+      this._observableState = observableState(observableState)
       this._callbacks = setupObservableState(this, this._observableState)
     },
 
@@ -48,7 +53,7 @@ export default function createContainer(
     },
 
     render() {
-      return <StatelessFunctionalComponent {...this.state} {...this._nonObservableState} {...this.props} />
+      return <StatelessFunctionalComponent {...this.state} {...this.props} />
     }
   })
 }

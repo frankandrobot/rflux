@@ -17,6 +17,11 @@ function _subscribe(observableStateList, callbacks) {
   observableStateList.forEach((obj, i) => obj.observable.onValue(callbacks[i]))
 }
 
+function _pluck(obj, keys) {
+
+  return keys.reduce((culledObj, key) => Object.assign(culledObj, {[key]: obj[key]}), {})
+}
+
 export function setupObservableState(component, observableStateList, initialState) {
 
   initialState = initialState || component.state || {}
@@ -25,7 +30,7 @@ export function setupObservableState(component, observableStateList, initialStat
 
   //set default state first before setting up listeners
   component.setState(
-    initialState,
+    _pluck(initialState, observableStateList.map(x => x.name)), // set observables only
     () => _subscribe(observableStateList, callbacks)
   )
 
