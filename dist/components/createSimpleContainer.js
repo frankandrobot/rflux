@@ -16,14 +16,28 @@ var _ContainerHelpers = require('../internal/ContainerHelpers');
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
- * If a prop is an observable, create a listener and pass the observed values as props.
- * Otherwise, pass the prop into the child component, which must be a stateless functional component.
+ * The container passes React props and state to its child as props.
+ * The main feature is that it converts observables into *values*...
+ * while automagically managing the observer lifecycle.
  *
- * The use case is when you don't need access to other parts of the state.
+ * Do NOT use anonymous functions to define getInitialState, getObservableState, getDefaultProps!
  *
- * @param getInitialState - the default container state
- * @param getObservableState - passed to child container as props
- * @param containerDefaults - default props and propTypes of parent container
+ * ```javascript
+ * createContainer({
+ *   getObservableState() {
+ *     return {
+ *       value: observable.map(x => x.foo)
+ *     }
+ *   }
+ * })(Child)
+ *
+ * const Child = value => <div>{value}</div> //gets the value of the observable as a prop!
+ * ```
+ *
+ * @param getInitialState - container initial state. Passed to child as props.
+ * @param getObservableState - pass observables here. Observable *values* passed to child as props
+ * @param getDefaultProps - container default props. Passed to child as props.
+ * @param propTypes - container propTypes.
  * @returns {Function}
  */
 function createContainer(_ref) {
@@ -37,15 +51,15 @@ function createContainer(_ref) {
   var getObservableState = _ref$getObservableSta === undefined ? function () {
     return {};
   } : _ref$getObservableSta;
-  var _ref$containerDefault = _ref.containerDefaults;
-  var containerDefaults = _ref$containerDefault === undefined ? {} : _ref$containerDefault;
-  var _containerDefaults$pr = containerDefaults.propTypes;
-  var propTypes = _containerDefaults$pr === undefined ? {} : _containerDefaults$pr;
-  var _containerDefaults$ge = containerDefaults.getDefaultProps;
+  var _ref$getDefaultProps = _ref.getDefaultProps;
 
-  var _getDefaultProps = _containerDefaults$ge === undefined ? function () {
-    return undefined;
-  } : _containerDefaults$ge;
+  var _getDefaultProps = _ref$getDefaultProps === undefined ? function () {
+    return {};
+  } : _ref$getDefaultProps;
+
+  var _ref$propTypes = _ref.propTypes;
+  var propTypes = _ref$propTypes === undefined ? {} : _ref$propTypes;
+
 
   return function (StatelessFunctionalComponent) {
     return _react2.default.createClass({
