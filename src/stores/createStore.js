@@ -89,7 +89,6 @@ function _bindStoreObservable(channel, Reducers) {
         },
         initialState
       )
-      .skip(1)
 }
 
 function _bindResultObservables(channel, Actions) {

@@ -44,7 +44,7 @@ export default class RFluxDangerouslySlowContainer extends React.Component {
 
     //subscribe new
     this.observables = observableState(nextProps)
-    setupObservableState(this, nextProps, this.props.children.type.defaultProps)
+    setupObservableState(this, this.observables, this.props.children.type.defaultProps)
   }
 
   componentWillUnmount() {
