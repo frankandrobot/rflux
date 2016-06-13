@@ -42,7 +42,7 @@ export default class RFluxContainer extends React.Component {
     super(props)
 
     const noop = () => ({})
-    const initialState = (this.getInitialObservableState || noop)()
+    const initialState = (this.getInitialObservableState || noop).call(this)
 
     this._observableState = observableState(initialState)
     this._nonObservableState = nonObservableState(initialState)
