@@ -83,7 +83,7 @@ function _bindActionObservables(ActionObservables) {
  */
 function _bindStoreObservable(channel, Reducers) {
 
-  var initialState = Reducers.initialState || {};
+  var initialState = new _StateWithSideEffects.StateWithSideEffects(Reducers.initialState || {});
 
   return function (AppDispatcher) {
     return AppDispatcher.filter(function (x) {
