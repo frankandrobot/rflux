@@ -61,7 +61,7 @@ export default class RFluxContainer extends React.Component {
   render() {
 
     return {
-      type: this.reprops.children.type,
+      type: this.props.children.type,
       ['$$typeof']: Symbol.for('react.element'),
       props: {...this.state, ...this._nonObservableState}
     }

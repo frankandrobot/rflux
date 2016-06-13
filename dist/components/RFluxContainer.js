@@ -93,7 +93,7 @@ var RFluxContainer = function (_React$Component) {
       var _ref;
 
       return _ref = {
-        type: this.reprops.children.type
+        type: this.props.children.type
       }, _defineProperty(_ref, '$$typeof', Symbol.for('react.element')), _defineProperty(_ref, 'props', _extends({}, this.state, this._nonObservableState)), _ref;
     }
   }]);
