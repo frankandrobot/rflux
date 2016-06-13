@@ -15,8 +15,6 @@ var _ContainerHelpers = require('../internal/ContainerHelpers');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
 /**
  * If a prop is an observable, create a listener and pass the observed values as props.
  * Otherwise, pass the prop into the child component, which must be a stateless functional component.
@@ -65,9 +63,9 @@ function createContainer(_ref) {
         var _observableState = getObservableState.call(this);
         var _nonObservableState = (0, _ContainerHelpers.nonObservableState)(_observableState);
 
-        this.setState.apply(this, _toConsumableArray(_nonObservableState));
+        this.setState(_nonObservableState);
 
-        this._observableState = _observableState(_observableState);
+        this._observableState = (0, _ContainerHelpers.observableState)(_observableState);
         this._callbacks = (0, _ContainerHelpers.setupObservableState)(this, this._observableState);
       },
       componentWillUnmount: function componentWillUnmount() {
