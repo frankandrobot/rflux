@@ -34,16 +34,12 @@ export default function createContainer(
 
     componentWillMount() {
 
-      const observableState = getObservableState.call(this)
-      const nonObservableState = nonObservableState(observableState)
+      const _observableState = getObservableState.call(this)
+      const _nonObservableState = nonObservableState(_observableState)
 
-      if (Object.keys(nonObservableState).length) {
-        console.warn(
-          'Passed non-observable state in #getObservableState. Use #getInitialState. ' +
-          `It will have no effect: ${nonObservableState}`)
-      }
+      this.setState(..._nonObservableState)
 
-      this._observableState = observableState(observableState)
+      this._observableState = _observableState(_observableState)
       this._callbacks = setupObservableState(this, this._observableState)
     },
 
