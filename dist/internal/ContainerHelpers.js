@@ -37,6 +37,13 @@ function _subscribe(observableStateList, callbacks) {
   });
 }
 
+function _pluck(obj, keys) {
+
+  return keys.reduce(function (culledObj, key) {
+    return Object.assign(culledObj, _defineProperty({}, key, obj[key]));
+  }, {});
+}
+
 function setupObservableState(component, observableStateList, initialState) {
 
   initialState = initialState || component.state || {};
@@ -46,7 +53,10 @@ function setupObservableState(component, observableStateList, initialState) {
   });
 
   //set default state first before setting up listeners
-  component.setState(initialState, function () {
+  component.setState(_pluck(initialState, observableStateList.map(function (x) {
+    return x.name;
+  })), // set observables only
+  function () {
     return _subscribe(observableStateList, callbacks);
   });
 

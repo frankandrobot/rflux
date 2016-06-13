@@ -21,8 +21,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  * The use case is when you don't need access to other parts of the state.
  *
- * @param defaultState - the default container state
- * @param getInitialObservableState - passed to child container as props
+ * @param getInitialState - the default container state
+ * @param getObservableState - passed to child container as props
  * @param containerDefaults - default props and propTypes of parent container
  * @returns {Function}
  */
@@ -33,10 +33,10 @@ function createContainer(_ref) {
     return {};
   } : _ref$getInitialState;
 
-  var _ref$getInitialObserv = _ref.getInitialObservableState;
-  var getInitialObservableState = _ref$getInitialObserv === undefined ? function () {
+  var _ref$getObservableSta = _ref.getObservableState;
+  var getObservableState = _ref$getObservableSta === undefined ? function () {
     return {};
-  } : _ref$getInitialObserv;
+  } : _ref$getObservableSta;
   var _ref$containerDefault = _ref.containerDefaults;
   var containerDefaults = _ref$containerDefault === undefined ? {} : _ref$containerDefault;
   var _containerDefaults$pr = containerDefaults.propTypes;
@@ -60,11 +60,14 @@ function createContainer(_ref) {
       },
       componentWillMount: function componentWillMount() {
 
-        var _initialObservableState = getInitialObservableState.call(this);
+        var observableState = getObservableState.call(this);
+        var nonObservableState = nonObservableState(observableState);
 
-        this._observableState = (0, _ContainerHelpers.observableState)(_initialObservableState);
-        this._nonObservableState = (0, _ContainerHelpers.nonObservableState)(_initialObservableState);
+        if (Object.keys(nonObservableState).length) {
+          console.warn('Passed non-observable state in #getObservableState. Use #getInitialState. ' + ('It will have no effect: ' + nonObservableState));
+        }
 
+        this._observableState = observableState(observableState);
         this._callbacks = (0, _ContainerHelpers.setupObservableState)(this, this._observableState);
       },
       componentWillUnmount: function componentWillUnmount() {
@@ -72,7 +75,7 @@ function createContainer(_ref) {
         (0, _ContainerHelpers.removeObservableState)(this._observableState, this._callbacks);
       },
       render: function render() {
-        return _react2.default.createElement(StatelessFunctionalComponent, _extends({}, this.state, this._nonObservableState, this.props));
+        return _react2.default.createElement(StatelessFunctionalComponent, _extends({}, this.state, this.props));
       }
     });
   };
