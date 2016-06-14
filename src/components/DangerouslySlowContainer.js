@@ -15,7 +15,7 @@ export default class DangerouslySlowContainer extends React.Component {
 
     super(props)
 
-    this.__dangerouslyEnableSlowness = __dangerouslyEnableSlowness
+    this.__dangerouslyEnableSlowness = __dangerouslyEnableSlowness || true
   }
 
   componentWillMount() {

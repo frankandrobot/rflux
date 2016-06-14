@@ -97,7 +97,9 @@ function _bindResultObservables(channel, Actions) {
     Object.keys(Actions).reduce(
       (observables, action) => Object.assign(observables, {
         [`${action}ResultObservable`]:
-          AppDispatcher.filter(x => x.channel === `${channel}Result` && x.actionType === `${action}Result`)
+          AppDispatcher
+            .filter(x => x.channel === `${channel}Result` && x.actionType === `${action}Result`)
+            .map(x => x.payload)
       }),
       {}
     )
