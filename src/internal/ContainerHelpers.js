@@ -39,8 +39,6 @@ const _pluck = (obj, keys) =>
 
 function _setupObservableState(component, observableList, initialState) {
 
-  initialState = initialState || component.state || {}
-
   const callbacks = observableList.map(prop => _callback(component, prop))
 
   //set default state first before setting up listeners
@@ -52,10 +50,12 @@ function _setupObservableState(component, observableList, initialState) {
   return callbacks
 }
 
-export function setupObservables(component, stateOrProps) {
+export function setupObservables(component, stateOrProps, initialState) {
+
+  initialState = initialState || component.state || {}
 
   component._observables = observables(stateOrProps)
-  component._callbacks = _setupObservableState(component, component._observables)
+  component._callbacks = _setupObservableState(component, component._observables, initialState)
 }
 
 export function removeObservables(component) {
