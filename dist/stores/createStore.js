@@ -98,7 +98,7 @@ function _bindStoreObservable(channel, Reducers) {
       }
 
       var result = function result(payload) {
-        return (0, _StateWithSideEffects.statelessSideEffects)({ channel: channel, actionType: action.actionType + 'Result', payload: payload });
+        return { channel: channel + 'Result', actionType: action.actionType + 'Result', payload: payload };
       };
 
       // always return a StateWithSideEffects
@@ -112,7 +112,7 @@ function _bindResultObservables(channel, Actions) {
   return function (AppDispatcher) {
     return Object.keys(Actions).reduce(function (observables, action) {
       return Object.assign(observables, _defineProperty({}, action + 'ResultObservable', AppDispatcher.filter(function (x) {
-        return x.channel === channel && x.actionType === action + 'Result';
+        return x.channel === channel + 'Result' && x.actionType === action + 'Result';
       })));
     }, {});
   };
