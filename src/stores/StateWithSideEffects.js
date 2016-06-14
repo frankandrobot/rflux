@@ -9,44 +9,24 @@ export default class StateWithSideEffects {
     this.sideEffects = sideEffects || []
   }
 
-  combine(stateOrStateWithSideEffects) {
+  combine(b) {
+
+    return b instanceof StateWithSideEffects ?
+
+      new StateWithSideEffects(
+        {...this.state, ...b.state},
+        this.sideEffects.concat(b.sideEffects)
+      ) :
+
+      new StateWithSideEffects(({...this.state, ...b}, this.sideEffects))
+  }
+
+  addSideEffects(...sideEffects) {
 
     return new StateWithSideEffects(
-      {...this.state, ...stateOrStateWithSideEffects.state},
-      this.sideEffects.concat(stateOrStateWithSideEffects.sideEffects)
+      {...this.state},
+      this.sideEffects.concat(sideEffects)
     )
-  }
-}
-
-/**
- * In a typed language this method wouldn't exist,
- * but since it's so easy to forget to return the proper class,
- * we add this to help prevent errors.
- *
- * @param {*} a
- * @param {*} b
- * @returns {StateWithSideEffects} instance
- */
-export function combineStateWithSideEffects(a, b) {
-
-  const aIsStateWithSideEffects = a instanceof StateWithSideEffects
-  const bIsStateWithSideEffects = b instanceof StateWithSideEffects
-
-  if (aIsStateWithSideEffects && bIsStateWithSideEffects) {
-
-    return a.combine(b)
-  }
-  else if (!aIsStateWithSideEffects && !bIsStateWithSideEffects) {
-
-    return new StateWithSideEffects({...a, ...b})
-  }
-  else if (aIsStateWithSideEffects && !bIsStateWithSideEffects) {
-
-    return new StateWithSideEffects(({...a.state, ...b}, a.sideEffects))
-  }
-  else if (!aIsStateWithSideEffects && bIsStateWithSideEffects) {
-
-    return new StateWithSideEffects({...a, ...b.state}, b.sideEffects)
   }
 }
 
@@ -57,18 +37,7 @@ export function combineStateWithSideEffects(a, b) {
  * @param {[]} sideEffects - array of side effects
  * @returns {StateWithSideEffects} instance
  */
-export function stateWithSideEffects(state, ...sideEffects) {
+export function state(state) {
 
-  return new StateWithSideEffects(state, sideEffects)
-}
-
-/**
- * Constructor helper
- *
- * @param {[]} sideEffects - array of side effects
- * @returns {StateWithSideEffects} instance with no state
- */
-export function statelessSideEffects(...sideEffects) {
-
-  return new StateWithSideEffects({}, sideEffects)
+  return new StateWithSideEffects(state)
 }
