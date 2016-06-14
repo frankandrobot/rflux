@@ -70,8 +70,6 @@ var _pluck = function _pluck(obj, keys) {
 
 function _setupObservableState(component, observableList, initialState) {
 
-  initialState = initialState || component.state || {};
-
   var callbacks = observableList.map(function (prop) {
     return _callback(component, prop);
   });
@@ -87,10 +85,12 @@ function _setupObservableState(component, observableList, initialState) {
   return callbacks;
 }
 
-function setupObservables(component, stateOrProps) {
+function setupObservables(component, stateOrProps, initialState) {
+
+  initialState = initialState || component.state || {};
 
   component._observables = observables(stateOrProps);
-  component._callbacks = _setupObservableState(component, component._observables);
+  component._callbacks = _setupObservableState(component, component._observables, initialState);
 }
 
 function removeObservables(component) {
