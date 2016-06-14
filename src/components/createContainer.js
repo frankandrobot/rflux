@@ -1,4 +1,4 @@
-import createDangerouslySlowContainer from './createDangeourslySlowContainer'
+import createDangerouslySlowContainer from './createDangerouslySlowContainer'
 
 
 /**

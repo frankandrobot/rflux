@@ -5,9 +5,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = createContainer;
 
-var _createDangeourslySlowContainer = require('./createDangeourslySlowContainer');
+var _createDangerouslySlowContainer = require('./createDangerouslySlowContainer');
 
-var _createDangeourslySlowContainer2 = _interopRequireDefault(_createDangeourslySlowContainer);
+var _createDangerouslySlowContainer2 = _interopRequireDefault(_createDangerouslySlowContainer);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -40,7 +40,7 @@ function createContainer(_ref) {
   var propTypes = _ref$propTypes === undefined ? {} : _ref$propTypes;
 
 
-  return (0, _createDangeourslySlowContainer2.default)({
+  return (0, _createDangerouslySlowContainer2.default)({
     getDefaultProps: getDefaultProps,
     getInitialState: getInitialState,
     getObservableState: getObservableState,
