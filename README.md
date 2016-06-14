@@ -2,10 +2,6 @@
 
 ReactJS Flux/Redux reimagined using Functional Reactive Programming with KefirJS.
 
-Early alpha for now. For now, you can checkout a stable (older) version at:
-
-https://github.com/awesome-editor/awesome-editor/tree/master/src/rflux
-
 ## Installation
 
 ```bash
@@ -19,9 +15,10 @@ However, it's been tested primarily with JSPM/SystemJS.
 Because it's a modern library, the distributable isn't minified---it's expected that Webpack, Browsify, JSPM
 will minifiy it for you.
 
-Minified it's coming it at less than 20k. With KefirJS, it's less than 30k!
-(Speaking of which, I need to figure out why it's bigger than KefirJS when minified.)
+The minified is coming in at less than 20k. With KefirJS, that's less than 30k!
 
 ## Documentation
 
 Checkout the [docs](/docs/).
+
+Sample usage, for now, can be found at: https://github.com/awesome-editor/awesome-editor/
