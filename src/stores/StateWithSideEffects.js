@@ -1,7 +1,7 @@
 /**
  * Hey, look! Something like a monad
  */
-export class StateWithSideEffects {
+export default class StateWithSideEffects {
 
   constructor(state, sideEffects) {
 
@@ -23,11 +23,11 @@ export class StateWithSideEffects {
  * but since it's so easy to forget to return the proper class,
  * we add this to help prevent errors.
  *
- * @param a
- * @param b
- * @returns {*}
+ * @param {*} a
+ * @param {*} b
+ * @returns {StateWithSideEffects} instance
  */
-export function combineSideEffects(a, b) {
+export function combineStateWithSideEffects(a, b) {
 
   const aIsStateWithSideEffects = a instanceof StateWithSideEffects
   const bIsStateWithSideEffects = b instanceof StateWithSideEffects
@@ -50,12 +50,25 @@ export function combineSideEffects(a, b) {
   }
 }
 
-export function addSideEffects(state, ...sideEffects) {
+/**
+ * Constructor helper
+ *
+ * @param {*} state
+ * @param {[]} sideEffects - array of side effects
+ * @returns {StateWithSideEffects} instance
+ */
+export function stateWithSideEffects(state, ...sideEffects) {
 
   return new StateWithSideEffects(state, sideEffects)
 }
 
-export function sideEffects(...sideEffects) {
+/**
+ * Constructor helper
+ *
+ * @param {[]} sideEffects - array of side effects
+ * @returns {StateWithSideEffects} instance with no state
+ */
+export function statelessSideEffects(...sideEffects) {
 
   return new StateWithSideEffects({}, sideEffects)
 }
