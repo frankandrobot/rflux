@@ -19,6 +19,8 @@ var _assert2 = _interopRequireDefault(_assert);
 
 var _StateWithSideEffects = require('./StateWithSideEffects');
 
+var _StateWithSideEffects2 = _interopRequireDefault(_StateWithSideEffects);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -36,9 +38,9 @@ function _bindActionFunctionToAppDispatcher(actionFunction) {
  * Returns a function that binds the action functions to the app dispatcher.
  * This way AppDispatcher isn't a hard-coded dependency.
  *
- * @param ActionFunctions
- * @returns {Function}
- * @private
+ * @param {*} Actions
+ * @param {*} ActionFunctions
+ * @returns {Function} a function that binds the action functions to the app dispatcher
  */
 function bindActionFunctions(Actions, ActionFunctions) {
 
@@ -55,8 +57,8 @@ function bindActionFunctions(Actions, ActionFunctions) {
  *
  * You always have the storeObservable which is the top-level state view of the entire store.
  *
- * @param ActionObservables
- * @returns {*}
+ * @param {*} ActionObservables
+ * @returns {Function} a function that binds the action observables to the store observable
  * @private
  */
 function _bindActionObservables(ActionObservables) {
@@ -76,14 +78,13 @@ function _bindActionObservables(ActionObservables) {
  *
  * Note: in order for this to work, every Action must have a Reducer of the same name
  *
- * @param channel
- * @param Actions
- * @param Reducers
- * @returns {Function}
+ * @param {String} channel
+ * @param {*} Reducers
+ * @returns {Function} a function that creates the store observable and binds it to the app dispatcher.
  */
 function _bindStoreObservable(channel, Reducers) {
 
-  var initialState = new _StateWithSideEffects.StateWithSideEffects(Reducers.initialState || {});
+  var initialState = new _StateWithSideEffects2.default(Reducers.initialState || {});
 
   return function (AppDispatcher) {
     return AppDispatcher.filter(function (x) {
@@ -97,11 +98,11 @@ function _bindStoreObservable(channel, Reducers) {
       }
 
       var result = function result(payload) {
-        return (0, _StateWithSideEffects.sideEffects)({ channel: channel, actionType: action.actionType + 'Result', payload: payload });
+        return (0, _StateWithSideEffects.statelessSideEffects)({ channel: channel, actionType: action.actionType + 'Result', payload: payload });
       };
 
       // always return a StateWithSideEffects
-      return (0, _cast2.default)(handler(stateWithSideEffects.state, action.payload, result), _StateWithSideEffects.StateWithSideEffects);
+      return (0, _cast2.default)(handler(stateWithSideEffects.state, action.payload, result), _StateWithSideEffects2.default);
     }, initialState);
   };
 }
@@ -130,13 +131,13 @@ function _bindResultObservables(channel, Actions) {
  * 1. use the storeStateName in the action/observable. Ex: createDoc
  * 2. use the word "observable" in the observables. Ex: docObservable
  *
- * @param storeName
- * @param channel
- * @param Actions
- * @param Reducers
- * @param ActionFunctions
- * @param ActionObservables (optional) - you always get one for free... the observable that listens to the entire store
- * @returns {{}}
+ * @param {String} channel
+ * @param {*} Actions
+ * @param {*} Reducers
+ * @param {*} ActionFunctions
+ * @param {*} ActionObservables (optional) - you always get the main store observable and the result observables
+ * for free
+ * @returns {Function} that binds the store to the app dispatcher
  */
 function createStore(channel, _ref) {
   var Actions = _ref.Actions;
