@@ -44,7 +44,7 @@ export default class DangerouslySlowContainer extends React.Component {
     return {
       type: this.props.children.type,
       ['$$typeof']: Symbol.for('react.element'),
-      props: {...this.state, ...this.normalProps}
+      props: {...this._nonObservables, ...this.state}
     }
   }
 }
