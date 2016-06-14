@@ -113,6 +113,8 @@ function _bindResultObservables(channel, Actions) {
     return Object.keys(Actions).reduce(function (observables, action) {
       return Object.assign(observables, _defineProperty({}, action + 'ResultObservable', AppDispatcher.filter(function (x) {
         return x.channel === channel + 'Result' && x.actionType === action + 'Result';
+      }).map(function (x) {
+        return x.payload;
       })));
     }, {});
   };

@@ -39,7 +39,7 @@ var DangerouslySlowContainer = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(DangerouslySlowContainer).call(this, props));
 
-    _this.__dangerouslyEnableSlowness = __dangerouslyEnableSlowness;
+    _this.__dangerouslyEnableSlowness = __dangerouslyEnableSlowness || true;
     return _this;
   }
 
