@@ -101,4 +101,4 @@ var RFluxDangerouslySlowContainer = function (_React$Component) {
 }(_react2.default.Component);
 
 exports.default = RFluxDangerouslySlowContainer;
-//# sourceMappingURL=RFluxDangerouslySlowContainer.js.map
+//# sourceMappingURL=DangerouslySlowContainer.js.map

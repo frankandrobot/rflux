@@ -1,57 +1,67 @@
 import isObservable from '../internal/isObservable'
 
+
+export function observables(stateOrProps) {
+
+  return Object.keys(stateOrProps)
+      .filter(prop => isObservable(stateOrProps[prop]))
+      .map(prop => ({name: prop, observable: stateOrProps[prop]})) || []
+}
+
+export function nonObservables(stateOrProps) {
+
+  return Object.keys(stateOrProps)
+    .filter(prop => !isObservable(stateOrProps[prop]) && prop !== 'children')
+    .reduce((total, prop) => Object.assign(total, {[prop]: stateOrProps[prop]}), {})
+}
+
+export function setupNonObservables(component, stateOrProps, setState = true) {
+
+  component._nonObservables = nonObservables(stateOrProps)
+
+  setState && component.setState(component._nonObservables)
+}
+
 /**
  * a callback maps a "val" to the obj property on the Component state
  *
- * @param component
- * @param prop
+ * @param {React.Component} component
+ * @param {*} prop
+ * @returns {Function} callback
  * @private
  */
-function _callback(component, prop) {
+const _callback = (component, prop) => val => component.setState({[prop.name]: val})
+const _subscribe = (observableList, callbacks) =>
+  observableList.forEach((obj, i) => obj.observable.onValue(callbacks[i]))
+const _pluck = (obj, keys) =>
+  keys.reduce((culledObj, key) => Object.assign(culledObj, {[key]: obj[key]}), {})
 
-  return val => component.setState({[prop.name]: val})
-}
 
-function _subscribe(observableStateList, callbacks) {
-
-  observableStateList.forEach((obj, i) => obj.observable.onValue(callbacks[i]))
-}
-
-function _pluck(obj, keys) {
-
-  return keys.reduce((culledObj, key) => Object.assign(culledObj, {[key]: obj[key]}), {})
-}
-
-export function setupObservableState(component, observableStateList, initialState) {
+function _setupObservableState(component, observableList, initialState) {
 
   initialState = initialState || component.state || {}
 
-  const callbacks = observableStateList.map(prop => _callback(component, prop))
+  const callbacks = observableList.map(prop => _callback(component, prop))
 
   //set default state first before setting up listeners
   component.setState(
-    _pluck(initialState, observableStateList.map(x => x.name)), // set observables only
-    () => _subscribe(observableStateList, callbacks)
+    _pluck(initialState, observableList.map(x => x.name)), // set observables only
+    () => _subscribe(observableList, callbacks)
   )
 
   return callbacks
 }
 
-export function removeObservableState(observableStateList, callbacks) {
+export function setupObservables(component, stateOrProps) {
 
-  observableStateList.forEach((obj, i) => obj.observable.offValue(callbacks[i]))
+  component._observables = observables(stateOrProps)
+  component._callbacks = _setupObservableState(component, component._observables)
 }
 
-export function observableState(state) {
+export function removeObservables(component) {
 
-  return Object.keys(state)
-      .filter(prop => isObservable(state[prop]))
-      .map(prop => ({name: prop, observable: state[prop]})) || []
-}
+  const observables = component._observables
+  const callbacks = component._callbacks
 
-export function nonObservableState(state) {
-
-  return Object.keys(state)
-    .filter(prop => !isObservable(state[prop]) && prop !== 'children')
-    .reduce((total, prop) => Object.assign(total, {[prop]: state[prop]}), {})
+  observables.forEach((obj, i) => obj.observable.offValue(callbacks[i]))
 }
