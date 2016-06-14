@@ -6,17 +6,26 @@ import {removeObservableState, setupObservableState} from '../internal/Container
 
 
 /**
- * The differences between this class and RFluxContainer is:
+ * The differences between this class and createContainer is:
  *
- * 1. You setup the observable via React props (not state)
+ * 1. Everything (including observables) is done via React props (not state and props)
  * 2. That means observers need to be recreated each time the Container's props change.
  *    (Hence, the "dangerously slow" name. Recreating observers on prop changes can be slow).
- * 3. You do NOT inherit from this class. Instead you can use it directly.
+ * 3. The use case is when you need observers that depend on React prop values.
+ *
+ * # Usage
+ *
+ * Unless you need to set defaultProps, you do NOT need to inherit from this class.
+ * Instead you can use it directly.
  *
  * ```javascript
  * render() {
  *   // "Child" has *values* from `observable` (not the stream itself) available as props.
- *   return <Container observable1={observable1}> <Child/> </Container>
+ *   return (
+ *     <RFluxDangerouslySlowContainer observable1={observable1}>
+ *        <Child/>
+ *     </RFluxDangerouslySlowContainer>
+ *   )
  * }
  * ```
  */
