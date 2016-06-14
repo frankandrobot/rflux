@@ -74,7 +74,7 @@ var DangerouslySlowContainer = function (_React$Component) {
 
       return _ref = {
         type: this.props.children.type
-      }, _defineProperty(_ref, '$$typeof', Symbol.for('react.element')), _defineProperty(_ref, 'props', _extends({}, this.state, this.normalProps)), _ref;
+      }, _defineProperty(_ref, '$$typeof', Symbol.for('react.element')), _defineProperty(_ref, 'props', _extends({}, this._nonObservables, this.state)), _ref;
     }
   }]);
 
