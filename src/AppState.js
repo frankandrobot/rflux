@@ -16,26 +16,35 @@ const _sagaInfo = []
  * This creates the store, adds it to the store info collection,
  * then recreates the combined AppState observable (optional)
  *
- * @param storeName
- * @param channel
- * @param Actions
- * @param Reducers
- * @param ActionFunctions
- * @param ActionObservables
+ * @param {String} channel
+ * @param {Map<String,Boolean>} Actions - map of action constants
+ * @param {Map<Action,Function>} Reducers - map of reducers indexed by Actions
+ * @param {Map<Action,Function>} ActionFunctions - map of action functions indexed by
+ * Actions
+ * @param {*} ActionObservables
  */
-export function registerStore(channel, {Actions, Reducers, ActionFunctions, ActionObservables}) {
+export function registerStore(
+  channel, {Actions, Reducers, ActionFunctions, ActionObservables}) {
 
-  const store = createStore(channel, {Actions, Reducers, ActionFunctions, ActionObservables})(AppDispatcher)
+  const store = createStore(
+    channel,
+    {Actions, Reducers, ActionFunctions, ActionObservables}
+  )(AppDispatcher)
 
   // add store to store info collection
   _storeInfo.push(store)
 
   // update app state observable with latest
   const storeObservables = _storeInfo.map(x => x.observable)
-  const appStateObservable = Kefir.combine(storeObservables, (...observables) =>
-    observables.reduce(
-      (stores, store, i) => Object.assign(stores, {[`${_storeInfo[i].name}`]: store.state}), {}
-    )
+  const appStateObservable = Kefir.combine(
+    storeObservables,
+    (...observables) =>
+      observables.reduce(
+        (stores, store, i) => Object.assign(
+          stores,
+          {[`${_storeInfo[i].name}`]: store.state}
+        )
+      ), {}
   )
 
   Object.assign(AppState, {appStateObservable})
@@ -45,7 +54,9 @@ export function registerStore(channel, {Actions, Reducers, ActionFunctions, Acti
 
   // setup one-way data flow + side effects
   store.observable.onValue(state =>
-    (state.sideEffects || []).forEach(sideEffect => setTimeout(() => AppDispatcher.emit(sideEffect), 0))
+    (state.sideEffects || []).forEach(
+      sideEffect => setTimeout(() => AppDispatcher.emit(sideEffect), 0)
+    )
   )
 }
 

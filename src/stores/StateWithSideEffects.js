@@ -1,14 +1,29 @@
 /**
- * Hey, look! Something like a monad
+ * Hey, look! Something like a monad (dang, forget I said the "m" word.)
+ *
+ * `StateWithSideEffects` is basically state plus an array of messages (the side
+ * effects to be executed).
+ *
+ * You can combine it with State or with another StateWithSideEffects, or add side
+ * effects to an existing StateWithSideEffects.
  */
 export default class StateWithSideEffects {
 
+  /**
+   * @param {State} state
+   * @param {Message[]} sideEffects
+   */
   constructor(state, sideEffects) {
 
     this.state = state || {}
     this.sideEffects = sideEffects || []
   }
 
+  /**
+   * Can combine `StateWithSideEffects` with another `StateWithSideEffects` or with state.
+   * @param {StateWithSideEffects|State} b
+   * @returns {StateWithSideEffects} the result
+   */
   combine(b) {
 
     return b instanceof StateWithSideEffects ?
@@ -34,7 +49,7 @@ export default class StateWithSideEffects {
  * Constructor helper
  *
  * @param {*} state
- * @param {[]} sideEffects - array of side effects
+ * @param {Message[]} sideEffects - array of side effects
  * @returns {StateWithSideEffects} instance
  */
 export function state(state) {
