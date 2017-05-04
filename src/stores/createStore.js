@@ -81,7 +81,7 @@ function _bindActionObservables(ActionObservables) {
  * When an action comes in, it will call the corresponding reducer with the payload,
  * and pass the new state to the observable.
  *
- * Every reducer is called with the parameters:
+ * Every reducer is called with these parameters:
  * 1. the current state
  * 2. the action payload
  * 3. a `endOfSideEffects` function that can be used to report the end of all the
@@ -92,6 +92,13 @@ function _bindActionObservables(ActionObservables) {
  * using the result of the `endOfSideEffects` function as the last side effect, it is
  * possible to tell when the entire reducer workflow completes... or so that's the
  * idea.
+ *
+ * Each reducer has this signature:
+ *
+ * ```
+ * (state:StoreState, payload:Payload, endOfSideEffects:Payload => Message)
+ * => StateWithSideEffects
+ * ```
  *
  * TODO sideEffectResult may not actually fire correctly, specially when side effects
  * are handled by async sagas.
@@ -145,10 +152,10 @@ function _createStoreObservable(channel, Reducers) {
  * side effects.
  * @param {String} channel
  * @param {Map<String,*>} Actions
- * @returns {Function}
+ * @returns {Function} function that binds AppDispatcher to the observables
  * @private
  */
-function _createEndOfSideEffectObservables(channel, Actions) {
+function _createEndOfActionsObservables(channel, Actions) {
 
   return AppDispatcher =>
 
@@ -169,28 +176,31 @@ function _createEndOfSideEffectObservables(channel, Actions) {
 
 /* eslint-disable no-console */
 /**
- * The "store" is just the public interface used by the app. It consists of:
+ * The store consists of
+ * - the channel name
+ * - the state observable
+ * - bound (aka "live") action functions
+ * - bound state selectors (which will probably be deprecated in a future release)
  *
- * - action functions (ex: DocActions) - this is what you call to initiate a store update
- * - action observables (optional) (ex: DocActionObservables) - this is how you know
- * the store update completed.
- * - store observable - the store state
+ * It is created from a map of the ActionTypes. Each ActionType has a corresponding
+ * reducer, which handles incoming messages. Each ActionType also has a corresponding
+ * ActionFunction that's used to dispatch messages.
  *
- * **In order for this to work, every action function and action observable must be
- * globally unique.**
+ * One catch is that the *names* of the ActionFunctions and the ActionObservables must
+ * be globally unique. This isn't hard to achieve as long as you:
  *
- * This isn't hard to achieve as long as you:
- * 1. use the storeStateName in the action/observable. Ex: createDoc
+ * 1. use the channel name in the action/observable. Ex: createDoc
  * 2. use the word "observable" in the observables. Ex: docObservable
  *
  * @param {String} channel
- * @param {Map<String,Boolean>} Actions - map of action constants
- * @param {Map<Action,Function>} Reducers - map of reducers, indexed by Actions.
- * Additionally, reducers should have `initialState`.
+ * @param {Map<String,*>} Actions - map of action type constants
+ * @param {Map<Action,Function>} Reducers - map of reducers, indexed by Action.
+ * Additionally, reducers have an `initialState` property.
  * @param {Map<Action,Function>} ActionFunctions - map of action functions, indexed by
- * Actions
- * @param {*} ActionObservables (optional) - you always get the main store observable
- * and the result observables for free
+ * Action
+ * @param {Map<String,Function>} ActionObservables (optional) - higher order functions
+ * that take the StoreObservable as input and return an observable that selects parts
+ * of the state tree. **This will probably be deprecated.**
  * @returns {Function} that binds the store to the app dispatcher
  */
 export default function createStore(
@@ -230,7 +240,10 @@ export default function createStore(
       store: {
         ...bindActionFunctions(Actions, ActionFunctions)(AppDispatcher),
         ..._bindActionObservables(ActionObservables)(storeObservable),
-        ..._createEndOfSideEffectObservables(channel, Actions)(AppDispatcher),
+        /**
+         * @deprecated
+         */
+        ..._createEndOfActionsObservables(channel, Actions)(AppDispatcher),
         [`${channel}Observable`]: storeObservable
       }
     }
