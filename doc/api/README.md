@@ -11,8 +11,7 @@ several differences:
    - one reducer (or handler) per action type.
    - action functions are how you get anything done
 -  a `redux-saga`-like framework is built-in. 
--  reducers are pure functions like in `redux`. However, it is possible to dispatch 
-   side effects inside of reducers, which are just messages handled by another reducer 
-   or by a saga.
+-  it is possible to dispatch messages to other reducers and sagas from inside a 
+   reducer (like `flux`) _while staying pure (unlike `flux`)_.
 -  the global store includes *bound* action functions that can be called to dispatch 
    actions (convenience).
