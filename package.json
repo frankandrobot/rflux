@@ -34,7 +34,7 @@
   },
   "scripts": {
     "dependo": "node node_modules/dependo/bin/dependo -f es6 src/rflux > dependencies.html",
-    "dist": "gulp build && git add dist && git commit -m \"[dist]\" && git push origin",
+    "dist": "gulp build && git add dist && git commit -m \"[dist]\"",
     "test": "node node_modules/.bin/tape -r babel-register -r kefir 'tests/**/*.js' | node node_modules/.bin/tap-notify | node node_modules/.bin/tap-diff",
     "release:major": "npm version major && git push --follow-tags",
     "release:minor": "npm version minor && git push --follow-tags",
