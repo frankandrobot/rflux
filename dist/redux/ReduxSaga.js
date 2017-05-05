@@ -66,9 +66,9 @@ var callObservable = sagaMessageBus.filter(function (action) {
  * @returns {Object} redux middleware
  */
 function reduxSagaMiddleware(channel, _ref) {
-  var Sagas = _ref.Sagas;
-  var SagaActionFunctions = _ref.SagaActionFunctions;
-  var SagaHandlers = _ref.SagaHandlers;
+  var Sagas = _ref.Sagas,
+      SagaActionFunctions = _ref.SagaActionFunctions,
+      SagaHandlers = _ref.SagaHandlers;
 
 
   (0, _assert2.default)(typeof channel === 'string', 'Needs a channel and it needs to be a string');

@@ -24,20 +24,20 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @returns {Function} that receives the child view
  */
 function createContainer(_ref) {
-  var _ref$getDefaultProps = _ref.getDefaultProps;
-  var getDefaultProps = _ref$getDefaultProps === undefined ? function () {
+  var _ref$getDefaultProps = _ref.getDefaultProps,
+      getDefaultProps = _ref$getDefaultProps === undefined ? function () {
     return {};
-  } : _ref$getDefaultProps;
-  var _ref$getInitialState = _ref.getInitialState;
-  var getInitialState = _ref$getInitialState === undefined ? function () {
+  } : _ref$getDefaultProps,
+      _ref$getInitialState = _ref.getInitialState,
+      getInitialState = _ref$getInitialState === undefined ? function () {
     return {};
-  } : _ref$getInitialState;
-  var _ref$getObservableSta = _ref.getObservableState;
-  var getObservableState = _ref$getObservableSta === undefined ? function () {
+  } : _ref$getInitialState,
+      _ref$getObservableSta = _ref.getObservableState,
+      getObservableState = _ref$getObservableSta === undefined ? function () {
     return {};
-  } : _ref$getObservableSta;
-  var _ref$propTypes = _ref.propTypes;
-  var propTypes = _ref$propTypes === undefined ? {} : _ref$propTypes;
+  } : _ref$getObservableSta,
+      _ref$propTypes = _ref.propTypes,
+      propTypes = _ref$propTypes === undefined ? {} : _ref$propTypes;
 
 
   return (0, _createDangerouslySlowContainer2.default)({

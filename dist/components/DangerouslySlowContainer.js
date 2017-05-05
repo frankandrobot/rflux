@@ -30,14 +30,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  * No complex state functions.
  * Because it supports parent React props, it can be inefficient for arbitrary prop changes.
  */
-
 var DangerouslySlowContainer = function (_React$Component) {
   _inherits(DangerouslySlowContainer, _React$Component);
 
   function DangerouslySlowContainer(props, __dangerouslyEnableSlowness) {
     _classCallCheck(this, DangerouslySlowContainer);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(DangerouslySlowContainer).call(this, props));
+    var _this = _possibleConstructorReturn(this, (DangerouslySlowContainer.__proto__ || Object.getPrototypeOf(DangerouslySlowContainer)).call(this, props));
 
     _this.__dangerouslyEnableSlowness = __dangerouslyEnableSlowness || true;
     return _this;

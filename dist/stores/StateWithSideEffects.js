@@ -13,16 +13,33 @@ exports.state = state;
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /**
- * Hey, look! Something like a monad
+ * Hey, look! Something like a monad (dang, forget I said the "m" word.)
+ *
+ * `StateWithSideEffects` is basically state plus an array of messages (the side
+ * effects to be executed).
+ *
+ * You can combine it with State or with another StateWithSideEffects, or add side
+ * effects to an existing StateWithSideEffects.
  */
-
 var StateWithSideEffects = function () {
+
+  /**
+   * @param {State} state
+   * @param {Message[]} sideEffects
+   */
   function StateWithSideEffects(state, sideEffects) {
     _classCallCheck(this, StateWithSideEffects);
 
     this.state = state || {};
     this.sideEffects = sideEffects || [];
   }
+
+  /**
+   * Can combine `StateWithSideEffects` with another `StateWithSideEffects` or with state.
+   * @param {StateWithSideEffects|State} b
+   * @returns {StateWithSideEffects} the result
+   */
+
 
   _createClass(StateWithSideEffects, [{
     key: "combine",
@@ -48,7 +65,7 @@ var StateWithSideEffects = function () {
  * Constructor helper
  *
  * @param {*} state
- * @param {[]} sideEffects - array of side effects
+ * @param {Message[]} sideEffects - array of side effects
  * @returns {StateWithSideEffects} instance
  */
 

@@ -36,7 +36,7 @@ function nonObservables(stateOrProps) {
 }
 
 function setupNonObservables(component, stateOrProps) {
-  var setState = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
+  var setState = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
 
 
   component._nonObservables = nonObservables(stateOrProps);
