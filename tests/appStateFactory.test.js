@@ -15,7 +15,7 @@ const store1 = {
     initialState: {}
   },
   ActionFunctions: {
-    action1: x => ({type: 'action1', payload: {...x}})
+    action1: x => ({channel: 'store1', actionType: 'action1', payload: {...x}})
   }
 }
 const store2 = {
@@ -27,7 +27,7 @@ const store2 = {
     initialState: {}
   },
   ActionFunctions: {
-    action2: x => ({type: 'action2', payload: {...x}})
+    action2: x => ({channel: 'store2', actionType: 'action2', payload: {...x}})
   }
 }
 const factory = appStateFactory()
@@ -73,12 +73,11 @@ test('AppState has a working observable', function(t) {
 
 test('AppState has individual working observables', function(t) {
   t.plan(1)
-  AppState.appStateObservable.onValue(x => t.comment(x))
-  AppState.store1Observable.onValue(state =>
+  AppState.store1Observable.skip(1).onValue(state =>
     t.deepEqual(state, {msg: 'new state'})
   )
   // this one shouldn't fire
-  AppState.store2Observable.onValue(state =>
+  AppState.store2Observable.skip(1).onValue(state =>
     t.deepEqual(state, {})
   )
   AppState.action1({msg: 'new state'})
