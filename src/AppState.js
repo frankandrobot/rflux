@@ -7,8 +7,8 @@ import createSagas from './stores/createSagas'
 
 const AppState = {}
 
-const _storeInfo = []
-const _sagaInfo = []
+export const _storeInfo = []
+export const _sagaInfo = []
 
 /**
  * This actually creates _and_ registers a store.

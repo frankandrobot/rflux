@@ -13,6 +13,7 @@
     "babel-preset-es2015": "^6.6.0",
     "babel-preset-react": "^6.5.0",
     "babel-register": "^6.24.1",
+    "blue-tape": "^1.0.0",
     "del": "^2.2.0",
     "dependo": "^0.1.6",
     "eslint": "^1.10.3",
@@ -26,6 +27,7 @@
     "gulp-watch": "^4.3.5",
     "gulp-webserver": "^0.9.1",
     "jspm": "^0.16.13",
+    "keymirror": "^0.1.1",
     "tap-diff": "^0.1.1",
     "tap-notify": "^1.0.0",
     "tape": "^4.6.3"
@@ -33,7 +35,7 @@
   "scripts": {
     "dependo": "node node_modules/dependo/bin/dependo -f es6 src/rflux > dependencies.html",
     "dist": "gulp build && git add dist && git commit -m \"[dist]\" && git push origin",
-    "test": "node node_modules/.bin/tape -r babel-register 'tests/**/*.js' | node node_modules/.bin/tap-notify | node node_modules/.bin/tap-diff",
+    "test": "node node_modules/.bin/tape -r babel-register -r kefir 'tests/**/*.js' | node node_modules/.bin/tap-notify | node node_modules/.bin/tap-diff",
     "release:major": "npm version major && git push --follow-tags",
     "release:minor": "npm version minor && git push --follow-tags",
     "release:patch": "npm version patch && git push --follow-tags"
@@ -41,11 +43,19 @@
   "author": "Uriel Avalos <uri@frankandrobot.com>",
   "license": "ISC",
   "jspm": {
+    "directories": {
+      "lib": "dist"
+    },
     "dependencies": {
       "kefir": "npm:kefir@^3.2.0"
     },
-    "directories": {
-      "lib": "dist"
+    "devDependencies": {
+      "babel": "npm:babel-core@^5.8.24",
+      "babel-runtime": "npm:babel-runtime@^5.8.24",
+      "core-js": "npm:core-js@^1.1.4"
     }
+  },
+  "dependencies": {
+    "kefir": "^3.2.0"
   }
 }
