@@ -6,6 +6,8 @@ import kefirEmitter from '../utils/kefirEmitter'
  * Every action must go through the AppDispatcher.
  *
  * Returns a Kefir.pool() that we use a bus.
- *
+ * @returns {Kefir.pool}
  **/
-export default kefirEmitter()
+export default function createAppDispatcher() {
+  return kefirEmitter()
+}

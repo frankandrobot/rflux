@@ -2,6 +2,7 @@ import cast from '../internal/cast'
 import assert from '../internal/assert'
 
 import StateWithSideEffects from './StateWithSideEffects'
+import {state} from './StateWithSideEffects'
 
 
 function _bindActionFunctionToAppDispatcher(actionFunction) {
@@ -115,8 +116,6 @@ function _bindActionObservables(ActionObservables) {
  */
 function _createStoreObservable(channel, Reducers) {
 
-  const initialState = new StateWithSideEffects(Reducers.initialState || {})
-
   return AppDispatcher =>
 
     AppDispatcher
@@ -142,8 +141,8 @@ function _createStoreObservable(channel, Reducers) {
             StateWithSideEffects
           )
         },
-        initialState
-      )
+        state(Reducers.initialState || {})
+        )
 }
 
 
@@ -230,21 +229,21 @@ export default function createStore(
 
   return AppDispatcher => {
 
-    const storeWithSideEffectsObservable =
+    const stateWithSideEffectsObservable =
       _createStoreObservable(channel, Reducers)(AppDispatcher)
-    const storeObservable = storeWithSideEffectsObservable.map(x => x.state)
+    const stateObservable = stateWithSideEffectsObservable.map(x => x.state)
 
     return {
       name: channel,
-      observable: storeWithSideEffectsObservable,
+      stateWithSideEffectsObservable,
       store: {
         ...bindActionFunctions(Actions, ActionFunctions)(AppDispatcher),
-        ..._bindActionObservables(ActionObservables)(storeObservable),
+        ..._bindActionObservables(ActionObservables)(stateObservable),
         /**
          * @deprecated
          */
         ..._createEndOfActionsObservables(channel, Actions)(AppDispatcher),
-        [`${channel}Observable`]: storeObservable
+        [`${channel}Observable`]: stateObservable
       }
     }
   }
