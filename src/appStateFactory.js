@@ -28,7 +28,7 @@ export default function appStateFactory(middleware = []) {
      * @param {Map<ActionType,Function>} ActionFunctions - map of action functions indexed by
      * ActionTypes
      * @param {Map<String,Function>} ActionObservables (optional) - higher order functions
-     * that take the StoreObservable as input and return an observable that selects parts
+     * that take the StoreStateObservable as input and return an observable that selects parts
      * of the state tree. **This will probably be deprecated.**
      * @function
      */
