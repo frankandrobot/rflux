@@ -12,7 +12,7 @@ function _bindActionFunctionToAppDispatcher(actionFunction) {
 }
 
 /**
- * Takes a map of ActionFunctions indexed by Action and binds each to the
+ * Takes a map of ActionFunctions indexed by ActionType and binds each to the
  * AppDispatcher. That is, when a bound function is called, it automatically
  * dispatches its message to the store.
  *
@@ -23,15 +23,15 @@ function _bindActionFunctionToAppDispatcher(actionFunction) {
  *    that accepts the AppDispatcher object as a parameter. This way, the
  *    AppDispatcher is not hard-coded dependency.
  *
- * @param {Map<String,Boolean>} Actions
- * @param {Map<Action,Function>} ActionFunctions
+ * @param {Map<String,Boolean>} ActionTypes
+ * @param {Map<ActionType,Function>} ActionFunctions
  * @returns {Function} a function that binds the action functions to the app dispatcher
  */
-export function bindActionFunctions(Actions, ActionFunctions) {
+export function bindActionFunctions(ActionTypes, ActionFunctions) {
 
   return AppDispatcher =>
 
-    Object.keys(Actions).reduce(
+    Object.keys(ActionTypes).reduce(
       (storeActions, action) => ({
         ...storeActions,
         [action]: _bindActionFunctionToAppDispatcher(ActionFunctions[action])(AppDispatcher)
@@ -44,7 +44,7 @@ export function bindActionFunctions(Actions, ActionFunctions) {
  * @deprecated You rarely (really) need a *pre-bound* selector (emphasis:
  * "pre-bound"). For this reason, these are deprecated.
  *
- * Takes a map of ActionObservables *not necessarily indexed by Action* and binds each
+ * Takes a map of ActionObservables *not necessarily indexed by ActionType* and binds each
  * to the StoreObservable. The StoreObservable is the store's state, wrapped in a
  * Kefir stream (otherwise known as an *observable*).
  *
@@ -105,13 +105,13 @@ function _bindActionObservables(ActionObservables) {
  * are handled by async sagas.
  *
  * **Notes:**
- * 1. Every Action must have a corresponding Reducer.
+ * 1. Every ActionType must have a corresponding Reducer.
  * 2. This method is actually a higher order function. It returns a function
  *    that accepts an AppDispatcher object as a parameter. This way, the
  *    AppDispatcher is not hard-coded dependency.
  *
  * @param {String} channel
- * @param {Map<Action,Function>} Reducers
+ * @param {Map<ActionType,Function>} Reducers
  * @returns {Function} a function that creates the store's state observable.
  */
 function _createStoreObservable(channel, Reducers) {
@@ -150,15 +150,15 @@ function _createStoreObservable(channel, Reducers) {
  * The idea is that you can use these observables to observe the end of a reducer +
  * side effects.
  * @param {String} channel
- * @param {Map<String,*>} Actions
+ * @param {Map<String,*>} ActionTypes
  * @returns {Function} function that binds AppDispatcher to the observables
  * @private
  */
-function _createEndOfActionsObservables(channel, Actions) {
+function _createEndOfActionsObservables(channel, ActionTypes) {
 
   return AppDispatcher =>
 
-    Object.keys(Actions).reduce(
+    Object.keys(ActionTypes).reduce(
       (observables, action) => Object.assign(
         observables,
         {
@@ -192,11 +192,11 @@ function _createEndOfActionsObservables(channel, Actions) {
  * 2. use the word "observable" in the observables. Ex: docObservable
  *
  * @param {String} channel
- * @param {Map<String,*>} Actions - map of action type constants
- * @param {Map<Action,Function>} Reducers - map of reducers, indexed by Action.
+ * @param {Map<String,*>} ActionTypes - map of action type constants
+ * @param {Map<ActionType,Function>} Reducers - map of reducers, indexed by ActionType.
  * Additionally, reducers have an `initialState` property.
- * @param {Map<Action,Function>} ActionFunctions - map of action functions, indexed by
- * Action
+ * @param {Map<ActionType,Function>} ActionFunctions - map of action functions, indexed by
+ * ActionType
  * @param {Map<String,Function>} ActionObservables (optional) - higher order functions
  * that take the StoreObservable as input and return an observable that selects parts
  * of the state tree. **This will probably be deprecated.**
@@ -204,17 +204,17 @@ function _createEndOfActionsObservables(channel, Actions) {
  */
 export default function createStore(
   channel,
-  {Actions, Reducers, ActionFunctions, ActionObservables}) {
+  {ActionTypes, Reducers, ActionFunctions, ActionObservables}) {
 
   ActionObservables = ActionObservables || {}
 
   assert(typeof channel === 'string', 'Needs a channel and it needs to be a string')
-  assert(Actions, 'Need Actions')
+  assert(ActionTypes, 'Need ActionTypes')
   assert(Reducers, 'Need Reducers')
   assert(ActionFunctions, 'Need action functions')
 
   //every action must have an action function and a reducer
-  Object.keys(Actions).forEach(action => {
+  Object.keys(ActionTypes).forEach(action => {
     assert(
       ActionFunctions[action],
       `Channel ${channel} is missing action function "${action}"`
@@ -237,12 +237,12 @@ export default function createStore(
       name: channel,
       stateWithSideEffectsObservable,
       store: {
-        ...bindActionFunctions(Actions, ActionFunctions)(AppDispatcher),
+        ...bindActionFunctions(ActionTypes, ActionFunctions)(AppDispatcher),
         ..._bindActionObservables(ActionObservables)(stateObservable),
         /**
          * @deprecated
          */
-        ..._createEndOfActionsObservables(channel, Actions)(AppDispatcher),
+        ..._createEndOfActionsObservables(channel, ActionTypes)(AppDispatcher),
         [`${channel}Observable`]: stateObservable
       }
     }

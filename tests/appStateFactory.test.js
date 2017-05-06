@@ -8,7 +8,7 @@ import appStateFactory from '../src/appStateFactory'
 
 const objectUnderTestFn = () => {
   const store1 = {
-    Actions: keyMirror({
+    ActionTypes: keyMirror({
       action1: true
     }),
     Reducers: {
@@ -20,7 +20,7 @@ const objectUnderTestFn = () => {
     }
   }
   const store2 = {
-    Actions: keyMirror({
+    ActionTypes: keyMirror({
       action2: true
     }),
     Reducers: {

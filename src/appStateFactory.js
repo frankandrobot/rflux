@@ -23,10 +23,10 @@ export default function appStateFactory(middleware = []) {
      * This actually creates _and_ registers a store.
      *
      * @param {String} channel
-     * @param {Map<String,*>} Actions - map of action types
-     * @param {Map<Action,Function>} Reducers - map of reducers indexed by Action
-     * @param {Map<Action,Function>} ActionFunctions - map of action functions indexed by
-     * Actions
+     * @param {Map<String,*>} ActionTypes - map of action types
+     * @param {Map<ActionType,Function>} Reducers - map of reducers indexed by ActionType
+     * @param {Map<ActionType,Function>} ActionFunctions - map of action functions indexed by
+     * ActionTypes
      * @param {Map<String,Function>} ActionObservables (optional) - higher order functions
      * that take the StoreObservable as input and return an observable that selects parts
      * of the state tree. **This will probably be deprecated.**
@@ -43,12 +43,12 @@ export default function appStateFactory(middleware = []) {
 function registerStore({AppState, stores, AppDispatcher}) {
   return function _registerStore(
     channel,
-    {Actions, Reducers, ActionFunctions, ActionObservables}) {
+    {ActionTypes, Reducers, ActionFunctions, ActionObservables}) {
 
     // first create the store
     const store = createStore(
       channel,
-      {Actions, Reducers, ActionFunctions, ActionObservables}
+      {ActionTypes, Reducers, ActionFunctions, ActionObservables}
     )(AppDispatcher)
 
     // then add store to store info collection
