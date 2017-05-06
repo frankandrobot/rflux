@@ -119,7 +119,7 @@ function _createStoreObservable(channel, Reducers) {
   return AppDispatcher =>
 
     AppDispatcher
-      .filter(x => x.channel === channel)
+      .filter(x => x && x.channel === channel)
       .scan(
         (stateWithSideEffects, action) => {
 
