@@ -44,6 +44,7 @@ const objectUnderTestFn = () => {
   }
 }
 
+
 test('register two stores', function(t) {
   t.plan(1)
   const {factory} = objectUnderTestFn()
@@ -51,12 +52,14 @@ test('register two stores', function(t) {
   t.equal(factory.stores.length, 2)
 })
 
+
 test('AppState has appStateObservable', function(t) {
   t.plan(1)
   const {AppState} = objectUnderTestFn()
 
   t.ok(!!AppState.appStateObservable, 'appStateObservable is defined')
 })
+
 
 test('AppState has action functions', function(t) {
   t.plan(2)
@@ -66,6 +69,7 @@ test('AppState has action functions', function(t) {
   t.ok(!!AppState.action2)
 })
 
+
 test('AppState has individual store state observables', function(t) {
   t.plan(2)
   const {AppState} = objectUnderTestFn()
@@ -74,18 +78,37 @@ test('AppState has individual store state observables', function(t) {
   t.ok(!!AppState.store2Observable)
 })
 
-test('AppState has a working observable', function(t) {
+
+test('AppState observable autofires initial state', function(t) {
   t.plan(1)
   const {AppState} = objectUnderTestFn()
 
-  AppState.appStateObservable.onValue(state =>
-    t.deepEqual(state, {
-      store1: {},
-      store2: {}
-    })
-  )
-  AppState.action1()
+  AppState.appStateObservable
+    .onValue(state =>
+      t.deepEqual(state, {
+        store1: {},
+        store2: {}
+      })
+    )
 })
+
+
+test('AppState observable works', function(t) {
+  t.plan(1)
+  const {AppState} = objectUnderTestFn()
+
+  AppState.appStateObservable
+    .skip(1) // skip initial state
+    .onValue(state =>
+      t.deepEqual(state, {
+        store1: {msg: 'new state'},
+        store2: {}
+      })
+    )
+
+  AppState.action1({msg: 'new state'})
+})
+
 
 test('AppState has individual working observables', function(t) {
   t.plan(1)
@@ -96,7 +119,7 @@ test('AppState has individual working observables', function(t) {
   )
   // this one shouldn't fire
   AppState.store2Observable.skip(1).onValue(state =>
-    t.deepEqual(state, {})
+    t.equal(0, 1)
   )
   AppState.action1({msg: 'new state'})
 })
