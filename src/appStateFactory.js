@@ -29,7 +29,7 @@ export default function appStateFactory(middleware = []) {
      * @function
      */
     registerStore: _registerStore({AppState, stores, AppDispatcher}),
-    registerSagas: _registerSagas({AppState}),
+    registerSagas: _registerSagas({AppState, sagas, AppDispatcher}),
     sagas: sagaFactory(AppDispatcher),
     create: _create({AppState, stores, AppDispatcher}),
 
