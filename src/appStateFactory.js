@@ -5,15 +5,10 @@ import createStore from './stores/createStore'
 import createSagas from './stores/createSagas'
 
 
-const AppState = {}
-
-export const _storeInfo = []
-export const _sagaInfo = []
-
 export default function appStateFactory(middleware = []) {
   const AppState = {}
   const stores = []
-  const sagaInfo = []
+  const sagas = []
   const AppDispatcher = createAppDispatcher()
 
   /* eslint-disable no-use-before-define */
@@ -32,16 +27,17 @@ export default function appStateFactory(middleware = []) {
      * of the state tree. **This will probably be deprecated.**
      * @function
      */
-    registerStore: registerStore({AppState, stores, AppDispatcher}),
-    create: create({AppState, stores, AppDispatcher}),
+    registerStore: _registerStore({AppState, stores, AppDispatcher}),
+    registerSagas: _registerSagas({AppState}),
+    create: _create({AppState, stores, AppDispatcher}),
 
     get stores() { return stores },
-    get sagas() { return sagaInfo }
+    get sagas() { return sagas }
   }
 }
 
-function registerStore({AppState, stores, AppDispatcher}) {
-  return function _registerStore(
+function _registerStore({AppState, stores, AppDispatcher}) {
+  return function __registerStore(
     channel,
     {ActionTypes, Reducers, ActionFunctions, ActionObservables}) {
 
@@ -76,24 +72,26 @@ function registerStore({AppState, stores, AppDispatcher}) {
 }
 
 
-export function registerSagas(channel, {Sagas, SagaActionFunctions, SagaHandlers}) {
+export function _registerSagas({AppState, sagas, AppDispatcher}) {
+  return function __registerSagas(channel, {Sagas, SagaActionFunctions, SagaHandlers}) {
 
-  const sagas = createSagas(channel, {Sagas, SagaActionFunctions, SagaHandlers})(AppDispatcher)
+    const _sagas = createSagas(channel, {Sagas, SagaActionFunctions, SagaHandlers})(AppDispatcher)
 
-  // store
-  _sagaInfo.push(sagas)
+    // store
+    sagas.push(_sagas)
 
-  // add action functions and result observables to app state
-  Object.assign(AppState, sagas.actionFunctions, sagas.resultObservables)
+    // add action functions and result observables to app state
+    Object.assign(AppState, _sagas.actionFunctions, _sagas.resultObservables)
 
-  // setup one-way data flow
-  const callback = () => undefined
+    // setup one-way data flow
+    const callback = () => undefined
 
-  Object.keys(sagas.observables).forEach(obs => sagas.observables[obs].onValue(callback))
+    Object.keys(_sagas.observables).forEach(obs => _sagas.observables[obs].onValue(callback))
+  }
 }
 
 
-export function create({AppState, stores, AppDispatcher}) {
+export function _create({AppState, stores, AppDispatcher}) {
   return function __create() {
     if (stores.length === 0) {
       throw new Error('You didn\'t register any stores!')
