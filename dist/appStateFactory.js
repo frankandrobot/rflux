@@ -59,7 +59,7 @@ function appStateFactory() {
      * @function
      */
     registerStore: _registerStore({ AppState: AppState, stores: stores, AppDispatcher: AppDispatcher }),
-    registerSagas: _registerSagas({ AppState: AppState }),
+    registerSagas: _registerSagas({ AppState: AppState, sagas: sagas, AppDispatcher: AppDispatcher }),
     sagas: (0, _sagaFactory2.default)(AppDispatcher),
     create: _create({ AppState: AppState, stores: stores, AppDispatcher: AppDispatcher }),
 
