@@ -26,6 +26,10 @@ var _createSagas = require('./stores/createSagas');
 
 var _createSagas2 = _interopRequireDefault(_createSagas);
 
+var _sagaFactory = require('./stores/sagaFactory');
+
+var _sagaFactory2 = _interopRequireDefault(_sagaFactory);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -56,12 +60,13 @@ function appStateFactory() {
      */
     registerStore: _registerStore({ AppState: AppState, stores: stores, AppDispatcher: AppDispatcher }),
     registerSagas: _registerSagas({ AppState: AppState }),
+    sagas: (0, _sagaFactory2.default)(AppDispatcher),
     create: _create({ AppState: AppState, stores: stores, AppDispatcher: AppDispatcher }),
 
-    get stores() {
+    get _stores() {
       return stores;
     },
-    get sagas() {
+    get _sagas() {
       return sagas;
     }
   };
