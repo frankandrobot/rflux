@@ -3,6 +3,7 @@ import Kefir from 'kefir'
 import createAppDispatcher from './appdispatcher/createAppDispatcher'
 import createStore from './stores/createStore'
 import createSagas from './stores/createSagas'
+import sagaFactory from './stores/sagaFactory'
 
 
 export default function appStateFactory(middleware = []) {
@@ -29,10 +30,11 @@ export default function appStateFactory(middleware = []) {
      */
     registerStore: _registerStore({AppState, stores, AppDispatcher}),
     registerSagas: _registerSagas({AppState}),
+    sagas: sagaFactory(AppDispatcher),
     create: _create({AppState, stores, AppDispatcher}),
 
-    get stores() { return stores },
-    get sagas() { return sagas }
+    get _stores() { return stores },
+    get _sagas() { return sagas }
   }
 }
 
