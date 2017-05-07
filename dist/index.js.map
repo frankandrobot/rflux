@@ -1,0 +1,1 @@
+{"version":3,"sources":["index.js"],"names":[],"mappings":";;AAAA;;;;AACA;;;;AACA","file":"index.js","sourcesContent":["import createSagas from './stores/createSagas'\nimport createStore from './stores/createStore'\nimport StateWithSideEffects from './stores/StateWithSideEffects'\nimport {state} from './stores/StateWithSideEffects'\n"]}
