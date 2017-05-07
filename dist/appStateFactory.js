@@ -3,13 +3,12 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports._sagaInfo = exports._storeInfo = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 exports.default = appStateFactory;
-exports.registerSagas = registerSagas;
-exports.create = create;
+exports._registerSagas = _registerSagas;
+exports._create = _create;
 
 var _kefir = require('kefir');
 
@@ -31,17 +30,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var AppState = {};
-
-var _storeInfo = exports._storeInfo = [];
-var _sagaInfo = exports._sagaInfo = [];
-
 function appStateFactory() {
   var middleware = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
   var AppState = {};
   var stores = [];
-  var sagaInfo = [];
+  var sagas = [];
   var AppDispatcher = (0, _createAppDispatcher2.default)();
 
   /* eslint-disable no-use-before-define */
@@ -60,24 +54,25 @@ function appStateFactory() {
      * of the state tree. **This will probably be deprecated.**
      * @function
      */
-    registerStore: registerStore({ AppState: AppState, stores: stores, AppDispatcher: AppDispatcher }),
-    create: create({ AppState: AppState, stores: stores, AppDispatcher: AppDispatcher }),
+    registerStore: _registerStore({ AppState: AppState, stores: stores, AppDispatcher: AppDispatcher }),
+    registerSagas: _registerSagas({ AppState: AppState }),
+    create: _create({ AppState: AppState, stores: stores, AppDispatcher: AppDispatcher }),
 
     get stores() {
       return stores;
     },
     get sagas() {
-      return sagaInfo;
+      return sagas;
     }
   };
 }
 
-function registerStore(_ref) {
+function _registerStore(_ref) {
   var AppState = _ref.AppState,
       stores = _ref.stores,
       AppDispatcher = _ref.AppDispatcher;
 
-  return function _registerStore(channel, _ref2) {
+  return function __registerStore(channel, _ref2) {
     var ActionTypes = _ref2.ActionTypes,
         Reducers = _ref2.Reducers,
         ActionFunctions = _ref2.ActionFunctions,
@@ -113,34 +108,40 @@ function registerStore(_ref) {
   };
 }
 
-function registerSagas(channel, _ref3) {
-  var Sagas = _ref3.Sagas,
-      SagaActionFunctions = _ref3.SagaActionFunctions,
-      SagaHandlers = _ref3.SagaHandlers;
+function _registerSagas(_ref3) {
+  var AppState = _ref3.AppState,
+      sagas = _ref3.sagas,
+      AppDispatcher = _ref3.AppDispatcher;
+
+  return function __registerSagas(channel, _ref4) {
+    var Sagas = _ref4.Sagas,
+        SagaActionFunctions = _ref4.SagaActionFunctions,
+        SagaHandlers = _ref4.SagaHandlers;
 
 
-  var sagas = (0, _createSagas2.default)(channel, { Sagas: Sagas, SagaActionFunctions: SagaActionFunctions, SagaHandlers: SagaHandlers })(AppDispatcher);
+    var _sagas = (0, _createSagas2.default)(channel, { Sagas: Sagas, SagaActionFunctions: SagaActionFunctions, SagaHandlers: SagaHandlers })(AppDispatcher);
 
-  // store
-  _sagaInfo.push(sagas);
+    // store
+    sagas.push(_sagas);
 
-  // add action functions and result observables to app state
-  Object.assign(AppState, sagas.actionFunctions, sagas.resultObservables);
+    // add action functions and result observables to app state
+    Object.assign(AppState, _sagas.actionFunctions, _sagas.resultObservables);
 
-  // setup one-way data flow
-  var callback = function callback() {
-    return undefined;
+    // setup one-way data flow
+    var callback = function callback() {
+      return undefined;
+    };
+
+    Object.keys(_sagas.observables).forEach(function (obs) {
+      return _sagas.observables[obs].onValue(callback);
+    });
   };
-
-  Object.keys(sagas.observables).forEach(function (obs) {
-    return sagas.observables[obs].onValue(callback);
-  });
 }
 
-function create(_ref4) {
-  var AppState = _ref4.AppState,
-      stores = _ref4.stores,
-      AppDispatcher = _ref4.AppDispatcher;
+function _create(_ref5) {
+  var AppState = _ref5.AppState,
+      stores = _ref5.stores,
+      AppDispatcher = _ref5.AppDispatcher;
 
   return function __create() {
     if (stores.length === 0) {
