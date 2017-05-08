@@ -141,7 +141,7 @@ test('kefir#pool + kefir#combined + kefir#scan autofires initial state', functio
 })
 
 
-test('kefir#pool + kefir#combined + kefir#scan should work initial state', function(t) {
+test('kefir#pool + kefir#combined + kefir#scan should work', function(t) {
   t.plan(2)
 
   let ctr = 0
@@ -175,3 +175,15 @@ test('kefir#pool + kefir#combined + kefir#scan should work initial state', funct
 
   emitter.emit(3)
 })
+
+
+test('transform an array into chained streams', function(t) {
+  const arr = [1, 2, 3]
+
+  arr
+    .reduce((chain, x) => chain.map(y => y + x), kefir.constant(0))
+    .onValue(result => t.deepEqual(result, 0+1+2+3))
+    .onValue(() => t.end())
+    .onError(() => t.fail())
+})
+

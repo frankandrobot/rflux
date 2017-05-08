@@ -201,8 +201,7 @@ function _createEndOfActionsObservables(channel, ActionTypes) {
  * @returns {Function} that binds the store to the app dispatcher
  */
 export default function createStore(
-  channel,
-  {ActionTypes, Reducers, ActionFunctions, ActionObservables}) {
+  {channel, ActionTypes, Reducers, ActionFunctions, ActionObservables}) {
 
   ActionObservables = ActionObservables || {}
 

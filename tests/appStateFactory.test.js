@@ -8,6 +8,7 @@ import appStateFactory from '../src/appStateFactory'
 
 const objectUnderTestFn = () => {
   const store1 = {
+    channel: 'store1',
     ActionTypes: keyMirror({
       action1: true
     }),
@@ -20,6 +21,7 @@ const objectUnderTestFn = () => {
     }
   }
   const store2 = {
+    channel: 'store2',
     ActionTypes: keyMirror({
       action2: true
     }),
@@ -31,26 +33,16 @@ const objectUnderTestFn = () => {
       action2: x => ({channel: 'store2', actionType: 'action2', payload: {...x}})
     }
   }
-  const factory = appStateFactory()
-
-  factory.registerStore('store1', store1)
-  factory.registerStore('store2', store2)
+  const factory = appStateFactory({
+    stores: [store1, store2]
+  })
 
   const AppState = factory.create()
 
   return {
-    factory,
     AppState
   }
 }
-
-
-test('register two stores', function(t) {
-  t.plan(1)
-  const {factory} = objectUnderTestFn()
-
-  t.equal(factory.stores.length, 2)
-})
 
 
 test('AppState has appStateObservable', function(t) {

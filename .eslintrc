@@ -80,7 +80,7 @@
     "indent": [2, 2, {"SwitchCase": 1}], /** 2 space indention **/
     "key-spacing": [2, {"beforeColon": false, "afterColon": true}],
     "max-len": [2, 128, 4], /** max line width = 128 chars, tabs count as 4 chars **/
-    "max-nested-callbacks": [2, 3],
+    "max-nested-callbacks": [2, 5],
     "max-params": [2, 5],
     "new-cap": 2,
     "newline-after-var": [2, "always"],
