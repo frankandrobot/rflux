@@ -33,11 +33,9 @@ const objectUnderTestFn = () => {
       action2: x => ({channel: 'store2', actionType: 'action2', payload: {...x}})
     }
   }
-  const factory = appStateFactory({
+  const {AppState} = appStateFactory({
     stores: [store1, store2]
   })
-
-  const AppState = factory.create()
 
   return {
     AppState

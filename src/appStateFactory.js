@@ -3,7 +3,6 @@ import Kefir from 'kefir'
 import createAppDispatcher from './appdispatcher/createAppDispatcher'
 import createStore from './stores/createStore'
 import createSagas from './stores/createSagas'
-import sagaFactory from './stores/sagaFactory'
 import middlewareFactory from './redux/middlewareFactory'
 
 
@@ -23,45 +22,39 @@ import middlewareFactory from './redux/middlewareFactory'
  */
 export default function appStateFactory(
   {
-    stores = [],
-    sagas = [],
+    stores: rawStores = [],
+    sagas: rawSagas = [],
     middleware = []
   }) {
 
+  /* eslint-disable no-use-before-define */
+  if (rawStores.length === 0) {
+    throw new Error('You didn\'t add any stores!')
+  }
   const InitialAppDispatcher = createAppDispatcher()
   const dispatch = (...args) => InitialAppDispatcher.emit(...args)
   const Middleware = middlewareFactory({dispatch, rawMiddleware: middleware})
-  const AppDispatcher = Middleware.spyOnAppDispatcher({AppDispatcher: InitialAppDispatcher})
+  const AppDispatcher = Middleware.attachMiddleware({AppDispatcher: InitialAppDispatcher})
 
-  /* eslint-disable no-use-before-define */
-  return {
-    sagas: sagaFactory(AppDispatcher),
-    create: _create({Middleware, rawStores: stores, rawSagas: sagas, AppDispatcher})
+  const stores = _createStores({rawStores, AppDispatcher})
+  const sagas = _createSagas({rawSagas, AppDispatcher})
+  const appStateObservable = _createAppStateObservable({stores})
+
+  _setupStoreObs({stores, AppDispatcher})
+  _setupSagaObs({sagas})
+
+  // inject the state back into Middleware, so that getState works
+  //appStateObservable.onValue(Middleware.setState)
+
+  const AppState = {
+    appStateObservable,
+    ..._storesToState({stores}),
+    ..._sagasToState({sagas})
   }
-}
 
-export function _create({Middleware, rawStores = [], rawSagas = [], AppDispatcher}) {
-  return function create() {
-
-    if (rawStores.length === 0) {
-      throw new Error('You didn\'t add any stores!')
-    }
-
-    const stores = _createStores({rawStores, AppDispatcher})
-    const sagas = _createSagas({rawSagas, AppDispatcher})
-    const appStateObservable = _createAppStateObservable({stores})
-
-    _setupStoreObs({stores, AppDispatcher})
-    _setupSagaObs({sagas})
-
-    // inject the state back into Middleware, so that getState works
-    appStateObservable.onValue(Middleware.setState)
-
-    return {
-      appStateObservable,
-      ..._storesToState({stores}),
-      ..._sagasToState({sagas})
-    }
+  return {
+    AppState,
+    AppDispatcher
   }
 }
 

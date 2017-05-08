@@ -29,7 +29,7 @@ test('middleware should pass message thru all', function(t) {
   const {AppDispatcher, middleware} = objectUnderTestFn()
   const dispatch = (...args) => AppDispatcher.emit(...args)
   const mw = middlewareFactory({dispatch, rawMiddleware: middleware})
-  const result = mw.spyOnAppDispatcher({AppDispatcher})
+  const result = mw.attachMiddleware({AppDispatcher})
 
   result
     .onValue(x => t.equal(x, 0))
@@ -44,7 +44,7 @@ test('middleware should have a working dispatch', function(t) {
   const {AppDispatcher, middleware} = objectUnderTestFn()
   const dispatch = (...args) => AppDispatcher.emit(...args)
   const mw = middlewareFactory({dispatch, rawMiddleware: middleware})
-  const result = mw.spyOnAppDispatcher({AppDispatcher})
+  const result = mw.attachMiddleware({AppDispatcher})
 
   result
     .onValue(x => t.equal(x, 4))
@@ -59,7 +59,7 @@ test('middleware should stop if next is not called', function(t) {
   const {AppDispatcher, middleware} = objectUnderTestFn()
   const dispatch = (...args) => AppDispatcher.emit(...args)
   const mw = middlewareFactory({dispatch, rawMiddleware: middleware})
-  const result = mw.spyOnAppDispatcher({AppDispatcher})
+  const result = mw.attachMiddleware({AppDispatcher})
 
   result
     .onValue(() => t.equal(0, 1))
