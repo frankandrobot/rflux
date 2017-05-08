@@ -62,8 +62,9 @@ function _bindSagaResultObservables(sagas) {
   * @param SagaActionFunctions - (optional) map of action functions
   * @param SagaHandlers - map of handler functions
   */
-function createSagas(channel, _ref) {
-  var Sagas = _ref.Sagas,
+function createSagas(_ref) {
+  var channel = _ref.channel,
+      Sagas = _ref.Sagas,
       SagaActionFunctions = _ref.SagaActionFunctions,
       SagaHandlers = _ref.SagaHandlers;
 

@@ -7,7 +7,6 @@ Object.defineProperty(exports, "__esModule", {
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 exports.default = appStateFactory;
-exports._registerSagas = _registerSagas;
 exports._create = _create;
 
 var _kefir = require('kefir');
@@ -22,9 +21,9 @@ var _createStore = require('./stores/createStore');
 
 var _createStore2 = _interopRequireDefault(_createStore);
 
-var _createSagas = require('./stores/createSagas');
+var _createSagas2 = require('./stores/createSagas');
 
-var _createSagas2 = _interopRequireDefault(_createSagas);
+var _createSagas3 = _interopRequireDefault(_createSagas2);
 
 var _sagaFactory = require('./stores/sagaFactory');
 
@@ -34,137 +33,146 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-function appStateFactory() {
-  var middleware = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+/**
+ * A store consists of:
+ * - a name (channel)
+ * - map of ActionTypes
+ * - map of Reducers indexed by ActionType
+ * - map of ActionFunctions indexed by ActionType
+ *
+ * @param {Middleware[]} middleware
+ * @param {Stores[]} stores
+ * @param {Sagas[]} sagas
+ */
+function appStateFactory(_ref) {
+  var _ref$middleware = _ref.middleware,
+      middleware = _ref$middleware === undefined ? [] : _ref$middleware,
+      _ref$stores = _ref.stores,
+      stores = _ref$stores === undefined ? [] : _ref$stores,
+      _ref$sagas = _ref.sagas,
+      sagas = _ref$sagas === undefined ? [] : _ref$sagas;
 
-  var AppState = {};
-  var stores = [];
-  var sagas = [];
+
   var AppDispatcher = (0, _createAppDispatcher2.default)();
 
   /* eslint-disable no-use-before-define */
   return {
-    /**
-     *
-     * This actually creates _and_ registers a store.
-     *
-     * @param {String} channel
-     * @param {Map<String,*>} ActionTypes - map of action types
-     * @param {Map<ActionType,Function>} Reducers - map of reducers indexed by ActionType
-     * @param {Map<ActionType,Function>} ActionFunctions - map of action functions indexed by
-     * ActionTypes
-     * @param {Map<String,Function>} ActionObservables (optional) - higher order functions
-     * that take the StoreStateObservable as input and return an observable that selects parts
-     * of the state tree. **This will probably be deprecated.**
-     * @function
-     */
-    registerStore: _registerStore({ AppState: AppState, stores: stores, AppDispatcher: AppDispatcher }),
-    registerSagas: _registerSagas({ AppState: AppState, sagas: sagas, AppDispatcher: AppDispatcher }),
     sagas: (0, _sagaFactory2.default)(AppDispatcher),
-    create: _create({ AppState: AppState, stores: stores, AppDispatcher: AppDispatcher }),
+    create: _create({ middleware: middleware, rawStores: stores, rawSagas: sagas, AppDispatcher: AppDispatcher })
+  };
+}
 
-    get _stores() {
-      return stores;
-    },
-    get _sagas() {
-      return sagas;
+function _create(_ref2) {
+  var _ref2$rawStores = _ref2.rawStores,
+      rawStores = _ref2$rawStores === undefined ? [] : _ref2$rawStores,
+      _ref2$rawSagas = _ref2.rawSagas,
+      rawSagas = _ref2$rawSagas === undefined ? [] : _ref2$rawSagas,
+      AppDispatcher = _ref2.AppDispatcher;
+
+  return function create() {
+
+    if (rawStores.length === 0) {
+      throw new Error('You didn\'t add any stores!');
     }
+
+    var stores = _createStores({ rawStores: rawStores, AppDispatcher: AppDispatcher });
+    var sagas = _createSagas({ rawSagas: rawSagas, AppDispatcher: AppDispatcher });
+    var appStateObservable = _createAppStateObservable({ stores: stores });
+
+    _setupStoreObs({ stores: stores, AppDispatcher: AppDispatcher });
+    _setupSagaObs({ sagas: sagas });
+
+    return _extends({
+      appStateObservable: appStateObservable
+    }, _storesToState({ stores: stores }), _sagasToState({ sagas: sagas }));
   };
 }
 
-function _registerStore(_ref) {
-  var AppState = _ref.AppState,
-      stores = _ref.stores,
-      AppDispatcher = _ref.AppDispatcher;
-
-  return function __registerStore(channel, _ref2) {
-    var ActionTypes = _ref2.ActionTypes,
-        Reducers = _ref2.Reducers,
-        ActionFunctions = _ref2.ActionFunctions,
-        ActionObservables = _ref2.ActionObservables;
-
-
-    // first create the store
-    var store = (0, _createStore2.default)(channel, { ActionTypes: ActionTypes, Reducers: Reducers, ActionFunctions: ActionFunctions, ActionObservables: ActionObservables })(AppDispatcher);
-
-    // then add store to store info collection
-    stores.push(store);
-
-    // then create the new appStateObservable
-    var stateWithSideEffectsObservables = stores.map(function (x) {
-      return x.stateWithSideEffectsObservable;
-    });
-    var appStateObservable = _kefir2.default.combine(
-    // this fires when any of the store state observables change
-    stateWithSideEffectsObservables,
-    // this combines all the store states into a single state
-    function () {
-      for (var _len = arguments.length, observables = Array(_len), _key = 0; _key < _len; _key++) {
-        observables[_key] = arguments[_key];
-      }
-
-      return observables.reduce(function (appStateObservable, state, i) {
-        return Object.assign(appStateObservable, _defineProperty({}, '' + stores[i].name, state.state));
-      }, {});
-    });
-
-    // new app state is observable + store
-    Object.assign(AppState, _extends({ appStateObservable: appStateObservable }, store.store));
-  };
-}
-
-function _registerSagas(_ref3) {
-  var AppState = _ref3.AppState,
-      sagas = _ref3.sagas,
+function _createStores(_ref3) {
+  var rawStores = _ref3.rawStores,
       AppDispatcher = _ref3.AppDispatcher;
 
-  return function __registerSagas(channel, _ref4) {
-    var Sagas = _ref4.Sagas,
-        SagaActionFunctions = _ref4.SagaActionFunctions,
-        SagaHandlers = _ref4.SagaHandlers;
-
-
-    var _sagas = (0, _createSagas2.default)(channel, { Sagas: Sagas, SagaActionFunctions: SagaActionFunctions, SagaHandlers: SagaHandlers })(AppDispatcher);
-
-    // store
-    sagas.push(_sagas);
-
-    // add action functions and result observables to app state
-    Object.assign(AppState, _sagas.actionFunctions, _sagas.resultObservables);
-
-    // setup one-way data flow
-    var callback = function callback() {
-      return undefined;
-    };
-
-    Object.keys(_sagas.observables).forEach(function (obs) {
-      return _sagas.observables[obs].onValue(callback);
-    });
-  };
+  return rawStores.map(function (s) {
+    return (0, _createStore2.default)(s)(AppDispatcher);
+  });
 }
 
-function _create(_ref5) {
-  var AppState = _ref5.AppState,
-      stores = _ref5.stores,
-      AppDispatcher = _ref5.AppDispatcher;
+function _createSagas(_ref4) {
+  var rawSagas = _ref4.rawSagas,
+      AppDispatcher = _ref4.AppDispatcher;
 
-  return function __create() {
-    if (stores.length === 0) {
-      throw new Error('You didn\'t register any stores!');
+  return rawSagas.map(function (s) {
+    return (0, _createSagas3.default)(s)(AppDispatcher);
+  });
+}
+
+function _createAppStateObservable(_ref5) {
+  var stores = _ref5.stores;
+
+  // first create the new appStateObservable
+  var storeStatesWithSideEffectsObservables = stores.map(function (x) {
+    return x.stateWithSideEffectsObservable;
+  });
+
+  // then combine these into the appStateObservable
+  return _kefir2.default.combine(
+  // this fires when any of the store state observables change
+  storeStatesWithSideEffectsObservables,
+  // this combines all the store states into a single state
+  function () {
+    for (var _len = arguments.length, observables = Array(_len), _key = 0; _key < _len; _key++) {
+      observables[_key] = arguments[_key];
     }
 
-    // setup one-way data flow + side effects
-    stores.map(function (store) {
-      return store.stateWithSideEffectsObservable.onValue(function (state) {
-        return (state.sideEffects || []).forEach(function (sideEffect) {
-          return setTimeout(function () {
-            return AppDispatcher.emit(sideEffect);
-          }, 0);
-        });
+    return observables.reduce(function (appStateObservable, state, i) {
+      return Object.assign(appStateObservable, _defineProperty({}, '' + stores[i].name, state.state));
+    }, {});
+  });
+}
+
+function _storesToState(_ref6) {
+  var stores = _ref6.stores;
+
+  return stores.reduce(function (state, store) {
+    return _extends({}, state, store.store);
+  }, {});
+}
+
+function _sagasToState(_ref7) {
+  var sagas = _ref7.sagas;
+
+  // add action functions and result observables to app state
+  return sagas.reduce(function (state, saga) {
+    return _extends({}, state, saga.actionFunctions, saga.resultObservables);
+  }, {});
+}
+
+function _setupStoreObs(_ref8) {
+  var stores = _ref8.stores,
+      AppDispatcher = _ref8.AppDispatcher;
+
+  // setup one-way data flow + side effects
+  stores.forEach(function (store) {
+    return store.stateWithSideEffectsObservable.onValue(function (state) {
+      return (state.sideEffects || []).forEach(function (sideEffect) {
+        return setTimeout(function () {
+          return AppDispatcher.emit(sideEffect);
+        }, 0);
       });
     });
+  });
+}
 
-    return AppState;
-  };
+function _setupSagaObs(_ref9) {
+  var sagas = _ref9.sagas;
+
+  // setup one-way data flow
+  sagas.forEach(function (_sagas) {
+    return Object.keys(_sagas.observables).forEach(function (obs) {
+      return _sagas.observables[obs].onValue(function () {
+        return undefined;
+      });
+    });
+  });
 }
 //# sourceMappingURL=appStateFactory.js.map

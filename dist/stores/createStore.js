@@ -204,8 +204,9 @@ function _createEndOfActionsObservables(channel, ActionTypes) {
  * of the state tree. **This will probably be deprecated.**
  * @returns {Function} that binds the store to the app dispatcher
  */
-function createStore(channel, _ref) {
-  var ActionTypes = _ref.ActionTypes,
+function createStore(_ref) {
+  var channel = _ref.channel,
+      ActionTypes = _ref.ActionTypes,
       Reducers = _ref.Reducers,
       ActionFunctions = _ref.ActionFunctions,
       ActionObservables = _ref.ActionObservables;
