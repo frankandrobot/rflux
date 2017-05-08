@@ -50,7 +50,7 @@ function _bindSagaResultObservables(sagas) {
   * @param SagaActionFunctions - (optional) map of action functions
   * @param SagaHandlers - map of handler functions
   */
-export default function createSagas(channel, {Sagas, SagaActionFunctions, SagaHandlers}) {
+export default function createSagas({channel, Sagas, SagaActionFunctions, SagaHandlers}) {
 
   assert(typeof channel === 'string', 'Needs a channel and it needs to be a string')
   assert(Sagas, 'Need Sagas')

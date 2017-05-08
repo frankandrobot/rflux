@@ -1,6 +1,6 @@
 {
   "name": "rflux2",
-  "version": "0.5.4",
+  "version": "0.6.3",
   "description": "",
   "main": false,
   "devDependencies": {
@@ -36,6 +36,7 @@
     "dependo": "node node_modules/dependo/bin/dependo -f es6 src/rflux > dependencies.html",
     "dist": "gulp build && git add dist && git commit -m \"[dist]\"",
     "test": "node node_modules/.bin/tape -r babel-register -r kefir 'tests/**/*.js' | node node_modules/.bin/tap-notify | node node_modules/.bin/tap-diff",
+    "test:simple": "node node_modules/.bin/tape -r babel-register -r kefir 'tests/**/*.js'",
     "release:major": "npm version major && git push --follow-tags",
     "release:minor": "npm version minor && git push --follow-tags",
     "release:patch": "npm version patch && git push --follow-tags"
