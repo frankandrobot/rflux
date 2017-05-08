@@ -7,7 +7,6 @@ Object.defineProperty(exports, "__esModule", {
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 exports.default = appStateFactory;
-exports._create = _create;
 
 var _kefir = require('kefir');
 
@@ -24,10 +23,6 @@ var _createStore2 = _interopRequireDefault(_createStore);
 var _createSagas2 = require('./stores/createSagas');
 
 var _createSagas3 = _interopRequireDefault(_createSagas2);
-
-var _sagaFactory = require('./stores/sagaFactory');
-
-var _sagaFactory2 = _interopRequireDefault(_sagaFactory);
 
 var _middlewareFactory = require('./redux/middlewareFactory');
 
@@ -53,77 +48,67 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  */
 function appStateFactory(_ref) {
   var _ref$stores = _ref.stores,
-      stores = _ref$stores === undefined ? [] : _ref$stores,
+      rawStores = _ref$stores === undefined ? [] : _ref$stores,
       _ref$sagas = _ref.sagas,
-      sagas = _ref$sagas === undefined ? [] : _ref$sagas,
+      rawSagas = _ref$sagas === undefined ? [] : _ref$sagas,
       _ref$middleware = _ref.middleware,
       middleware = _ref$middleware === undefined ? [] : _ref$middleware;
 
 
+  /* eslint-disable no-use-before-define */
+  if (rawStores.length === 0) {
+    throw new Error('You didn\'t add any stores!');
+  }
   var InitialAppDispatcher = (0, _createAppDispatcher2.default)();
   var dispatch = function dispatch() {
     return InitialAppDispatcher.emit.apply(InitialAppDispatcher, arguments);
   };
   var Middleware = (0, _middlewareFactory2.default)({ dispatch: dispatch, rawMiddleware: middleware });
-  var AppDispatcher = Middleware.spyOnAppDispatcher({ AppDispatcher: InitialAppDispatcher });
+  var AppDispatcher = Middleware.attachMiddleware({ AppDispatcher: InitialAppDispatcher });
 
-  /* eslint-disable no-use-before-define */
+  var stores = _createStores({ rawStores: rawStores, AppDispatcher: AppDispatcher });
+  var sagas = _createSagas({ rawSagas: rawSagas, AppDispatcher: AppDispatcher });
+  var appStateObservable = _createAppStateObservable({ stores: stores })
+  // inject the state back into Middleware, so that getState works. Unfortunately, in kefirjs, there is
+  // no way to do a side effect w/o activating the stream. So we use `map` for side effects (which is
+  // technically an antipattern).
+  .map(function (state) {
+    Middleware.setState(state);return state;
+  });
+
+  _setupStoreObs({ stores: stores, AppDispatcher: AppDispatcher });
+  _setupSagaObs({ sagas: sagas });
+
+  var AppState = _extends({
+    appStateObservable: appStateObservable
+  }, _storesToState({ stores: stores }), _sagasToState({ sagas: sagas }));
+
   return {
-    sagas: (0, _sagaFactory2.default)(AppDispatcher),
-    create: _create({ Middleware: Middleware, rawStores: stores, rawSagas: sagas, AppDispatcher: AppDispatcher })
+    AppState: AppState,
+    AppDispatcher: AppDispatcher
   };
 }
 
-function _create(_ref2) {
-  var Middleware = _ref2.Middleware,
-      _ref2$rawStores = _ref2.rawStores,
-      rawStores = _ref2$rawStores === undefined ? [] : _ref2$rawStores,
-      _ref2$rawSagas = _ref2.rawSagas,
-      rawSagas = _ref2$rawSagas === undefined ? [] : _ref2$rawSagas,
+function _createStores(_ref2) {
+  var rawStores = _ref2.rawStores,
       AppDispatcher = _ref2.AppDispatcher;
-
-  return function create() {
-
-    if (rawStores.length === 0) {
-      throw new Error('You didn\'t add any stores!');
-    }
-
-    var stores = _createStores({ rawStores: rawStores, AppDispatcher: AppDispatcher });
-    var sagas = _createSagas({ rawSagas: rawSagas, AppDispatcher: AppDispatcher });
-    var appStateObservable = _createAppStateObservable({ stores: stores });
-
-    _setupStoreObs({ stores: stores, AppDispatcher: AppDispatcher });
-    _setupSagaObs({ sagas: sagas });
-
-    // inject the state back into Middleware, so that getState works
-    appStateObservable.onValue(Middleware.setState);
-
-    return _extends({
-      appStateObservable: appStateObservable
-    }, _storesToState({ stores: stores }), _sagasToState({ sagas: sagas }));
-  };
-}
-
-function _createStores(_ref3) {
-  var rawStores = _ref3.rawStores,
-      AppDispatcher = _ref3.AppDispatcher;
 
   return rawStores.map(function (s) {
     return (0, _createStore2.default)(s)(AppDispatcher);
   });
 }
 
-function _createSagas(_ref4) {
-  var rawSagas = _ref4.rawSagas,
-      AppDispatcher = _ref4.AppDispatcher;
+function _createSagas(_ref3) {
+  var rawSagas = _ref3.rawSagas,
+      AppDispatcher = _ref3.AppDispatcher;
 
   return rawSagas.map(function (s) {
     return (0, _createSagas3.default)(s)(AppDispatcher);
   });
 }
 
-function _createAppStateObservable(_ref5) {
-  var stores = _ref5.stores;
+function _createAppStateObservable(_ref4) {
+  var stores = _ref4.stores;
 
   // first create the new appStateObservable
   var storeStatesWithSideEffectsObservables = stores.map(function (x) {
@@ -146,16 +131,16 @@ function _createAppStateObservable(_ref5) {
   });
 }
 
-function _storesToState(_ref6) {
-  var stores = _ref6.stores;
+function _storesToState(_ref5) {
+  var stores = _ref5.stores;
 
   return stores.reduce(function (state, store) {
     return _extends({}, state, store.store);
   }, {});
 }
 
-function _sagasToState(_ref7) {
-  var sagas = _ref7.sagas;
+function _sagasToState(_ref6) {
+  var sagas = _ref6.sagas;
 
   // add action functions and result observables to app state
   return sagas.reduce(function (state, saga) {
@@ -163,9 +148,9 @@ function _sagasToState(_ref7) {
   }, {});
 }
 
-function _setupStoreObs(_ref8) {
-  var stores = _ref8.stores,
-      AppDispatcher = _ref8.AppDispatcher;
+function _setupStoreObs(_ref7) {
+  var stores = _ref7.stores,
+      AppDispatcher = _ref7.AppDispatcher;
 
   // setup one-way data flow + side effects
   stores.forEach(function (store) {
@@ -179,8 +164,8 @@ function _setupStoreObs(_ref8) {
   });
 }
 
-function _setupSagaObs(_ref9) {
-  var sagas = _ref9.sagas;
+function _setupSagaObs(_ref8) {
+  var sagas = _ref8.sagas;
 
   // setup one-way data flow
   sagas.forEach(function (_sagas) {

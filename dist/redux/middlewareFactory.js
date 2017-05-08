@@ -31,17 +31,20 @@ function middlewareFactory(_ref) {
     setState: function setState(_state) {
       return state = _state;
     },
-    spyOnAppDispatcher: function spyOnAppDispatcher(_ref2) {
+
+    attachMiddleware: function attachMiddleware(_ref2) {
       var AppDispatcher = _ref2.AppDispatcher;
 
-      return AppDispatcher
-      // this turns the middlewares into a stream of filters
-      .flatMap(function (action) {
+      var AppDispatcherObs =
+      // this injects the middleware into the AppDispatcher. Middleware can stop propagation of events
+      // to observables by not calling "next(action)". Middleware can also transform actions or dispatch
+      // their own actions.
+      AppDispatcher.flatMap(function (action) {
         return middleware.reduce(function (chain, _middleware) {
           var transformedAction = action;
           var allowContinue = false;
           // the "next" action doesn't actually do anything.... it just tells the chain of
-          // filters to continue. But also allows the middleware to transfom the action
+          // filters to continue. Also allows the middleware to transfom the action
           var next = function next(_action) {
             transformedAction = _action;
             allowContinue = true;
@@ -49,12 +52,24 @@ function middlewareFactory(_ref) {
 
           return chain.filter(function (_action) {
             _middleware(next)(_action);
+            // stop if next not called
             return allowContinue;
-          }).map(function () {
+          })
+          // transform action (if requested)
+          .map(function () {
             return transformedAction;
           });
         }, _kefir2.default.constant(action));
       });
+
+      // Yuck. Turn the observer into a dispatcher by adding an emit method that dispatches events into
+      // the *original* AppDispatcher bus. Recall that the AppDispatcher is a bus (an observable with an emit
+      // method).
+      Object.assign(AppDispatcherObs, { emit: function emit() {
+          return AppDispatcher.emit.apply(AppDispatcher, arguments);
+        } });
+
+      return AppDispatcherObs;
     }
   };
 }

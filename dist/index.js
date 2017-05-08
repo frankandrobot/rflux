@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.StateWithSideEffects = exports.state = exports.DangerouslySlowContainer = exports.createDangerouslySlowContainer = exports.createContainer = undefined;
+exports.sagaFactory = exports.StateWithSideEffects = exports.state = exports.DangerouslySlowContainer = exports.createDangerouslySlowContainer = exports.createContainer = undefined;
 
 var _createContainer = require('./components/createContainer');
 
@@ -21,6 +21,10 @@ var _StateWithSideEffects = require('./stores/StateWithSideEffects');
 
 var _StateWithSideEffects2 = _interopRequireDefault(_StateWithSideEffects);
 
+var _sagaFactory = require('./stores/sagaFactory');
+
+var _sagaFactory2 = _interopRequireDefault(_sagaFactory);
+
 var _appStateFactory = require('./appStateFactory');
 
 var _appStateFactory2 = _interopRequireDefault(_appStateFactory);
@@ -32,5 +36,6 @@ exports.createDangerouslySlowContainer = _createDangerouslySlowContainer2.defaul
 exports.DangerouslySlowContainer = _DangerouslySlowContainer2.default;
 exports.state = _StateWithSideEffects.state;
 exports.StateWithSideEffects = _StateWithSideEffects2.default;
+exports.sagaFactory = _sagaFactory2.default;
 exports.default = _appStateFactory2.default;
 //# sourceMappingURL=index.js.map
