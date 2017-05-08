@@ -4,6 +4,7 @@ import createAppDispatcher from './appdispatcher/createAppDispatcher'
 import createStore from './stores/createStore'
 import createSagas from './stores/createSagas'
 import sagaFactory from './stores/sagaFactory'
+import middlewareFactory from './redux/middlewareFactory'
 
 
 /**
@@ -13,18 +14,24 @@ import sagaFactory from './stores/sagaFactory'
  * - map of Reducers indexed by ActionType
  * - map of ActionFunctions indexed by ActionType
  *
- * @param {Middleware[]} middleware
+ * A middleware is function with the following signature:
+ * store => next => action
+ *
  * @param {Stores[]} stores
  * @param {Sagas[]} sagas
+ * @param {Middleware[]} middleware
  */
 export default function appStateFactory(
   {
-    middleware = [],
     stores = [],
-    sagas = []
+    sagas = [],
+    middleware = []
   }) {
 
   const AppDispatcher = createAppDispatcher()
+  const dispatch = (...args) => AppDispatcher.emit(...args)
+  //const Middleware = middlewareFactory({dispatch, rawMiddleware: middleware})
+
 
   /* eslint-disable no-use-before-define */
   return {
