@@ -29,6 +29,10 @@ var _sagaFactory = require('./stores/sagaFactory');
 
 var _sagaFactory2 = _interopRequireDefault(_sagaFactory);
 
+var _middlewareFactory = require('./redux/middlewareFactory');
+
+var _middlewareFactory2 = _interopRequireDefault(_middlewareFactory);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -40,30 +44,39 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * - map of Reducers indexed by ActionType
  * - map of ActionFunctions indexed by ActionType
  *
- * @param {Middleware[]} middleware
+ * A middleware is function with the following signature:
+ * store => next => action
+ *
  * @param {Stores[]} stores
  * @param {Sagas[]} sagas
+ * @param {Middleware[]} middleware
  */
 function appStateFactory(_ref) {
-  var _ref$middleware = _ref.middleware,
-      middleware = _ref$middleware === undefined ? [] : _ref$middleware,
-      _ref$stores = _ref.stores,
+  var _ref$stores = _ref.stores,
       stores = _ref$stores === undefined ? [] : _ref$stores,
       _ref$sagas = _ref.sagas,
-      sagas = _ref$sagas === undefined ? [] : _ref$sagas;
+      sagas = _ref$sagas === undefined ? [] : _ref$sagas,
+      _ref$middleware = _ref.middleware,
+      middleware = _ref$middleware === undefined ? [] : _ref$middleware;
 
 
-  var AppDispatcher = (0, _createAppDispatcher2.default)();
+  var InitialAppDispatcher = (0, _createAppDispatcher2.default)();
+  var dispatch = function dispatch() {
+    return InitialAppDispatcher.emit.apply(InitialAppDispatcher, arguments);
+  };
+  var Middleware = (0, _middlewareFactory2.default)({ dispatch: dispatch, rawMiddleware: middleware });
+  var AppDispatcher = Middleware.spyOnAppDispatcher({ AppDispatcher: InitialAppDispatcher });
 
   /* eslint-disable no-use-before-define */
   return {
     sagas: (0, _sagaFactory2.default)(AppDispatcher),
-    create: _create({ middleware: middleware, rawStores: stores, rawSagas: sagas, AppDispatcher: AppDispatcher })
+    create: _create({ Middleware: Middleware, rawStores: stores, rawSagas: sagas, AppDispatcher: AppDispatcher })
   };
 }
 
 function _create(_ref2) {
-  var _ref2$rawStores = _ref2.rawStores,
+  var Middleware = _ref2.Middleware,
+      _ref2$rawStores = _ref2.rawStores,
       rawStores = _ref2$rawStores === undefined ? [] : _ref2$rawStores,
       _ref2$rawSagas = _ref2.rawSagas,
       rawSagas = _ref2$rawSagas === undefined ? [] : _ref2$rawSagas,
@@ -81,6 +94,9 @@ function _create(_ref2) {
 
     _setupStoreObs({ stores: stores, AppDispatcher: AppDispatcher });
     _setupSagaObs({ sagas: sagas });
+
+    // inject the state back into Middleware, so that getState works
+    appStateObservable.onValue(Middleware.setState);
 
     return _extends({
       appStateObservable: appStateObservable
