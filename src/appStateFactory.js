@@ -38,13 +38,15 @@ export default function appStateFactory(
 
   const stores = _createStores({rawStores, AppDispatcher})
   const sagas = _createSagas({rawSagas, AppDispatcher})
-  const appStateObservable = _createAppStateObservable({stores})
+  const appStateObservable =
+    _createAppStateObservable({stores})
+    // inject the state back into Middleware, so that getState works. Unfortunately, in kefirjs, there is
+    // no way to do a side effect w/o activating the stream. So we use `map` for side effects (which is
+    // technically an antipattern).
+      .map(state => { Middleware.setState(state); return state })
 
   _setupStoreObs({stores, AppDispatcher})
   _setupSagaObs({sagas})
-
-  // inject the state back into Middleware, so that getState works
-  //appStateObservable.onValue(Middleware.setState)
 
   const AppState = {
     appStateObservable,
