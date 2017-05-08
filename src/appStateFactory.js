@@ -4,6 +4,7 @@ import createAppDispatcher from './appdispatcher/createAppDispatcher'
 import createStore from './stores/createStore'
 import createSagas from './stores/createSagas'
 import sagaFactory from './stores/sagaFactory'
+import middlewareFactory from './redux/middlewareFactory'
 
 
 /**
@@ -13,27 +14,33 @@ import sagaFactory from './stores/sagaFactory'
  * - map of Reducers indexed by ActionType
  * - map of ActionFunctions indexed by ActionType
  *
- * @param {Middleware[]} middleware
+ * A middleware is function with the following signature:
+ * store => next => action
+ *
  * @param {Stores[]} stores
  * @param {Sagas[]} sagas
+ * @param {Middleware[]} middleware
  */
 export default function appStateFactory(
   {
-    middleware = [],
     stores = [],
-    sagas = []
+    sagas = [],
+    middleware = []
   }) {
 
-  const AppDispatcher = createAppDispatcher()
+  const InitialAppDispatcher = createAppDispatcher()
+  const dispatch = (...args) => InitialAppDispatcher.emit(...args)
+  const Middleware = middlewareFactory({dispatch, rawMiddleware: middleware})
+  const AppDispatcher = Middleware.spyOnAppDispatcher({AppDispatcher: InitialAppDispatcher})
 
   /* eslint-disable no-use-before-define */
   return {
     sagas: sagaFactory(AppDispatcher),
-    create: _create({middleware, rawStores: stores, rawSagas: sagas, AppDispatcher})
+    create: _create({Middleware, rawStores: stores, rawSagas: sagas, AppDispatcher})
   }
 }
 
-export function _create({rawStores = [], rawSagas = [], AppDispatcher}) {
+export function _create({Middleware, rawStores = [], rawSagas = [], AppDispatcher}) {
   return function create() {
 
     if (rawStores.length === 0) {
@@ -46,6 +53,9 @@ export function _create({rawStores = [], rawSagas = [], AppDispatcher}) {
 
     _setupStoreObs({stores, AppDispatcher})
     _setupSagaObs({sagas})
+
+    // inject the state back into Middleware, so that getState works
+    appStateObservable.onValue(Middleware.setState)
 
     return {
       appStateObservable,
