@@ -3,14 +3,15 @@ import kefir from 'kefir'
 
 export default function middlewareFactory({dispatch, rawMiddleware}) {
 
+  let state = null
   const store = {
     dispatch,
-    getState: () => undefined
+    getState: () => state
   }
   const middleware = rawMiddleware.map(__middleware => __middleware(store))
 
   return {
-    setState: () => undefined,
+    setState: _state => state = _state,
     spyOnAppDispatcher({AppDispatcher}) {
       return AppDispatcher
         // this turns the middlewares into a stream of filters

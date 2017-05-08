@@ -28,19 +28,19 @@ export default function appStateFactory(
     middleware = []
   }) {
 
-  const AppDispatcher = createAppDispatcher()
-  const dispatch = (...args) => AppDispatcher.emit(...args)
-  //const Middleware = middlewareFactory({dispatch, rawMiddleware: middleware})
-
+  const InitialAppDispatcher = createAppDispatcher()
+  const dispatch = (...args) => InitialAppDispatcher.emit(...args)
+  const Middleware = middlewareFactory({dispatch, rawMiddleware: middleware})
+  const AppDispatcher = Middleware.spyOnAppDispatcher({AppDispatcher: InitialAppDispatcher})
 
   /* eslint-disable no-use-before-define */
   return {
     sagas: sagaFactory(AppDispatcher),
-    create: _create({middleware, rawStores: stores, rawSagas: sagas, AppDispatcher})
+    create: _create({Middleware, rawStores: stores, rawSagas: sagas, AppDispatcher})
   }
 }
 
-export function _create({rawStores = [], rawSagas = [], AppDispatcher}) {
+export function _create({Middleware, rawStores = [], rawSagas = [], AppDispatcher}) {
   return function create() {
 
     if (rawStores.length === 0) {
@@ -53,6 +53,9 @@ export function _create({rawStores = [], rawSagas = [], AppDispatcher}) {
 
     _setupStoreObs({stores, AppDispatcher})
     _setupSagaObs({sagas})
+
+    // inject the state back into Middleware, so that getState works
+    appStateObservable.onValue(Middleware.setState)
 
     return {
       appStateObservable,
