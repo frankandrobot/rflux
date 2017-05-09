@@ -28,19 +28,19 @@ const callObservable = sagaMessageBus
 
 /**
  * @param {String} channel
- * @param {Map} Sagas - map whose keys are the names of the side effects
+ * @param {Map} ActionTypes - map whose keys are the names of the side effects
  * @param {Map} SagaActionFunctions - (optional) map of action functions
  * @param {Map} SagaHandlers - map of handler functions
  * @returns {Object} redux middleware
  */
-export function reduxSagaMiddleware(channel, {Sagas, SagaActionFunctions, SagaHandlers}) {
+export function reduxSagaMiddleware(channel, {ActionTypes, SagaActionFunctions, SagaHandlers}) {
 
   assert(typeof channel === 'string', 'Needs a channel and it needs to be a string')
-  assert(Sagas, 'Need Sagas')
+  assert(ActionTypes, 'Need ActionTypes')
   assert(SagaHandlers, 'Need SagaHandlers')
 
   //every side effect must map to an action function and handler
-  Object.keys(Sagas).forEach(action => {
+  Object.keys(ActionTypes).forEach(action => {
     if (SagaActionFunctions) {
       assert(SagaActionFunctions[action], `Channel ${channel} is missing side effect action function "${action}"`)
     }

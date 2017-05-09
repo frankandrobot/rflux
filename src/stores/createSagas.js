@@ -17,11 +17,11 @@ export function bindSagaHandler(channel, sagaName, sagaHandler) {
       })
 }
 
-function _bindSagaHandlers(channel, Sagas, SagaHandlers) {
+function _bindSagaHandlers(channel, ActionTypes, SagaHandlers) {
 
   return AppDispatcher =>
 
-    Object.keys(Sagas).reduce(
+    Object.keys(ActionTypes).reduce(
       (observables, saga) => {
 
         const handler = SagaHandlers[saga]
@@ -46,18 +46,18 @@ function _bindSagaResultObservables(sagas) {
   * then every SideEffect must have a corresponding action function.
   *
   * @param channel
-  * @param Sagas - map whose keys are the names of the side effects
+  * @param ActionTypes - map whose keys are the names of the side effects
   * @param SagaActionFunctions - (optional) map of action functions
   * @param SagaHandlers - map of handler functions
   */
-export default function createSagas({channel, Sagas, SagaActionFunctions, SagaHandlers}) {
+export default function createSagas({channel, ActionTypes, SagaActionFunctions, SagaHandlers}) {
 
   assert(typeof channel === 'string', 'Needs a channel and it needs to be a string')
-  assert(Sagas, 'Need Sagas')
+  assert(ActionTypes, 'Need ActionTypes')
   assert(SagaHandlers, 'Need SagaHandlers')
 
   //every side effect must map to an action function and handler
-  Object.keys(Sagas).forEach(action => {
+  Object.keys(ActionTypes).forEach(action => {
     if (SagaActionFunctions) {
       assert(SagaActionFunctions[action], `Channel ${channel} is missing side effect action function "${action}"`)
     }
@@ -68,12 +68,12 @@ export default function createSagas({channel, Sagas, SagaActionFunctions, SagaHa
 
   return AppDispatcher => {
 
-    const observables = _bindSagaHandlers(channel, Sagas, SagaHandlers)(AppDispatcher)
+    const observables = _bindSagaHandlers(channel, ActionTypes, SagaHandlers)(AppDispatcher)
 
     return {
       name: channel,
       observables,
-      actionFunctions: bindActionFunctions(Sagas, SagaActionFunctions)(AppDispatcher),
+      actionFunctions: bindActionFunctions(ActionTypes, SagaActionFunctions)(AppDispatcher),
       resultObservables: _bindSagaResultObservables(observables)
     }
   }

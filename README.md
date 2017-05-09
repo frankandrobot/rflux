@@ -19,6 +19,6 @@ The minified is coming in at less than 20k. With KefirJS, that's less than 30k!
 
 ## Documentation
 
-Checkout the [docs](/docs/).
+Checkout the [docs](./doc/).
 
 Sample usage, for now, can be found at: https://github.com/awesome-editor/awesome-editor/
