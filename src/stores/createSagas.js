@@ -49,9 +49,9 @@ function _bindSagaResultObservables(sagas) {
  * @param {Map<ActionType,Function>} SagaActionFunctions - (optional) map of action functions indexed by
  * ActionType. Like a store's action functions, these functions can be used to initiate a saga. Note
  * that if you include one action function, then every ActionType must have a corresponding action function.
- * @param {Function} SagaHandlersFn - higher order function with signature `({sagas})=>SagaHandlers` that
- * accepts the `sagas` interface object and returns the SagaHandlers. The SagaHandlers are a map of
- * functions indexed by ActionType i.e, Map<ActionType,Function>.
+ * @param {Function} SagaHandlersFn - higher order function with signature
+ * `({...sagaInterface})=>SagaHandlers` that accepts the `sagas` interface object and returns the
+ * SagaHandlers. The SagaHandlers are a map of functions indexed by ActionType i.e, Map<ActionType,Function>.
  * @return {Saga} higher order function that creates the saga.
  */
 export default function createSagas({channel, ActionTypes, SagaActionFunctions = {}, SagaHandlersFn}) {
@@ -64,7 +64,7 @@ export default function createSagas({channel, ActionTypes, SagaActionFunctions =
   return ({AppDispatcher, sagaInterface}) => {
 
     /* eslint-disable new-cap */
-    const SagaHandlers = SagaHandlersFn({sagas: sagaInterface})
+    const SagaHandlers = SagaHandlersFn({...sagaInterface})
     /* eslint-enable */
 
     //every side effect must map to an action function and handler
