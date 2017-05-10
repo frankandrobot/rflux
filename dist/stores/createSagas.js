@@ -3,6 +3,9 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 exports.bindSagaHandler = bindSagaHandler;
 exports.default = createSagas;
 
@@ -61,9 +64,9 @@ function _bindSagaResultObservables(sagas) {
  * @param {Map<ActionType,Function>} SagaActionFunctions - (optional) map of action functions indexed by
  * ActionType. Like a store's action functions, these functions can be used to initiate a saga. Note
  * that if you include one action function, then every ActionType must have a corresponding action function.
- * @param {Function} SagaHandlersFn - higher order function with signature `({sagas})=>SagaHandlers` that
- * accepts the `sagas` interface object and returns the SagaHandlers. The SagaHandlers are a map of
- * functions indexed by ActionType i.e, Map<ActionType,Function>.
+ * @param {Function} SagaHandlersFn - higher order function with signature
+ * `({...sagaInterface})=>SagaHandlers` that accepts the `sagas` interface object and returns the
+ * SagaHandlers. The SagaHandlers are a map of functions indexed by ActionType i.e, Map<ActionType,Function>.
  * @return {Saga} higher order function that creates the saga.
  */
 function createSagas(_ref) {
@@ -85,7 +88,7 @@ function createSagas(_ref) {
 
 
     /* eslint-disable new-cap */
-    var SagaHandlers = SagaHandlersFn({ sagas: sagaInterface });
+    var SagaHandlers = SagaHandlersFn(_extends({}, sagaInterface));
     /* eslint-enable */
 
     //every side effect must map to an action function and handler
