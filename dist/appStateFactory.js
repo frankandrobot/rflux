@@ -24,6 +24,10 @@ var _createSagas2 = require('./stores/createSagas');
 
 var _createSagas3 = _interopRequireDefault(_createSagas2);
 
+var _sagaInterfaceFactory = require('./stores/sagaInterfaceFactory');
+
+var _sagaInterfaceFactory2 = _interopRequireDefault(_sagaInterfaceFactory);
+
 var _middlewareFactory = require('./redux/middlewareFactory');
 
 var _middlewareFactory2 = _interopRequireDefault(_middlewareFactory);
@@ -32,6 +36,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
 /**
  * A store consists of:
  * - a name (channel)
@@ -39,12 +45,22 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * - map of Reducers indexed by ActionType
  * - map of ActionFunctions indexed by ActionType
  *
+ * See `createStore` for more details.
+ *
+ * A saga consists of:
+ * - a name (channel)
+ * - map of ActionTypes
+ * - SagaHandlersFn higher order function that accepts a `sagas` interface and returns the SagaHandlers.
+ *
+ * See `createSagas` for more details.
+ *
  * A middleware is function with the following signature:
  * store => next => action
  *
  * @param {Stores[]} stores
  * @param {Sagas[]} sagas
  * @param {Middleware[]} middleware
+ * @returns {{AppState, AppDispatcher}} the AppState and its dispatcher to send messages.
  */
 function appStateFactory(_ref) {
   var _ref$stores = _ref.stores,
@@ -59,22 +75,25 @@ function appStateFactory(_ref) {
   if (rawStores.length === 0) {
     throw new Error('You didn\'t add any stores!');
   }
+  // first setup internal fixtures
   var InitialAppDispatcher = (0, _createAppDispatcher2.default)();
   var dispatch = function dispatch() {
     return InitialAppDispatcher.emit.apply(InitialAppDispatcher, arguments);
   };
   var Middleware = (0, _middlewareFactory2.default)({ dispatch: dispatch, rawMiddleware: middleware });
   var AppDispatcher = Middleware.attachMiddleware({ AppDispatcher: InitialAppDispatcher });
-
+  // then setup public structures
   var stores = _createStores({ rawStores: rawStores, AppDispatcher: AppDispatcher });
-  var sagas = _createSagas({ rawSagas: rawSagas, AppDispatcher: AppDispatcher });
   var appStateObservable = _createAppStateObservable({ stores: stores })
-  // inject the state back into Middleware, so that getState works. Unfortunately, in kefirjs, there is
-  // no way to do a side effect w/o activating the stream. So we use `map` for side effects (which is
-  // technically an antipattern).
+  // inject the state back into Middleware, so that getState works. Unfortunately, in kefirjs,
+  // there is no way to do a side effect w/o activating the stream. So we use `map` for side effects
+  // (which is technically an antipattern).
   .map(function (state) {
-    Middleware.setState(state);return state;
+    Middleware.setState(state);
+    return state;
   });
+  var sagaInterface = (0, _sagaInterfaceFactory2.default)({ AppDispatcher: AppDispatcher, appStateObservable: appStateObservable });
+  var sagas = _createSagas({ rawSagas: rawSagas, AppDispatcher: AppDispatcher, sagaInterface: sagaInterface });
 
   _setupStoreObs({ stores: stores, AppDispatcher: AppDispatcher });
   _setupSagaObs({ sagas: sagas });
@@ -91,19 +110,19 @@ function appStateFactory(_ref) {
 
 function _createStores(_ref2) {
   var rawStores = _ref2.rawStores,
-      AppDispatcher = _ref2.AppDispatcher;
+      args = _objectWithoutProperties(_ref2, ['rawStores']);
 
   return rawStores.map(function (s) {
-    return (0, _createStore2.default)(s)(AppDispatcher);
+    return (0, _createStore2.default)(s)(_extends({}, args));
   });
 }
 
 function _createSagas(_ref3) {
   var rawSagas = _ref3.rawSagas,
-      AppDispatcher = _ref3.AppDispatcher;
+      args = _objectWithoutProperties(_ref3, ['rawSagas']);
 
   return rawSagas.map(function (s) {
-    return (0, _createSagas3.default)(s)(AppDispatcher);
+    return (0, _createSagas3.default)(s)(_extends({}, args));
   });
 }
 

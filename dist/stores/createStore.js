@@ -230,7 +230,9 @@ function createStore(_ref) {
     console.warn('Channel ' + channel + ' doesn\'t have initialState');
   }
 
-  return function (AppDispatcher) {
+  return function (_ref2) {
+    var AppDispatcher = _ref2.AppDispatcher;
+
 
     var stateWithSideEffectsObservable = _createStoreStateObservable(channel, Reducers)(AppDispatcher);
     var stateObservable = stateWithSideEffectsObservable.map(function (x) {

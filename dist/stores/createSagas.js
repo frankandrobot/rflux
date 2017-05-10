@@ -33,10 +33,10 @@ function bindSagaHandler(channel, sagaName, sagaHandler) {
   };
 }
 
-function _bindSagaHandlers(channel, Sagas, SagaHandlers) {
+function _bindSagaHandlers(channel, ActionTypes, SagaHandlers) {
 
   return function (AppDispatcher) {
-    return Object.keys(Sagas).reduce(function (observables, saga) {
+    return Object.keys(ActionTypes).reduce(function (observables, saga) {
 
       var handler = SagaHandlers[saga];
       var observable = bindSagaHandler(channel, saga, handler)(AppDispatcher);
@@ -54,43 +54,54 @@ function _bindSagaResultObservables(sagas) {
 }
 
 /**
-  * SideEffectActionFunctions are optional but if you pass these,
-  * then every SideEffect must have a corresponding action function.
-  *
-  * @param channel
-  * @param Sagas - map whose keys are the names of the side effects
-  * @param SagaActionFunctions - (optional) map of action functions
-  * @param SagaHandlers - map of handler functions
-  */
+ * Sagas are primarily used for handling ajax workflows.
+ *
+ * @param {String} channel - the name of the saga collection
+ * @param {Map<String,*>} ActionTypes - the names of the action types (aka side effects) these sagas handle
+ * @param {Map<ActionType,Function>} SagaActionFunctions - (optional) map of action functions indexed by
+ * ActionType. Like a store's action functions, these functions can be used to initiate a saga. Note
+ * that if you include one action function, then every ActionType must have a corresponding action function.
+ * @param {Function} SagaHandlersFn - higher order function with signature `({sagas})=>SagaHandlers` that
+ * accepts the `sagas` interface object and returns the SagaHandlers. The SagaHandlers are a map of
+ * functions indexed by ActionType i.e, Map<ActionType,Function>.
+ * @return {Saga} higher order function that creates the saga.
+ */
 function createSagas(_ref) {
   var channel = _ref.channel,
-      Sagas = _ref.Sagas,
-      SagaActionFunctions = _ref.SagaActionFunctions,
-      SagaHandlers = _ref.SagaHandlers;
+      ActionTypes = _ref.ActionTypes,
+      _ref$SagaActionFuncti = _ref.SagaActionFunctions,
+      SagaActionFunctions = _ref$SagaActionFuncti === undefined ? {} : _ref$SagaActionFuncti,
+      SagaHandlersFn = _ref.SagaHandlersFn;
 
 
   (0, _assert2.default)(typeof channel === 'string', 'Needs a channel and it needs to be a string');
-  (0, _assert2.default)(Sagas, 'Need Sagas');
-  (0, _assert2.default)(SagaHandlers, 'Need SagaHandlers');
+  (0, _assert2.default)(ActionTypes, 'Need ActionTypes');
+  (0, _assert2.default)(SagaHandlersFn, 'Need SagaHandlersFn');
+  (0, _assert2.default)(typeof SagaHandlersFn === 'function', 'SagaHandlersFn should be a higher order function');
 
-  //every side effect must map to an action function and handler
-  Object.keys(Sagas).forEach(function (action) {
-    if (SagaActionFunctions) {
-      (0, _assert2.default)(SagaActionFunctions[action], 'Channel ' + channel + ' is missing side effect action function "' + action + '"');
-    }
-    (0, _assert2.default)(SagaHandlers[action], 'Channel ' + channel + ' is missing side effect handler "' + action + '"');
-  });
+  return function (_ref2) {
+    var AppDispatcher = _ref2.AppDispatcher,
+        sagaInterface = _ref2.sagaInterface;
 
-  SagaActionFunctions = SagaActionFunctions || {};
 
-  return function (AppDispatcher) {
+    /* eslint-disable new-cap */
+    var SagaHandlers = SagaHandlersFn({ sagas: sagaInterface });
+    /* eslint-enable */
 
-    var observables = _bindSagaHandlers(channel, Sagas, SagaHandlers)(AppDispatcher);
+    //every side effect must map to an action function and handler
+    Object.keys(ActionTypes).forEach(function (action) {
+      if (SagaActionFunctions) {
+        (0, _assert2.default)(SagaActionFunctions[action], 'Channel ' + channel + ' is missing side effect action function "' + action + '"');
+      }
+      (0, _assert2.default)(SagaHandlers[action], 'Channel ' + channel + ' is missing side effect handler "' + action + '"');
+    });
+
+    var observables = _bindSagaHandlers(channel, ActionTypes, SagaHandlers)(AppDispatcher);
 
     return {
       name: channel,
       observables: observables,
-      actionFunctions: (0, _createStore.bindActionFunctions)(Sagas, SagaActionFunctions)(AppDispatcher),
+      actionFunctions: (0, _createStore.bindActionFunctions)(ActionTypes, SagaActionFunctions)(AppDispatcher),
       resultObservables: _bindSagaResultObservables(observables)
     };
   };
