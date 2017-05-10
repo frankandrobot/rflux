@@ -5,7 +5,8 @@ import isObservable from '../internal/isObservable'
 import uuid from '../internal/uuid'
 
 
-export default function sagaFactory(AppDispatcher) {
+export default function sagaInterfaceFactory({AppDispatcher, appStateObservable}) {
+
   const sideEffects = kefirEmitter()
   const callObservable = sideEffects
     .filter(action => action.action === 'CALL')
@@ -47,12 +48,17 @@ export default function sagaFactory(AppDispatcher) {
   }
 
 
-  //function select()
+  function getState() {
+
+    return appStateObservable
+  }
+
 
   return {
     sideEffects,
     put,
     call,
-    listen
+    listen,
+    getState
   }
 }

@@ -1,7 +1,6 @@
 import assert from '../internal/assert'
 
 import {bindActionFunctions} from './createStore'
-import sagaFactory from './sagaFactory'
 
 
 export function bindSagaHandler(channel, sagaName, sagaHandler) {
@@ -62,11 +61,10 @@ export default function createSagas({channel, ActionTypes, SagaActionFunctions =
   assert(SagaHandlersFn, 'Need SagaHandlersFn')
   assert(typeof SagaHandlersFn === 'function', 'SagaHandlersFn should be a higher order function')
 
-  return AppDispatcher => {
+  return ({AppDispatcher, sagaInterface}) => {
 
-    const sagas = sagaFactory(AppDispatcher)
     /* eslint-disable new-cap */
-    const SagaHandlers = SagaHandlersFn({sagas})
+    const SagaHandlers = SagaHandlersFn({sagas: sagaInterface})
     /* eslint-enable */
 
     //every side effect must map to an action function and handler

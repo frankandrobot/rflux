@@ -224,7 +224,7 @@ export default function createStore(
     console.warn(`Channel ${channel} doesn't have initialState`)
   }
 
-  return AppDispatcher => {
+  return ({AppDispatcher}) => {
 
     const stateWithSideEffectsObservable =
       _createStoreStateObservable(channel, Reducers)(AppDispatcher)

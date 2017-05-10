@@ -4,7 +4,7 @@ import DangerouslySlowContainer from './components/DangerouslySlowContainer'
 
 import StateWithSideEffects from './stores/StateWithSideEffects'
 import {state} from './stores/StateWithSideEffects'
-import sagaFactory from './stores/sagaFactory'
+import sagaFactory from './stores/sagaInterfaceFactory'
 
 import appStateFactory from './appStateFactory'
 
@@ -14,8 +14,7 @@ export {
   createDangerouslySlowContainer,
   DangerouslySlowContainer,
   state,
-  StateWithSideEffects,
-  sagaFactory
+  StateWithSideEffects
 }
 
 export default appStateFactory
