@@ -7,7 +7,9 @@
 export default function checkUnique(arrayOfObjs = [], prop, msg) {
   const hist = {}
 
-  for(let item in arrayOfObjs) {
+  for(let i in arrayOfObjs) {
+    const item = arrayOfObjs[i]
+
     hist[item[prop]] = (hist[item[prop]] || 0) + 1
     if (hist[item[prop]] >= 2) {
       throw new Error(`${msg}: ${item[prop]}`)

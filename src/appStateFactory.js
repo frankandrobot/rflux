@@ -64,9 +64,9 @@ export default function appStateFactory(
   const sagas = createSagas({rawSagas, AppDispatcher, sagaInterface})
 
   checkUnique(
-    [...rawStores, ...rawSagas],
+    [...rawStores, ...rawSagas, ...reducers],
     'channel',
-    'Cannot have a store and a saga with the same name'
+    'Cannot have a store, saga, or redux reducer with the same name'
   )
 
   _setupStoreObs({stores, AppDispatcher})
