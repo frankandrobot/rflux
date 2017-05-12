@@ -73,4 +73,4 @@ function middlewareFactory(_ref) {
     }
   };
 }
-//# sourceMappingURL=middlewareFactory.js.map
+//# sourceMappingURL=reduxMiddlewareFactory.js.map

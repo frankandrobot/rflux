@@ -28,9 +28,9 @@ var _sagaInterfaceFactory = require('./stores/sagaInterfaceFactory');
 
 var _sagaInterfaceFactory2 = _interopRequireDefault(_sagaInterfaceFactory);
 
-var _middlewareFactory = require('./redux/middlewareFactory');
+var _reduxMiddlewareFactory = require('./redux/reduxMiddlewareFactory');
 
-var _middlewareFactory2 = _interopRequireDefault(_middlewareFactory);
+var _reduxMiddlewareFactory2 = _interopRequireDefault(_reduxMiddlewareFactory);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -67,8 +67,12 @@ function appStateFactory(_ref) {
       rawStores = _ref$stores === undefined ? [] : _ref$stores,
       _ref$sagas = _ref.sagas,
       rawSagas = _ref$sagas === undefined ? [] : _ref$sagas,
-      _ref$middleware = _ref.middleware,
-      middleware = _ref$middleware === undefined ? [] : _ref$middleware;
+      _ref$redux = _ref.redux;
+  _ref$redux = _ref$redux === undefined ? { redux: { middleware: [], reducers: [] } } : _ref$redux;
+  var _ref$redux$middleware = _ref$redux.middleware,
+      middleware = _ref$redux$middleware === undefined ? [] : _ref$redux$middleware,
+      _ref$redux$reducers = _ref$redux.reducers,
+      reducers = _ref$redux$reducers === undefined ? [] : _ref$redux$reducers;
 
 
   /* eslint-disable no-use-before-define */
@@ -80,7 +84,8 @@ function appStateFactory(_ref) {
   var dispatch = function dispatch() {
     return InitialAppDispatcher.emit.apply(InitialAppDispatcher, arguments);
   };
-  var Middleware = (0, _middlewareFactory2.default)({ dispatch: dispatch, rawMiddleware: middleware });
+  // unfortunately, you have to setup the redux middleware early in the setup process
+  var Middleware = (0, _reduxMiddlewareFactory2.default)({ dispatch: dispatch, rawMiddleware: middleware });
   var AppDispatcher = Middleware.attachMiddleware({ AppDispatcher: InitialAppDispatcher });
   // then setup public structures
   var stores = _createStores({ rawStores: rawStores, AppDispatcher: AppDispatcher });
