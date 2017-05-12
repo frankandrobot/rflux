@@ -1,6 +1,7 @@
 import assert from '../internal/assert'
+import checkUnique from '../internal/checkUnique'
 
-import {bindActionFunctions} from './createStore'
+import {bindActionFunctions} from './createStores'
 
 
 export function bindSagaHandler(channel, sagaName, sagaHandler) {
@@ -54,7 +55,7 @@ function _bindSagaResultObservables(sagas) {
  * SagaHandlers. The SagaHandlers are a map of functions indexed by ActionType i.e, Map<ActionType,Function>.
  * @return {Saga} higher order function that creates the saga.
  */
-export default function createSagas({channel, ActionTypes, SagaActionFunctions = {}, SagaHandlersFn}) {
+export function _createSagas({channel, ActionTypes, SagaActionFunctions = {}, SagaHandlersFn}) {
 
   assert(typeof channel === 'string', 'Needs a channel and it needs to be a string')
   assert(ActionTypes, 'Need ActionTypes')
@@ -87,4 +88,10 @@ export default function createSagas({channel, ActionTypes, SagaActionFunctions =
       resultObservables: _bindSagaResultObservables(observables)
     }
   }
+}
+
+
+export default function createSagas({rawSagas, ...args}) {
+  checkUnique(rawSagas, 'channel', 'Cannot have two sagas with the same name')
+  return rawSagas.map(s => _createSagas(s)({...args}))
 }

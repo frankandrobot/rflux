@@ -1,7 +1,8 @@
 import Kefir from 'kefir'
 
+import checkUnique from './internal/checkUnique'
 import createAppDispatcher from './appdispatcher/createAppDispatcher'
-import createStore from './stores/createStore'
+import createStores from './stores/createStores'
 import createSagas from './stores/createSagas'
 import sagaInterfaceFactory from './stores/sagaInterfaceFactory'
 import reduxMiddlewareFactory from './redux/reduxMiddlewareFactory'
@@ -49,7 +50,7 @@ export default function appStateFactory(
   const Middleware = reduxMiddlewareFactory({dispatch, rawMiddleware: middleware})
   const AppDispatcher = Middleware.attachMiddleware({AppDispatcher: InitialAppDispatcher})
   // then setup public structures
-  const stores = _createStores({rawStores, AppDispatcher})
+  const stores = createStores({rawStores, AppDispatcher})
   const appStateObservable =
     _createAppStateObservable({stores})
     // inject the state back into Middleware, so that getState works. Unfortunately, in kefirjs,
@@ -60,7 +61,13 @@ export default function appStateFactory(
         return state
       })
   const sagaInterface = sagaInterfaceFactory({AppDispatcher, appStateObservable})
-  const sagas = _createSagas({rawSagas, AppDispatcher, sagaInterface})
+  const sagas = createSagas({rawSagas, AppDispatcher, sagaInterface})
+
+  checkUnique(
+    [...rawStores, ...rawSagas],
+    'channel',
+    'Cannot have a store and a saga with the same name'
+  )
 
   _setupStoreObs({stores, AppDispatcher})
   _setupSagaObs({sagas})
@@ -75,14 +82,6 @@ export default function appStateFactory(
     AppState,
     AppDispatcher
   }
-}
-
-function _createStores({rawStores, ...args}) {
-  return rawStores.map(s => createStore(s)({...args}))
-}
-
-function _createSagas({rawSagas, ...args}) {
-  return rawSagas.map(s => createSagas(s)({...args}))
 }
 
 function _createAppStateObservable({stores}) {
