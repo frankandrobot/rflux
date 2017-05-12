@@ -4,7 +4,7 @@ import createAppDispatcher from './appdispatcher/createAppDispatcher'
 import createStore from './stores/createStore'
 import createSagas from './stores/createSagas'
 import sagaInterfaceFactory from './stores/sagaInterfaceFactory'
-import middlewareFactory from './redux/middlewareFactory'
+import reduxMiddlewareFactory from './redux/reduxMiddlewareFactory'
 
 
 /**
@@ -35,7 +35,7 @@ export default function appStateFactory(
   {
     stores: rawStores = [],
     sagas: rawSagas = [],
-    middleware = []
+    redux: {middleware = [], reducers = []} = {redux: {middleware: [], reducers: []}}
   }) {
 
   /* eslint-disable no-use-before-define */
@@ -45,7 +45,8 @@ export default function appStateFactory(
   // first setup internal fixtures
   const InitialAppDispatcher = createAppDispatcher()
   const dispatch = (...args) => InitialAppDispatcher.emit(...args)
-  const Middleware = middlewareFactory({dispatch, rawMiddleware: middleware})
+  // unfortunately, you have to setup the redux middleware early in the setup process
+  const Middleware = reduxMiddlewareFactory({dispatch, rawMiddleware: middleware})
   const AppDispatcher = Middleware.attachMiddleware({AppDispatcher: InitialAppDispatcher})
   // then setup public structures
   const stores = _createStores({rawStores, AppDispatcher})

@@ -1,7 +1,7 @@
 import test from 'tape'
 
 import createAppDispatcher from '../../src/appdispatcher/createAppDispatcher'
-import middlewareFactory from '../../src/redux/middlewareFactory'
+import middlewareFactory from '../../src/redux/reduxMiddlewareFactory'
 
 
 const objectUnderTestFn = () => {
