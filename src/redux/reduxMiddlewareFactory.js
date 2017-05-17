@@ -1,14 +1,25 @@
 import kefir from 'kefir'
 
 
-export default function middlewareFactory({dispatch, rawMiddleware}) {
+/**
+ * This is the hardcoded channel name for redux
+ * @type {String}
+ */
+const reduxChannelName = 'redux'
+
+export default function reduxMiddlewareFactory({AppDispatcher, rawMiddleware}) {
 
   let state = null
-  const store = {
-    dispatch,
+  const reduxStore = {
+    // transform redux-formatted message to rflux
+    dispatch: (...args) => AppDispatcher.emit({
+      channel: reduxChannelName,
+      actionType: args.type,
+      payload: {...args}
+    }),
     getState: () => state
   }
-  const middleware = rawMiddleware.map(__middleware => __middleware(store))
+  const middleware = rawMiddleware.map(__middleware => __middleware(reduxStore))
 
   return {
     setState: _state => state = _state,

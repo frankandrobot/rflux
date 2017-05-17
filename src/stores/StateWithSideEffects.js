@@ -52,7 +52,7 @@ export default class StateWithSideEffects {
  * @param {Message[]} sideEffects - array of side effects
  * @returns {StateWithSideEffects} instance
  */
-export function state(state) {
+export function state(state = {}) {
 
   return new StateWithSideEffects(state)
 }
