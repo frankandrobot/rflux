@@ -27,44 +27,41 @@ const objectUnderTestFn = () => {
 
 test('middleware should pass message thru all', function(t) {
   const {AppDispatcher, middleware} = objectUnderTestFn()
-  const dispatch = (...args) => AppDispatcher.emit(...args)
-  const mw = middlewareFactory({dispatch, rawMiddleware: middleware})
-  const result = mw.attachMiddleware({AppDispatcher})
+  const mw = middlewareFactory({AppDispatcher, rawMiddleware: middleware})
+  const result = mw.appDispatcher()
 
   result
-    .onValue(x => t.equal(x, 0))
+    .onValue(x => t.equal(x.payload, 0))
     .onValue(() => t.end())
     .onError(() => t.fail())
 
-  AppDispatcher.emit(0)
+  AppDispatcher.emit({payload: 0})
 })
 
 
 test('middleware should have a working dispatch', function(t) {
   const {AppDispatcher, middleware} = objectUnderTestFn()
-  const dispatch = (...args) => AppDispatcher.emit(...args)
-  const mw = middlewareFactory({dispatch, rawMiddleware: middleware})
-  const result = mw.attachMiddleware({AppDispatcher})
+  const mw = middlewareFactory({AppDispatcher, rawMiddleware: middleware})
+  const result = mw.appDispatcher()
 
   result
-    .onValue(x => t.equal(x, 4))
+    .onValue(x => t.equal(x.payload, 4))
     .onValue(() => t.end())
     .onError(() => t.fail())
 
-  AppDispatcher.emit(2)
+  AppDispatcher.emit({payload: 2})
 })
 
 
 test('middleware should stop if next is not called', function(t) {
   const {AppDispatcher, middleware} = objectUnderTestFn()
-  const dispatch = (...args) => AppDispatcher.emit(...args)
-  const mw = middlewareFactory({dispatch, rawMiddleware: middleware})
-  const result = mw.attachMiddleware({AppDispatcher})
+  const mw = middlewareFactory({AppDispatcher, rawMiddleware: middleware})
+  const result = mw.appDispatcher()
 
   result
     .onValue(() => t.equal(0, 1))
     .onError(() => t.fail())
 
-  AppDispatcher.emit(1)
+  AppDispatcher.emit({payload: 1})
   t.end()
 })
