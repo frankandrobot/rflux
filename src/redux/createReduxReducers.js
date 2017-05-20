@@ -48,23 +48,20 @@ function _createReduxReducerStateObservable(channel, Reducers) {
  * @param {Map<String,Function>} Reducers
  * @returns {Function} the redux reducers channel
  */
-export function createReduxReducer({Reducers}) {
+export default function createReduxReducers({Reducers, AppDispatcher}) {
 
   assert(Reducers, 'Need Reducers')
 
-  return ({AppDispatcher}) => {
+  const reduxChannelName = 'redux'
+  const stateWithSideEffectsObservable =
+    _createReduxReducerStateObservable(reduxChannelName, Reducers)(AppDispatcher)
+  const stateObservable = stateWithSideEffectsObservable.map(x => x.state)
 
-    const reduxChannelName = 'redux'
-    const stateWithSideEffectsObservable =
-      _createReduxReducerStateObservable(reduxChannelName, Reducers)(AppDispatcher)
-    const stateObservable = stateWithSideEffectsObservable.map(x => x.state)
-
-    return {
-      name: reduxChannelName,
-      stateWithSideEffectsObservable,
-      store: {
-        reduxObservable: stateObservable
-      }
+  return {
+    name: reduxChannelName,
+    stateWithSideEffectsObservable,
+    store: {
+      reduxObservable: stateObservable
     }
   }
 }
