@@ -7,15 +7,22 @@ Object.defineProperty(exports, "__esModule", {
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 exports.bindSagaHandler = bindSagaHandler;
+exports._createSagas = _createSagas;
 exports.default = createSagas;
 
 var _assert = require('../internal/assert');
 
 var _assert2 = _interopRequireDefault(_assert);
 
-var _createStore = require('./createStore');
+var _checkUnique = require('../internal/checkUnique');
+
+var _checkUnique2 = _interopRequireDefault(_checkUnique);
+
+var _createStores = require('./createStores');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -69,7 +76,7 @@ function _bindSagaResultObservables(sagas) {
  * SagaHandlers. The SagaHandlers are a map of functions indexed by ActionType i.e, Map<ActionType,Function>.
  * @return {Saga} higher order function that creates the saga.
  */
-function createSagas(_ref) {
+function _createSagas(_ref) {
   var channel = _ref.channel,
       ActionTypes = _ref.ActionTypes,
       _ref$SagaActionFuncti = _ref.SagaActionFunctions,
@@ -104,9 +111,19 @@ function createSagas(_ref) {
     return {
       name: channel,
       observables: observables,
-      actionFunctions: (0, _createStore.bindActionFunctions)(ActionTypes, SagaActionFunctions)(AppDispatcher),
+      actionFunctions: (0, _createStores.bindActionFunctions)(ActionTypes, SagaActionFunctions)(AppDispatcher),
       resultObservables: _bindSagaResultObservables(observables)
     };
   };
+}
+
+function createSagas(_ref3) {
+  var rawSagas = _ref3.rawSagas,
+      args = _objectWithoutProperties(_ref3, ['rawSagas']);
+
+  (0, _checkUnique2.default)(rawSagas, 'channel', 'Cannot have two sagas with the same name');
+  return rawSagas.map(function (s) {
+    return _createSagas(s)(_extends({}, args));
+  });
 }
 //# sourceMappingURL=createSagas.js.map

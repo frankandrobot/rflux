@@ -12,17 +12,21 @@ var _kefir = require('kefir');
 
 var _kefir2 = _interopRequireDefault(_kefir);
 
+var _checkUnique = require('./internal/checkUnique');
+
+var _checkUnique2 = _interopRequireDefault(_checkUnique);
+
 var _createAppDispatcher = require('./appdispatcher/createAppDispatcher');
 
 var _createAppDispatcher2 = _interopRequireDefault(_createAppDispatcher);
 
-var _createStore = require('./stores/createStore');
+var _createStores = require('./stores/createStores');
 
-var _createStore2 = _interopRequireDefault(_createStore);
+var _createStores2 = _interopRequireDefault(_createStores);
 
-var _createSagas2 = require('./stores/createSagas');
+var _createSagas = require('./stores/createSagas');
 
-var _createSagas3 = _interopRequireDefault(_createSagas2);
+var _createSagas2 = _interopRequireDefault(_createSagas);
 
 var _sagaInterfaceFactory = require('./stores/sagaInterfaceFactory');
 
@@ -32,11 +36,15 @@ var _reduxMiddlewareFactory = require('./redux/reduxMiddlewareFactory');
 
 var _reduxMiddlewareFactory2 = _interopRequireDefault(_reduxMiddlewareFactory);
 
+var _createReduxReducers = require('./redux/createReduxReducers');
+
+var _createReduxReducers2 = _interopRequireDefault(_createReduxReducers);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 /**
  * A store consists of:
@@ -50,7 +58,8 @@ function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in ob
  * A saga consists of:
  * - a name (channel)
  * - map of ActionTypes
- * - SagaHandlersFn higher order function that accepts a `sagas` interface and returns the SagaHandlers.
+ * - SagaHandlersFn higher order function that accepts a `sagas` interface and
+ *   returns the SagaHandlers.
  *
  * See `createSagas` for more details.
  *
@@ -68,44 +77,44 @@ function appStateFactory(_ref) {
       _ref$sagas = _ref.sagas,
       rawSagas = _ref$sagas === undefined ? [] : _ref$sagas,
       _ref$redux = _ref.redux;
-  _ref$redux = _ref$redux === undefined ? { redux: { middleware: [], reducers: [] } } : _ref$redux;
+  _ref$redux = _ref$redux === undefined ? { redux: { middleware: [], reducers: {} } } : _ref$redux;
   var _ref$redux$middleware = _ref$redux.middleware,
       middleware = _ref$redux$middleware === undefined ? [] : _ref$redux$middleware,
       _ref$redux$reducers = _ref$redux.reducers,
-      reducers = _ref$redux$reducers === undefined ? [] : _ref$redux$reducers;
+      reducers = _ref$redux$reducers === undefined ? {} : _ref$redux$reducers;
 
 
   /* eslint-disable no-use-before-define */
-  if (rawStores.length === 0) {
-    throw new Error('You didn\'t add any stores!');
-  }
-  // first setup internal fixtures
-  var InitialAppDispatcher = (0, _createAppDispatcher2.default)();
-  var dispatch = function dispatch() {
-    return InitialAppDispatcher.emit.apply(InitialAppDispatcher, arguments);
-  };
-  // unfortunately, you have to setup the redux middleware early in the setup process
-  var Middleware = (0, _reduxMiddlewareFactory2.default)({ dispatch: dispatch, rawMiddleware: middleware });
-  var AppDispatcher = Middleware.appDispatcher({ AppDispatcher: InitialAppDispatcher });
-  // then setup public structures
-  var stores = _createStores({ rawStores: rawStores, AppDispatcher: AppDispatcher });
-  var appStateObservable = _createAppStateObservable({ stores: stores })
-  // inject the state back into Middleware, so that getState works. Unfortunately, in kefirjs,
-  // there is no way to do a side effect w/o activating the stream. So we use `map` for side effects
-  // (which is technically an antipattern).
+  // setup redux
+  var Middleware = (0, _reduxMiddlewareFactory2.default)({
+    AppDispatcher: (0, _createAppDispatcher2.default)(),
+    rawMiddleware: middleware
+  });
+  var AppDispatcher = Middleware.appDispatcher();
+
+  // setup public interface
+  var reduxStore = (0, _createReduxReducers2.default)({ Reducers: reducers, AppDispatcher: AppDispatcher });
+  var stores = (0, _createStores2.default)({ rawStores: rawStores, AppDispatcher: AppDispatcher });
+  var appStateObservable = _createAppStateObservable({ stores: [].concat(_toConsumableArray(stores), _toConsumableArray(reduxStore)) })
+  // inject the state back into Middleware, so that getState works. Unfortunately,
+  // in kefirjs, there is no way to do a side effect w/o activating the stream. So
+  // we use `map` for side effects (which is technically an antipattern).
   .map(function (state) {
     Middleware.setState(state);
     return state;
   });
   var sagaInterface = (0, _sagaInterfaceFactory2.default)({ AppDispatcher: AppDispatcher, appStateObservable: appStateObservable });
-  var sagas = _createSagas({ rawSagas: rawSagas, AppDispatcher: AppDispatcher, sagaInterface: sagaInterface });
+  var sagas = (0, _createSagas2.default)({ rawSagas: rawSagas, AppDispatcher: AppDispatcher, sagaInterface: sagaInterface });
 
-  _setupStoreObs({ stores: stores, AppDispatcher: AppDispatcher });
+  (0, _checkUnique2.default)([].concat(_toConsumableArray(rawStores), _toConsumableArray(rawSagas), _toConsumableArray(reducers)), 'channel', 'Cannot have a store, saga, or redux reducer with the same name');
+
+  _setupStoreObs({ stores: [].concat(_toConsumableArray(stores), _toConsumableArray(reduxStore)), AppDispatcher: AppDispatcher });
   _setupSagaObs({ sagas: sagas });
 
   var AppState = _extends({
     appStateObservable: appStateObservable
   }, _storesToState({ stores: stores }), _sagasToState({ sagas: sagas }));
+  /* eslint-enable */
 
   return {
     AppState: AppState,
@@ -113,26 +122,8 @@ function appStateFactory(_ref) {
   };
 }
 
-function _createStores(_ref2) {
-  var rawStores = _ref2.rawStores,
-      args = _objectWithoutProperties(_ref2, ['rawStores']);
-
-  return rawStores.map(function (s) {
-    return (0, _createStore2.default)(s)(_extends({}, args));
-  });
-}
-
-function _createSagas(_ref3) {
-  var rawSagas = _ref3.rawSagas,
-      args = _objectWithoutProperties(_ref3, ['rawSagas']);
-
-  return rawSagas.map(function (s) {
-    return (0, _createSagas3.default)(s)(_extends({}, args));
-  });
-}
-
-function _createAppStateObservable(_ref4) {
-  var stores = _ref4.stores;
+function _createAppStateObservable(_ref2) {
+  var stores = _ref2.stores;
 
   // first create the new appStateObservable
   var storeStatesWithSideEffectsObservables = stores.map(function (x) {
@@ -155,16 +146,16 @@ function _createAppStateObservable(_ref4) {
   });
 }
 
-function _storesToState(_ref5) {
-  var stores = _ref5.stores;
+function _storesToState(_ref3) {
+  var stores = _ref3.stores;
 
   return stores.reduce(function (state, store) {
     return _extends({}, state, store.store);
   }, {});
 }
 
-function _sagasToState(_ref6) {
-  var sagas = _ref6.sagas;
+function _sagasToState(_ref4) {
+  var sagas = _ref4.sagas;
 
   // add action functions and result observables to app state
   return sagas.reduce(function (state, saga) {
@@ -172,9 +163,9 @@ function _sagasToState(_ref6) {
   }, {});
 }
 
-function _setupStoreObs(_ref7) {
-  var stores = _ref7.stores,
-      AppDispatcher = _ref7.AppDispatcher;
+function _setupStoreObs(_ref5) {
+  var stores = _ref5.stores,
+      AppDispatcher = _ref5.AppDispatcher;
 
   // setup one-way data flow + side effects
   stores.forEach(function (store) {
@@ -188,8 +179,8 @@ function _setupStoreObs(_ref7) {
   });
 }
 
-function _setupSagaObs(_ref8) {
-  var sagas = _ref8.sagas;
+function _setupSagaObs(_ref6) {
+  var sagas = _ref6.sagas;
 
   // setup one-way data flow
   sagas.forEach(function (_sagas) {

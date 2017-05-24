@@ -7,7 +7,8 @@ Object.defineProperty(exports, "__esModule", {
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 exports.bindActionFunctions = bindActionFunctions;
-exports.default = createStore;
+exports._createStore = _createStore;
+exports.default = createStores;
 
 var _cast = require('../internal/cast');
 
@@ -17,11 +18,17 @@ var _assert = require('../internal/assert');
 
 var _assert2 = _interopRequireDefault(_assert);
 
+var _checkUnique = require('../internal/checkUnique');
+
+var _checkUnique2 = _interopRequireDefault(_checkUnique);
+
 var _StateWithSideEffects = require('./StateWithSideEffects');
 
 var _StateWithSideEffects2 = _interopRequireDefault(_StateWithSideEffects);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -204,7 +211,7 @@ function _createEndOfActionsObservables(channel, ActionTypes) {
  * of the state tree. **This will probably be deprecated.**
  * @returns {Function} that binds the store to the app dispatcher
  */
-function createStore(_ref) {
+function _createStore(_ref) {
   var channel = _ref.channel,
       ActionTypes = _ref.ActionTypes,
       Reducers = _ref.Reducers,
@@ -246,4 +253,14 @@ function createStore(_ref) {
     };
   };
 }
-//# sourceMappingURL=createStore.js.map
+
+function createStores(_ref3) {
+  var rawStores = _ref3.rawStores,
+      args = _objectWithoutProperties(_ref3, ['rawStores']);
+
+  (0, _checkUnique2.default)(rawStores, 'channel', 'Cannot have two stores with the same name');
+  return rawStores.map(function (s) {
+    return _createStore(s)(_extends({}, args));
+  });
+}
+//# sourceMappingURL=createStores.js.map

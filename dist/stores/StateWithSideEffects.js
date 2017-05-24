@@ -71,7 +71,9 @@ var StateWithSideEffects = function () {
 
 
 exports.default = StateWithSideEffects;
-function state(state) {
+function state() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
 
   return new StateWithSideEffects(state);
 }
