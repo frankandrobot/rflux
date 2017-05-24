@@ -24,7 +24,7 @@ export default function reduxMiddlewareFactory({AppDispatcher, rawMiddleware}) {
     dispatch: args => AppDispatcher.emit({
       channel: reduxChannelName,
       actionType: (args || {}).type,
-      payload: args
+      payload: args || {}
     }),
     getState: () => state
   }
@@ -63,7 +63,7 @@ export default function reduxMiddlewareFactory({AppDispatcher, rawMiddleware}) {
                     // transform action (if requested)
                     .map(() => transformedReduxAction)
                 },
-                kefir.constant(rfluxAction.payload)
+                kefir.constant(rfluxAction.payload || {})
               )
               .map(reduxAction => ({...rfluxAction, payload: reduxAction}))
           )
