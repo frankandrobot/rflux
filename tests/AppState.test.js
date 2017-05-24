@@ -70,21 +70,21 @@ test('AppState has individual store state observables', function(t) {
 
 
 test('AppState observable autofires initial state', function(t) {
-  t.plan(1)
   const {AppState} = objectUnderTestFn()
 
   AppState.appStateObservable
-    .onValue(state =>
+    .onValue(state => {
       t.deepEqual(state, {
         store1: {},
         store2: {}
       })
-    )
+      t.end()
+    })
+    .onError(() => t.fail())
 })
 
 
 test('AppState observable works', function(t) {
-  t.plan(1)
   const {AppState} = objectUnderTestFn()
 
   AppState.appStateObservable
@@ -95,6 +95,8 @@ test('AppState observable works', function(t) {
         store2: {}
       })
     )
+    .onValue(() => t.end())
+    .onError(() => t.fail())
 
   AppState.action1({msg: 'new state'})
 })

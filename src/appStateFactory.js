@@ -53,7 +53,7 @@ export default function appStateFactory(
   const reduxStore = createReduxReducers({Reducers: reducers, AppDispatcher})
   const stores = createStores({rawStores, AppDispatcher})
   const appStateObservable =
-    _createAppStateObservable({stores: [...stores, reduxStore]})
+    _createAppStateObservable({stores: [...stores, ...reduxStore]})
     // inject the state back into Middleware, so that getState works. Unfortunately,
     // in kefirjs, there is no way to do a side effect w/o activating the stream. So
     // we use `map` for side effects (which is technically an antipattern).
@@ -70,7 +70,7 @@ export default function appStateFactory(
     'Cannot have a store, saga, or redux reducer with the same name'
   )
 
-  _setupStoreObs({stores: [...stores, reduxStore], AppDispatcher})
+  _setupStoreObs({stores: [...stores, ...reduxStore], AppDispatcher})
   _setupSagaObs({sagas})
 
   const AppState = {
@@ -79,7 +79,7 @@ export default function appStateFactory(
     ..._sagasToState({sagas})
   }
   /* eslint-enable */
-  
+
   return {
     AppState,
     AppDispatcher

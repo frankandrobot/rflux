@@ -2,12 +2,8 @@ import kefir from 'kefir'
 
 import assert from '../internal/assert'
 
+import reduxChannelName from './reduxChannelName'
 
-/**
- * This is the hardcoded channel name for redux
- * @type {String}
- */
-const reduxChannelName = 'redux'
 
 /**
  * This injects the middleware into the AppDispatcher. Middleware can stop propagation
@@ -15,7 +11,7 @@ const reduxChannelName = 'redux'
  * transform actions or dispatch their own actions.
  * @param {kefirEmitter} AppDispatcher
  * @param {middleware[]} rawMiddleware
- * @returns {*}
+ * @returns {MiddlewareFactory} factory
  */
 export default function reduxMiddlewareFactory({AppDispatcher, rawMiddleware}) {
 
