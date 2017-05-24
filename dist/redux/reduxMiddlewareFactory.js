@@ -45,7 +45,7 @@ function reduxMiddlewareFactory(_ref) {
       return AppDispatcher.emit({
         channel: _reduxChannelName2.default,
         actionType: (args || {}).type,
-        payload: args
+        payload: args || {}
       });
     },
     getState: function getState() {
@@ -87,7 +87,7 @@ function reduxMiddlewareFactory(_ref) {
           .map(function () {
             return transformedReduxAction;
           });
-        }, _kefir2.default.constant(rfluxAction.payload)).map(function (reduxAction) {
+        }, _kefir2.default.constant(rfluxAction.payload || {})).map(function (reduxAction) {
           return _extends({}, rfluxAction, { payload: reduxAction });
         });
       });
