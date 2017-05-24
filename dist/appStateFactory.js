@@ -86,7 +86,7 @@ function appStateFactory(_ref) {
   };
   // unfortunately, you have to setup the redux middleware early in the setup process
   var Middleware = (0, _reduxMiddlewareFactory2.default)({ dispatch: dispatch, rawMiddleware: middleware });
-  var AppDispatcher = Middleware.attachMiddleware({ AppDispatcher: InitialAppDispatcher });
+  var AppDispatcher = Middleware.appDispatcher({ AppDispatcher: InitialAppDispatcher });
   // then setup public structures
   var stores = _createStores({ rawStores: rawStores, AppDispatcher: AppDispatcher });
   var appStateObservable = _createAppStateObservable({ stores: stores })

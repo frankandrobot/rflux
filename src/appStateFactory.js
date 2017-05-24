@@ -1,10 +1,12 @@
 import Kefir from 'kefir'
 
+import checkUnique from './internal/checkUnique'
 import createAppDispatcher from './appdispatcher/createAppDispatcher'
-import createStore from './stores/createStore'
+import createStores from './stores/createStores'
 import createSagas from './stores/createSagas'
 import sagaInterfaceFactory from './stores/sagaInterfaceFactory'
 import reduxMiddlewareFactory from './redux/reduxMiddlewareFactory'
+import createReduxReducers from './redux/createReduxReducers'
 
 
 /**
@@ -19,7 +21,8 @@ import reduxMiddlewareFactory from './redux/reduxMiddlewareFactory'
  * A saga consists of:
  * - a name (channel)
  * - map of ActionTypes
- * - SagaHandlersFn higher order function that accepts a `sagas` interface and returns the SagaHandlers.
+ * - SagaHandlersFn higher order function that accepts a `sagas` interface and
+ *   returns the SagaHandlers.
  *
  * See `createSagas` for more details.
  *
@@ -35,34 +38,39 @@ export default function appStateFactory(
   {
     stores: rawStores = [],
     sagas: rawSagas = [],
-    redux: {middleware = [], reducers = []} = {redux: {middleware: [], reducers: []}}
+    redux: {middleware = [], reducers = {}} = {redux: {middleware: [], reducers: {}}}
   }) {
 
   /* eslint-disable no-use-before-define */
-  if (rawStores.length === 0) {
-    throw new Error('You didn\'t add any stores!')
-  }
-  // first setup internal fixtures
-  const InitialAppDispatcher = createAppDispatcher()
-  const dispatch = (...args) => InitialAppDispatcher.emit(...args)
-  // unfortunately, you have to setup the redux middleware early in the setup process
-  const Middleware = reduxMiddlewareFactory({dispatch, rawMiddleware: middleware})
-  const AppDispatcher = Middleware.attachMiddleware({AppDispatcher: InitialAppDispatcher})
-  // then setup public structures
-  const stores = _createStores({rawStores, AppDispatcher})
+  // setup redux
+  const Middleware = reduxMiddlewareFactory({
+    AppDispatcher: createAppDispatcher(),
+    rawMiddleware: middleware
+  })
+  const AppDispatcher = Middleware.appDispatcher()
+
+  // setup public interface
+  const reduxStore = createReduxReducers({Reducers: reducers, AppDispatcher})
+  const stores = createStores({rawStores, AppDispatcher})
   const appStateObservable =
-    _createAppStateObservable({stores})
-    // inject the state back into Middleware, so that getState works. Unfortunately, in kefirjs,
-    // there is no way to do a side effect w/o activating the stream. So we use `map` for side effects
-    // (which is technically an antipattern).
+    _createAppStateObservable({stores: [...stores, ...reduxStore]})
+    // inject the state back into Middleware, so that getState works. Unfortunately,
+    // in kefirjs, there is no way to do a side effect w/o activating the stream. So
+    // we use `map` for side effects (which is technically an antipattern).
       .map(state => {
         Middleware.setState(state)
         return state
       })
   const sagaInterface = sagaInterfaceFactory({AppDispatcher, appStateObservable})
-  const sagas = _createSagas({rawSagas, AppDispatcher, sagaInterface})
+  const sagas = createSagas({rawSagas, AppDispatcher, sagaInterface})
 
-  _setupStoreObs({stores, AppDispatcher})
+  checkUnique(
+    [...rawStores, ...rawSagas, ...reducers],
+    'channel',
+    'Cannot have a store, saga, or redux reducer with the same name'
+  )
+
+  _setupStoreObs({stores: [...stores, ...reduxStore], AppDispatcher})
   _setupSagaObs({sagas})
 
   const AppState = {
@@ -70,6 +78,7 @@ export default function appStateFactory(
     ..._storesToState({stores}),
     ..._sagasToState({sagas})
   }
+  /* eslint-enable */
 
   return {
     AppState,
@@ -77,17 +86,10 @@ export default function appStateFactory(
   }
 }
 
-function _createStores({rawStores, ...args}) {
-  return rawStores.map(s => createStore(s)({...args}))
-}
-
-function _createSagas({rawSagas, ...args}) {
-  return rawSagas.map(s => createSagas(s)({...args}))
-}
-
 function _createAppStateObservable({stores}) {
   // first create the new appStateObservable
-  const storeStatesWithSideEffectsObservables = stores.map(x => x.stateWithSideEffectsObservable)
+  const storeStatesWithSideEffectsObservables =
+    stores.map(x => x.stateWithSideEffectsObservable)
 
   // then combine these into the appStateObservable
   return Kefir.combine(

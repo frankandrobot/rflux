@@ -1,5 +1,6 @@
 import cast from '../internal/cast'
 import assert from '../internal/assert'
+import checkUnique from '../internal/checkUnique'
 
 import StateWithSideEffects from './StateWithSideEffects'
 import {state} from './StateWithSideEffects'
@@ -200,7 +201,7 @@ function _createEndOfActionsObservables(channel, ActionTypes) {
  * of the state tree. **This will probably be deprecated.**
  * @returns {Function} that binds the store to the app dispatcher
  */
-export default function createStore(
+export function _createStore(
   {channel, ActionTypes, Reducers, ActionFunctions, ActionObservables}) {
 
   ActionObservables = ActionObservables || {}
@@ -244,4 +245,10 @@ export default function createStore(
       }
     }
   }
+}
+
+
+export default function createStores({rawStores, ...args}) {
+  checkUnique(rawStores, 'channel', 'Cannot have two stores with the same name');
+  return rawStores.map(s => _createStore(s)({...args}))
 }
