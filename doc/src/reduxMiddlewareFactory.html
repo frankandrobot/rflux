@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>reduxMiddlewareFactory.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="page">
+
+      <div class="header">
+        
+          <h1>reduxMiddlewareFactory.js</h1>
+        
+
+        
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
+              
+                
+                <li>
+                  <a class="source" href="appStateFactory.html">
+                    appStateFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createAppDispatcher.html">
+                    createAppDispatcher.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DangerouslySlowContainer.html">
+                    DangerouslySlowContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createContainer.html">
+                    createContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createDangerouslySlowContainer.html">
+                    createDangerouslySlowContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="index.html">
+                    index.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="ContainerHelpers.html">
+                    ContainerHelpers.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="assert.html">
+                    assert.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="cast.html">
+                    cast.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="checkUnique.html">
+                    checkUnique.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="isObservable.html">
+                    isObservable.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="uuid.html">
+                    uuid.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="ReduxSaga.html">
+                    ReduxSaga.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createReduxReducers.html">
+                    createReduxReducers.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="reduxChannelName.html">
+                    reduxChannelName.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="reduxMiddlewareFactory.html">
+                    reduxMiddlewareFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="StateWithSideEffects.html">
+                    StateWithSideEffects.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createSagas.html">
+                    createSagas.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createStores.html">
+                    createStores.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="sagaInterfaceFactory.html">
+                    sagaInterfaceFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="kefirEmitter.html">
+                    kefirEmitter.js
+                  </a>
+                </li>
+              
+            </ol>
+          </div>
+        
+      </div>
+
+      
+        
+        
+        
+          <div class='highlight'><pre><span class="hljs-keyword">import</span> kefir <span class="hljs-keyword">from</span> <span class="hljs-string">'kefir'</span>
+
+<span class="hljs-keyword">import</span> assert <span class="hljs-keyword">from</span> <span class="hljs-string">'../internal/assert'</span>
+
+<span class="hljs-keyword">import</span> reduxChannelName <span class="hljs-keyword">from</span> <span class="hljs-string">'./reduxChannelName'</span>
+
+
+<span class="hljs-comment">/**
+ * This injects the middleware into the AppDispatcher. Middleware can stop propagation
+ * of events to observables by not calling "next(action)". Middleware can also
+ * transform actions or dispatch their own actions.
+ * @param {kefirEmitter} AppDispatcher
+ * @param {middleware[]} rawMiddleware
+ * @returns {MiddlewareFactory} factory
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">reduxMiddlewareFactory</span>(<span class="hljs-params">{AppDispatcher, rawMiddleware}</span>) </span>{
+
+  assert(AppDispatcher, <span class="hljs-string">'Need an AppDispatcher'</span>)
+  assert(rawMiddleware, <span class="hljs-string">'Need rawMiddleware'</span>)
+
+  <span class="hljs-keyword">let</span> state = <span class="hljs-literal">null</span>
+  <span class="hljs-keyword">const</span> reduxStore = {</pre></div>
+        
+      
+        
+        <p>transform redux-formatted message to rflux</p>
+
+        
+          <div class='highlight'><pre>    dispatch: <span class="hljs-function"><span class="hljs-params">args</span> =&gt;</span> AppDispatcher.emit({
+      <span class="hljs-attr">channel</span>: reduxChannelName,
+      <span class="hljs-attr">actionType</span>: (args || {}).type,
+      <span class="hljs-attr">payload</span>: args || {}
+    }),
+    <span class="hljs-attr">getState</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> state
+  }
+  <span class="hljs-keyword">const</span> middleware = rawMiddleware.map(<span class="hljs-function"><span class="hljs-params">__middleware</span> =&gt;</span> __middleware(reduxStore))
+
+  <span class="hljs-keyword">return</span> {
+    <span class="hljs-attr">setState</span>: <span class="hljs-function"><span class="hljs-params">_state</span> =&gt;</span> state = _state,
+
+    <span class="hljs-comment">/**
+     * This AppDispatcher is middleware aware.
+     * @returns {kefirEmitter} the AppDispatcher
+     **/</span>
+    appDispatcher() {
+      <span class="hljs-keyword">const</span> AppDispatcherObs =
+        AppDispatcher
+          .flatMap(<span class="hljs-function"><span class="hljs-params">rfluxAction</span> =&gt;</span>
+            middleware
+              .reduce(
+                <span class="hljs-function">(<span class="hljs-params">chain, _middleware</span>) =&gt;</span> {
+                  <span class="hljs-keyword">let</span> transformedReduxAction
+                  <span class="hljs-keyword">let</span> allowContinue = <span class="hljs-literal">false</span></pre></div>
+        
+      
+        
+        <p>the “next” action doesn’t actually do anything…. it just tells the
+chain of filters to continue. Also allows the middleware to transfom
+the payload</p>
+
+        
+          <div class='highlight'><pre>                  <span class="hljs-keyword">const</span> next = <span class="hljs-function"><span class="hljs-params">reduxAction</span> =&gt;</span> {
+                    transformedReduxAction = reduxAction
+                    allowContinue = <span class="hljs-literal">true</span>
+                  }
+
+                  <span class="hljs-keyword">return</span> chain
+                    .filter(<span class="hljs-function"><span class="hljs-params">reduxAction</span> =&gt;</span> {
+                      _middleware(next)(reduxAction)</pre></div>
+        
+      
+        
+        <p>stop if next not called</p>
+
+        
+          <div class='highlight'><pre>                      <span class="hljs-keyword">return</span> allowContinue
+                    })</pre></div>
+        
+      
+        
+        <p>transform action (if requested)</p>
+
+        
+          <div class='highlight'><pre>                    .map(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> transformedReduxAction)
+                },
+                kefir.constant(rfluxAction.payload || {})
+              )
+              .map(<span class="hljs-function"><span class="hljs-params">reduxAction</span> =&gt;</span> ({...rfluxAction, <span class="hljs-attr">payload</span>: reduxAction}))
+          )</pre></div>
+        
+      
+        
+        <p>Yuck. Turn the observer into a dispatcher by adding an emit method that
+dispatches events into the <em>original</em> AppDispatcher bus. Recall that the
+AppDispatcher is a bus (an observable with an emit method).</p>
+
+        
+          <div class='highlight'><pre>      <span class="hljs-built_in">Object</span>.assign(AppDispatcherObs, {<span class="hljs-attr">emit</span>: <span class="hljs-function">(<span class="hljs-params">...args</span>) =&gt;</span> AppDispatcher.emit(...args)})
+
+      <span class="hljs-keyword">return</span> AppDispatcherObs
+    }
+  }
+}</pre></div>
+        
+      
+      <div class="fleur">h</div>
+    </div>
+  </div>
+</body>
+</html>

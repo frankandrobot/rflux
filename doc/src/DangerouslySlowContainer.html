@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>DangerouslySlowContainer.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="page">
+
+      <div class="header">
+        
+          <h1>DangerouslySlowContainer.js</h1>
+        
+
+        
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
+              
+                
+                <li>
+                  <a class="source" href="appStateFactory.html">
+                    appStateFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createAppDispatcher.html">
+                    createAppDispatcher.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DangerouslySlowContainer.html">
+                    DangerouslySlowContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createContainer.html">
+                    createContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createDangerouslySlowContainer.html">
+                    createDangerouslySlowContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="index.html">
+                    index.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="ContainerHelpers.html">
+                    ContainerHelpers.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="assert.html">
+                    assert.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="cast.html">
+                    cast.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="checkUnique.html">
+                    checkUnique.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="isObservable.html">
+                    isObservable.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="uuid.html">
+                    uuid.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="ReduxSaga.html">
+                    ReduxSaga.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createReduxReducers.html">
+                    createReduxReducers.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="reduxChannelName.html">
+                    reduxChannelName.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="reduxMiddlewareFactory.html">
+                    reduxMiddlewareFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="StateWithSideEffects.html">
+                    StateWithSideEffects.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createSagas.html">
+                    createSagas.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createStores.html">
+                    createStores.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="sagaInterfaceFactory.html">
+                    sagaInterfaceFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="kefirEmitter.html">
+                    kefirEmitter.js
+                  </a>
+                </li>
+              
+            </ol>
+          </div>
+        
+      </div>
+
+      
+        
+        
+        
+          <div class='highlight'><pre><span class="hljs-comment">/* eslint no-use-before-define:0 */</span>
+<span class="hljs-keyword">import</span> React <span class="hljs-keyword">from</span> <span class="hljs-string">'react'</span>
+
+<span class="hljs-keyword">import</span> {setupNonObservables, setupObservables, removeObservables} <span class="hljs-keyword">from</span> <span class="hljs-string">'../internal/ContainerHelpers'</span>
+
+
+<span class="hljs-comment">/**
+ * Natural interface---just wrap a child view in this container class and pass values via props.
+ * No complex state functions.
+ * Because it supports parent React props, it can be inefficient for arbitrary prop changes.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DangerouslySlowContainer</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
+
+  <span class="hljs-keyword">constructor</span>(props, __dangerouslyEnableSlowness) {
+
+    <span class="hljs-keyword">super</span>(props)
+
+    <span class="hljs-keyword">this</span>.__dangerouslyEnableSlowness = __dangerouslyEnableSlowness || <span class="hljs-literal">true</span>
+  }
+
+  componentWillMount() {
+
+    setupNonObservables(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.props, <span class="hljs-literal">false</span>)
+    setupObservables(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.props, <span class="hljs-keyword">this</span>.props.children.type.defaultProps)
+  }
+
+  componentWillReceiveProps(nextProps) {
+
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.__dangerouslyEnableSlowness) {
+
+      removeObservables(<span class="hljs-keyword">this</span>)
+      setupNonObservables(<span class="hljs-keyword">this</span>, nextProps, <span class="hljs-literal">false</span>)
+      setupObservables(<span class="hljs-keyword">this</span>, nextProps, <span class="hljs-keyword">this</span>.props.children.type.defaultProps)
+    }
+  }
+
+  componentWillUnmount() {
+
+    removeObservables(<span class="hljs-keyword">this</span>)
+  }
+
+  render() {
+
+    <span class="hljs-keyword">return</span> {
+      <span class="hljs-attr">type</span>: <span class="hljs-keyword">this</span>.props.children.type,
+      [<span class="hljs-string">'$$typeof'</span>]: <span class="hljs-built_in">Symbol</span>.for(<span class="hljs-string">'react.element'</span>),
+      <span class="hljs-attr">props</span>: {...this._nonObservables, ...this.state}
+    }
+  }
+}</pre></div>
+        
+      
+      <div class="fleur">h</div>
+    </div>
+  </div>
+</body>
+</html>

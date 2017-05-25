@@ -39,7 +39,8 @@
     "test:simple": "node node_modules/.bin/tape -r babel-register -r kefir 'tests/**/*.js'",
     "release:major": "npm version major && git push --follow-tags",
     "release:minor": "npm version minor && git push --follow-tags",
-    "release:patch": "npm version patch && git push --follow-tags"
+    "release:patch": "npm version patch && git push --follow-tags",
+    "doc:src": "node node_modules/.bin/docco -l linear -o ./doc/src/ src/*.js src/**/*.js"
   },
   "author": "Uriel Avalos <uri@frankandrobot.com>",
   "license": "ISC",

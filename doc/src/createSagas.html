@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>createSagas.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="page">
+
+      <div class="header">
+        
+          <h1>createSagas.js</h1>
+        
+
+        
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
+              
+                
+                <li>
+                  <a class="source" href="appStateFactory.html">
+                    appStateFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createAppDispatcher.html">
+                    createAppDispatcher.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DangerouslySlowContainer.html">
+                    DangerouslySlowContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createContainer.html">
+                    createContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createDangerouslySlowContainer.html">
+                    createDangerouslySlowContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="index.html">
+                    index.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="ContainerHelpers.html">
+                    ContainerHelpers.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="assert.html">
+                    assert.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="cast.html">
+                    cast.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="checkUnique.html">
+                    checkUnique.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="isObservable.html">
+                    isObservable.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="uuid.html">
+                    uuid.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="ReduxSaga.html">
+                    ReduxSaga.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createReduxReducers.html">
+                    createReduxReducers.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="reduxChannelName.html">
+                    reduxChannelName.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="reduxMiddlewareFactory.html">
+                    reduxMiddlewareFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="StateWithSideEffects.html">
+                    StateWithSideEffects.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createSagas.html">
+                    createSagas.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createStores.html">
+                    createStores.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="sagaInterfaceFactory.html">
+                    sagaInterfaceFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="kefirEmitter.html">
+                    kefirEmitter.js
+                  </a>
+                </li>
+              
+            </ol>
+          </div>
+        
+      </div>
+
+      
+        
+        
+        
+          <div class='highlight'><pre><span class="hljs-keyword">import</span> assert <span class="hljs-keyword">from</span> <span class="hljs-string">'../internal/assert'</span>
+<span class="hljs-keyword">import</span> checkUnique <span class="hljs-keyword">from</span> <span class="hljs-string">'../internal/checkUnique'</span>
+
+<span class="hljs-keyword">import</span> {bindActionFunctions} <span class="hljs-keyword">from</span> <span class="hljs-string">'./createStores'</span>
+
+
+<span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">bindSagaHandler</span>(<span class="hljs-params">channel, sagaName, sagaHandler</span>) </span>{
+
+  <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-params">AppDispatcher</span> =&gt;</span>
+
+    AppDispatcher
+      .filter(<span class="hljs-function"><span class="hljs-params">x</span> =&gt;</span> x.channel === channel &amp;&amp; x.actionType === sagaName)
+      .flatMap(<span class="hljs-function"><span class="hljs-params">x</span> =&gt;</span> sagaHandler(x.payload))
+      .map(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> {</pre></div>
+        
+      
+        
+        <p>emit the result back to the app dispatcher for time travel.</p>
+
+        
+          <div class='highlight'><pre>        setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> AppDispatcher.emit({channel, <span class="hljs-attr">actionType</span>: <span class="hljs-string">`<span class="hljs-subst">${sagaName}</span>Result`</span>, <span class="hljs-attr">payload</span>: result}), <span class="hljs-number">0</span>)
+        <span class="hljs-keyword">return</span> result
+      })
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_bindSagaHandlers</span>(<span class="hljs-params">channel, ActionTypes, SagaHandlers</span>) </span>{
+
+  <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-params">AppDispatcher</span> =&gt;</span>
+
+    <span class="hljs-built_in">Object</span>.keys(ActionTypes).reduce(
+      <span class="hljs-function">(<span class="hljs-params">observables, saga</span>) =&gt;</span> {
+
+        <span class="hljs-keyword">const</span> handler = SagaHandlers[saga]
+        <span class="hljs-keyword">const</span> observable = bindSagaHandler(channel, saga, handler)(AppDispatcher)
+
+        <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.assign(observables, {[saga]: observable})
+      },
+      {}
+    )
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_bindSagaResultObservables</span>(<span class="hljs-params">sagas</span>) </span>{
+
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.keys(sagas).reduce(
+    <span class="hljs-function">(<span class="hljs-params">observables, saga</span>) =&gt;</span> <span class="hljs-built_in">Object</span>.assign(observables, {[<span class="hljs-string">`<span class="hljs-subst">${saga}</span>ResultObservable`</span>]: sagas[saga]}),
+    {}
+  )
+}
+
+<span class="hljs-comment">/**
+ * Sagas are primarily used for handling ajax workflows.
+ *
+ * @param {String} channel - the name of the saga collection
+ * @param {Map&lt;String,*&gt;} ActionTypes - the names of the action types (aka side effects) these sagas handle
+ * @param {Map&lt;ActionType,Function&gt;} SagaActionFunctions - (optional) map of action functions indexed by
+ * ActionType. Like a store's action functions, these functions can be used to initiate a saga. Note
+ * that if you include one action function, then every ActionType must have a corresponding action function.
+ * @param {Function} SagaHandlersFn - higher order function with signature
+ * `({...sagaInterface})=&gt;SagaHandlers` that accepts the `sagas` interface object and returns the
+ * SagaHandlers. The SagaHandlers are a map of functions indexed by ActionType i.e, Map&lt;ActionType,Function&gt;.
+ * @return {Saga} higher order function that creates the saga.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_createSagas</span>(<span class="hljs-params">{channel, ActionTypes, SagaActionFunctions = {}, SagaHandlersFn}</span>) </span>{
+
+  assert(<span class="hljs-keyword">typeof</span> channel === <span class="hljs-string">'string'</span>, <span class="hljs-string">'Needs a channel and it needs to be a string'</span>)
+  assert(ActionTypes, <span class="hljs-string">'Need ActionTypes'</span>)
+  assert(SagaHandlersFn, <span class="hljs-string">'Need SagaHandlersFn'</span>)
+  assert(<span class="hljs-keyword">typeof</span> SagaHandlersFn === <span class="hljs-string">'function'</span>, <span class="hljs-string">'SagaHandlersFn should be a higher order function'</span>)
+
+  <span class="hljs-keyword">return</span> <span class="hljs-function">(<span class="hljs-params">{AppDispatcher, sagaInterface}</span>) =&gt;</span> {
+
+    <span class="hljs-comment">/* eslint-disable new-cap */</span>
+    <span class="hljs-keyword">const</span> SagaHandlers = SagaHandlersFn({...sagaInterface})
+    <span class="hljs-comment">/* eslint-enable */</span></pre></div>
+        
+      
+        
+        <p>every side effect must map to an action function and handler</p>
+
+        
+          <div class='highlight'><pre>    <span class="hljs-built_in">Object</span>.keys(ActionTypes).forEach(<span class="hljs-function"><span class="hljs-params">action</span> =&gt;</span> {
+      <span class="hljs-keyword">if</span> (SagaActionFunctions) {
+        assert(
+          SagaActionFunctions[action],
+          <span class="hljs-string">`Channel <span class="hljs-subst">${channel}</span> is missing side effect action function "<span class="hljs-subst">${action}</span>"`</span>
+        )
+      }
+      assert(SagaHandlers[action], <span class="hljs-string">`Channel <span class="hljs-subst">${channel}</span> is missing side effect handler "<span class="hljs-subst">${action}</span>"`</span>)
+    })
+
+    <span class="hljs-keyword">const</span> observables = _bindSagaHandlers(channel, ActionTypes, SagaHandlers)(AppDispatcher)
+
+    <span class="hljs-keyword">return</span> {
+      <span class="hljs-attr">name</span>: channel,
+      observables,
+      <span class="hljs-attr">actionFunctions</span>: bindActionFunctions(ActionTypes, SagaActionFunctions)(AppDispatcher),
+      <span class="hljs-attr">resultObservables</span>: _bindSagaResultObservables(observables)
+    }
+  }
+}
+
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createSagas</span>(<span class="hljs-params">{rawSagas, ...args}</span>) </span>{
+  checkUnique(rawSagas, <span class="hljs-string">'channel'</span>, <span class="hljs-string">'Cannot have two sagas with the same name'</span>)
+  <span class="hljs-keyword">return</span> rawSagas.map(<span class="hljs-function"><span class="hljs-params">s</span> =&gt;</span> _createSagas(s)({...args}))
+}</pre></div>
+        
+      
+      <div class="fleur">h</div>
+    </div>
+  </div>
+</body>
+</html>

@@ -75,7 +75,7 @@ export default function appStateFactory(
 
   const AppState = {
     appStateObservable,
-    ..._storesToState({stores}),
+    ..._storesToState({stores: [...stores, ...reduxStore]}),
     ..._sagasToState({sagas})
   }
   /* eslint-enable */

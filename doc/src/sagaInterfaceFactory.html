@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>sagaInterfaceFactory.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="page">
+
+      <div class="header">
+        
+          <h1>sagaInterfaceFactory.js</h1>
+        
+
+        
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
+              
+                
+                <li>
+                  <a class="source" href="appStateFactory.html">
+                    appStateFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createAppDispatcher.html">
+                    createAppDispatcher.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DangerouslySlowContainer.html">
+                    DangerouslySlowContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createContainer.html">
+                    createContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createDangerouslySlowContainer.html">
+                    createDangerouslySlowContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="index.html">
+                    index.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="ContainerHelpers.html">
+                    ContainerHelpers.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="assert.html">
+                    assert.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="cast.html">
+                    cast.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="checkUnique.html">
+                    checkUnique.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="isObservable.html">
+                    isObservable.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="uuid.html">
+                    uuid.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="ReduxSaga.html">
+                    ReduxSaga.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createReduxReducers.html">
+                    createReduxReducers.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="reduxChannelName.html">
+                    reduxChannelName.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="reduxMiddlewareFactory.html">
+                    reduxMiddlewareFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="StateWithSideEffects.html">
+                    StateWithSideEffects.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createSagas.html">
+                    createSagas.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createStores.html">
+                    createStores.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="sagaInterfaceFactory.html">
+                    sagaInterfaceFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="kefirEmitter.html">
+                    kefirEmitter.js
+                  </a>
+                </li>
+              
+            </ol>
+          </div>
+        
+      </div>
+
+      
+        
+        
+        
+          <div class='highlight'><pre><span class="hljs-keyword">import</span> Kefir <span class="hljs-keyword">from</span> <span class="hljs-string">'kefir'</span>
+
+<span class="hljs-keyword">import</span> kefirEmitter <span class="hljs-keyword">from</span> <span class="hljs-string">'../utils/kefirEmitter'</span>
+<span class="hljs-keyword">import</span> isObservable <span class="hljs-keyword">from</span> <span class="hljs-string">'../internal/isObservable'</span>
+<span class="hljs-keyword">import</span> uuid <span class="hljs-keyword">from</span> <span class="hljs-string">'../internal/uuid'</span>
+
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">sagaInterfaceFactory</span>(<span class="hljs-params">{AppDispatcher, appStateObservable}</span>) </span>{
+
+  <span class="hljs-keyword">const</span> sideEffects = kefirEmitter()
+  <span class="hljs-keyword">const</span> callObservable = sideEffects
+    .filter(<span class="hljs-function"><span class="hljs-params">action</span> =&gt;</span> action.action === <span class="hljs-string">'CALL'</span>)
+    .map(<span class="hljs-function"><span class="hljs-params">action</span> =&gt;</span> action.payload)
+    .flatMap(<span class="hljs-function"><span class="hljs-params">action</span> =&gt;</span> {
+
+      <span class="hljs-keyword">const</span> callId = action.callId
+      <span class="hljs-keyword">const</span> result = action.fn(...action.args)
+      <span class="hljs-keyword">const</span> resultObservable = isObservable(result) ? result : Kefir.constant(result)
+
+      <span class="hljs-keyword">return</span> resultObservable.map(<span class="hljs-function"><span class="hljs-params">rslt</span> =&gt;</span> ({callId, rslt}))
+    })
+    .onValue(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-literal">undefined</span>)
+
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">put</span>(<span class="hljs-params">action</span>) </span>{
+
+    setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> AppDispatcher.emit(action), <span class="hljs-number">0</span>)
+
+    <span class="hljs-keyword">return</span> Kefir.constant(action) <span class="hljs-comment">// streamified so we can chain together</span>
+  }
+
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">call</span>(<span class="hljs-params">fn, ...args</span>) </span>{
+
+    <span class="hljs-keyword">const</span> callId = uuid()
+
+    setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> sideEffects.emit({<span class="hljs-attr">action</span>: <span class="hljs-string">'CALL'</span>, <span class="hljs-attr">payload</span>: {fn, args, callId}}), <span class="hljs-number">0</span>)
+
+    <span class="hljs-keyword">return</span> callObservable.filter(<span class="hljs-function"><span class="hljs-params">fn</span> =&gt;</span> fn.callId === callId).map(<span class="hljs-function"><span class="hljs-params">fn</span> =&gt;</span> fn.rslt).take(<span class="hljs-number">1</span>)
+  }
+
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">listen</span>(<span class="hljs-params">channel, actionType</span>) </span>{
+
+    <span class="hljs-keyword">return</span> AppDispatcher
+      .filter(<span class="hljs-function"><span class="hljs-params">action</span> =&gt;</span> action.channel === channel &amp;&amp; action.actionType === actionType)
+      .map(<span class="hljs-function"><span class="hljs-params">action</span> =&gt;</span> action.payload)
+  }
+
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getState</span>(<span class="hljs-params"></span>) </span>{
+
+    <span class="hljs-keyword">return</span> appStateObservable
+  }
+
+
+  <span class="hljs-keyword">return</span> {
+    sideEffects,
+    put,
+    call,
+    listen,
+    getState
+  }
+}</pre></div>
+        
+      
+      <div class="fleur">h</div>
+    </div>
+  </div>
+</body>
+</html>

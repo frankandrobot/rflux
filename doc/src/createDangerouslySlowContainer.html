@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>createDangerouslySlowContainer.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="page">
+
+      <div class="header">
+        
+          <h1>createDangerouslySlowContainer.js</h1>
+        
+
+        
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
+              
+                
+                <li>
+                  <a class="source" href="appStateFactory.html">
+                    appStateFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createAppDispatcher.html">
+                    createAppDispatcher.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DangerouslySlowContainer.html">
+                    DangerouslySlowContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createContainer.html">
+                    createContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createDangerouslySlowContainer.html">
+                    createDangerouslySlowContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="index.html">
+                    index.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="ContainerHelpers.html">
+                    ContainerHelpers.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="assert.html">
+                    assert.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="cast.html">
+                    cast.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="checkUnique.html">
+                    checkUnique.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="isObservable.html">
+                    isObservable.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="uuid.html">
+                    uuid.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="ReduxSaga.html">
+                    ReduxSaga.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createReduxReducers.html">
+                    createReduxReducers.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="reduxChannelName.html">
+                    reduxChannelName.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="reduxMiddlewareFactory.html">
+                    reduxMiddlewareFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="StateWithSideEffects.html">
+                    StateWithSideEffects.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createSagas.html">
+                    createSagas.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createStores.html">
+                    createStores.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="sagaInterfaceFactory.html">
+                    sagaInterfaceFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="kefirEmitter.html">
+                    kefirEmitter.js
+                  </a>
+                </li>
+              
+            </ol>
+          </div>
+        
+      </div>
+
+      
+        
+        
+        
+          <div class='highlight'><pre><span class="hljs-keyword">import</span> React <span class="hljs-keyword">from</span> <span class="hljs-string">'react'</span>
+
+<span class="hljs-keyword">import</span> {removeObservables, setupNonObservables, setupObservables} <span class="hljs-keyword">from</span> <span class="hljs-string">'../internal/ContainerHelpers'</span>
+
+
+<span class="hljs-comment">/**
+ * Supports parent React props at the expense of potentially being inefficient:
+ *
+ * &gt; Every #componentWillReceiveProps forces observer re-initialization.
+ * &gt; Therefore it is your responsibility to ensure that it doesn't get called too often.
+ *
+ * Since container props and state both get mapped as child props,
+ * state overriddes props with the same name.
+ *
+ * Do NOT use anonymous functions to define getInitialState, getObservableState, getDefaultProps!
+ *
+ * @param {Function} getDefaultProps - container default props. Passed to child as props.
+ * @param {Function} getInitialState - container initial state. Passed to child as props.
+ * @param {Function} getObservableState - pass observables here. Observable *values* passed to child as props
+ * @param {*} propTypes - container propTypes.
+ * @returns {Function} that returns the container
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createDangerouslySlowContainer</span>(<span class="hljs-params">{
+  getDefaultProps = (</span>) =&gt; (<span class="hljs-params">{}</span>),
+  <span class="hljs-title">getInitialState</span> = (<span class="hljs-params"></span>) =&gt; (<span class="hljs-params">{}</span>),
+  <span class="hljs-title">getObservableState</span> = (<span class="hljs-params"></span>) =&gt; (<span class="hljs-params">{}</span>),
+  <span class="hljs-title">propTypes</span> = </span>{},
+  __dangerouslyEnableSlowness = <span class="hljs-literal">true</span>
+  }) {
+
+  <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-params">StatelessFunctionalComponent</span> =&gt;</span> React.createClass({
+
+    <span class="hljs-attr">propTypes</span>: propTypes,
+
+    getInitialState() {
+      <span class="hljs-keyword">return</span> getInitialState.call(<span class="hljs-keyword">this</span>)
+    },
+
+    getDefaultProps() {
+      <span class="hljs-keyword">return</span> getDefaultProps()
+    },
+
+    componentWillMount() {
+
+      <span class="hljs-keyword">const</span> observableState = getObservableState.call(<span class="hljs-keyword">this</span>)
+
+      setupNonObservables(<span class="hljs-keyword">this</span>, observableState)
+      setupObservables(<span class="hljs-keyword">this</span>, observableState)
+    },
+
+    componentWillReceiveProps() {
+
+      <span class="hljs-keyword">if</span> (__dangerouslyEnableSlowness) {
+
+        <span class="hljs-keyword">const</span> observableState = getObservableState.call(<span class="hljs-keyword">this</span>)
+
+        removeObservables(<span class="hljs-keyword">this</span>)
+        setupObservables(<span class="hljs-keyword">this</span>, observableState)
+      }
+    },
+
+    componentWillUnmount() {
+
+      removeObservables(<span class="hljs-keyword">this</span>)
+    },
+
+    render() {
+      <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">StatelessFunctionalComponent</span> {<span class="hljs-attr">...this.props</span>} {<span class="hljs-attr">...this.state</span>} /&gt;</span>
+    }
+  })
+}
+
+</span></pre></div>
+        
+      
+      <div class="fleur">h</div>
+    </div>
+  </div>
+</body>
+</html>

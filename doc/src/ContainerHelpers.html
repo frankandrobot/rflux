@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>ContainerHelpers.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="page">
+
+      <div class="header">
+        
+          <h1>ContainerHelpers.js</h1>
+        
+
+        
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
+              
+                
+                <li>
+                  <a class="source" href="appStateFactory.html">
+                    appStateFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createAppDispatcher.html">
+                    createAppDispatcher.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DangerouslySlowContainer.html">
+                    DangerouslySlowContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createContainer.html">
+                    createContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createDangerouslySlowContainer.html">
+                    createDangerouslySlowContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="index.html">
+                    index.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="ContainerHelpers.html">
+                    ContainerHelpers.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="assert.html">
+                    assert.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="cast.html">
+                    cast.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="checkUnique.html">
+                    checkUnique.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="isObservable.html">
+                    isObservable.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="uuid.html">
+                    uuid.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="ReduxSaga.html">
+                    ReduxSaga.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createReduxReducers.html">
+                    createReduxReducers.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="reduxChannelName.html">
+                    reduxChannelName.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="reduxMiddlewareFactory.html">
+                    reduxMiddlewareFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="StateWithSideEffects.html">
+                    StateWithSideEffects.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createSagas.html">
+                    createSagas.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createStores.html">
+                    createStores.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="sagaInterfaceFactory.html">
+                    sagaInterfaceFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="kefirEmitter.html">
+                    kefirEmitter.js
+                  </a>
+                </li>
+              
+            </ol>
+          </div>
+        
+      </div>
+
+      
+        
+        
+        
+          <div class='highlight'><pre><span class="hljs-keyword">import</span> isObservable <span class="hljs-keyword">from</span> <span class="hljs-string">'../internal/isObservable'</span>
+
+
+<span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">observables</span>(<span class="hljs-params">stateOrProps</span>) </span>{
+
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.keys(stateOrProps)
+      .filter(<span class="hljs-function"><span class="hljs-params">prop</span> =&gt;</span> isObservable(stateOrProps[prop]))
+      .map(<span class="hljs-function"><span class="hljs-params">prop</span> =&gt;</span> ({<span class="hljs-attr">name</span>: prop, <span class="hljs-attr">observable</span>: stateOrProps[prop]})) || []
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">nonObservables</span>(<span class="hljs-params">stateOrProps</span>) </span>{
+
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.keys(stateOrProps)
+    .filter(<span class="hljs-function"><span class="hljs-params">prop</span> =&gt;</span> !isObservable(stateOrProps[prop]) &amp;&amp; prop !== <span class="hljs-string">'children'</span>)
+    .reduce(<span class="hljs-function">(<span class="hljs-params">total, prop</span>) =&gt;</span> <span class="hljs-built_in">Object</span>.assign(total, {[prop]: stateOrProps[prop]}), {})
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setupNonObservables</span>(<span class="hljs-params">component, stateOrProps, setState = true</span>) </span>{
+
+  component._nonObservables = nonObservables(stateOrProps)
+
+  setState &amp;&amp; component.setState(component._nonObservables)
+}
+
+<span class="hljs-comment">/**
+ * a callback maps a "val" to the obj property on the Component state
+ *
+ * @param {React.Component} component
+ * @param {*} prop
+ * @returns {Function} callback
+ * @private
+ */</span>
+<span class="hljs-keyword">const</span> _callback = <span class="hljs-function">(<span class="hljs-params">component, prop</span>) =&gt;</span> val =&gt; component.setState({[prop.name]: val})
+<span class="hljs-keyword">const</span> _subscribe = <span class="hljs-function">(<span class="hljs-params">observableList, callbacks</span>) =&gt;</span>
+  observableList.forEach(<span class="hljs-function">(<span class="hljs-params">obj, i</span>) =&gt;</span> obj.observable.onValue(callbacks[i]))
+<span class="hljs-keyword">const</span> _pluck = <span class="hljs-function">(<span class="hljs-params">obj, keys</span>) =&gt;</span>
+  keys.reduce(<span class="hljs-function">(<span class="hljs-params">culledObj, key</span>) =&gt;</span> <span class="hljs-built_in">Object</span>.assign(culledObj, {[key]: obj[key]}), {})
+
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_setupObservableState</span>(<span class="hljs-params">component, observableList, initialState</span>) </span>{
+
+  <span class="hljs-keyword">const</span> callbacks = observableList.map(<span class="hljs-function"><span class="hljs-params">prop</span> =&gt;</span> _callback(component, prop))</pre></div>
+        
+      
+        
+        <p>set default state first before setting up listeners</p>
+
+        
+          <div class='highlight'><pre>  component.setState(
+    _pluck(initialState, observableList.map(<span class="hljs-function"><span class="hljs-params">x</span> =&gt;</span> x.name)), <span class="hljs-comment">// set observables only</span>
+    () =&gt; _subscribe(observableList, callbacks)
+  )
+
+  <span class="hljs-keyword">return</span> callbacks
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setupObservables</span>(<span class="hljs-params">component, stateOrProps, initialState</span>) </span>{
+
+  initialState = initialState || component.state || {}
+
+  component._observables = observables(stateOrProps)
+  component._callbacks = _setupObservableState(component, component._observables, initialState)
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">removeObservables</span>(<span class="hljs-params">component</span>) </span>{
+
+  <span class="hljs-keyword">const</span> observables = component._observables
+  <span class="hljs-keyword">const</span> callbacks = component._callbacks
+
+  observables.forEach(<span class="hljs-function">(<span class="hljs-params">obj, i</span>) =&gt;</span> obj.observable.offValue(callbacks[i]))
+}</pre></div>
+        
+      
+      <div class="fleur">h</div>
+    </div>
+  </div>
+</body>
+</html>

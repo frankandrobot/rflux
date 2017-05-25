@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>createReduxReducers.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="page">
+
+      <div class="header">
+        
+          <h1>createReduxReducers.js</h1>
+        
+
+        
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
+              
+                
+                <li>
+                  <a class="source" href="appStateFactory.html">
+                    appStateFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createAppDispatcher.html">
+                    createAppDispatcher.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DangerouslySlowContainer.html">
+                    DangerouslySlowContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createContainer.html">
+                    createContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createDangerouslySlowContainer.html">
+                    createDangerouslySlowContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="index.html">
+                    index.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="ContainerHelpers.html">
+                    ContainerHelpers.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="assert.html">
+                    assert.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="cast.html">
+                    cast.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="checkUnique.html">
+                    checkUnique.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="isObservable.html">
+                    isObservable.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="uuid.html">
+                    uuid.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="ReduxSaga.html">
+                    ReduxSaga.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createReduxReducers.html">
+                    createReduxReducers.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="reduxChannelName.html">
+                    reduxChannelName.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="reduxMiddlewareFactory.html">
+                    reduxMiddlewareFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="StateWithSideEffects.html">
+                    StateWithSideEffects.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createSagas.html">
+                    createSagas.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createStores.html">
+                    createStores.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="sagaInterfaceFactory.html">
+                    sagaInterfaceFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="kefirEmitter.html">
+                    kefirEmitter.js
+                  </a>
+                </li>
+              
+            </ol>
+          </div>
+        
+      </div>
+
+      
+        
+        
+        
+          <div class='highlight'><pre><span class="hljs-keyword">import</span> assert <span class="hljs-keyword">from</span> <span class="hljs-string">'../internal/assert'</span>
+
+<span class="hljs-keyword">import</span> {state} <span class="hljs-keyword">from</span> <span class="hljs-string">'../stores/StateWithSideEffects'</span>
+
+<span class="hljs-keyword">import</span> reduxChannelName <span class="hljs-keyword">from</span> <span class="hljs-string">'./reduxChannelName'</span>
+
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_createReduxReducerStateObservable</span>(<span class="hljs-params">channel, Reducers</span>) </span>{
+
+  <span class="hljs-keyword">const</span> reducerKeys = <span class="hljs-built_in">Object</span>.keys(Reducers)
+
+  <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-params">AppDispatcher</span> =&gt;</span>
+
+    AppDispatcher
+      .filter(<span class="hljs-function"><span class="hljs-params">x</span> =&gt;</span> x &amp;&amp; x.channel === channel)
+      .scan(
+        <span class="hljs-function">(<span class="hljs-params">state, action</span>) =&gt;</span> {
+
+          <span class="hljs-keyword">const</span> newFullState = {}
+
+          <span class="hljs-keyword">for</span>(<span class="hljs-keyword">let</span> i=<span class="hljs-number">0</span>; i&lt;reducerKeys.length; i++) {
+            <span class="hljs-keyword">const</span> reducerKey = reducerKeys[i]
+            <span class="hljs-keyword">const</span> reducer = Reducers[reducerKey]
+            <span class="hljs-keyword">const</span> newState = reducer(state[reducerKey], action.payload)
+
+            newFullState[reducerKey] = newState
+          }</pre></div>
+        
+      
+        
+        <p>note how this returns a normal JS object. That means “state” in this
+stream is just a normal JS object.</p>
+
+        
+          <div class='highlight'><pre>          <span class="hljs-keyword">return</span> newFullState
+        },</pre></div>
+        
+      
+        
+        <p>the assumption is that if you invoke the reducer with no params, you will
+get back the initial state.</p>
+
+        
+          <div class='highlight'><pre>        reducerKeys.reduce(
+          <span class="hljs-function">(<span class="hljs-params">initialState, reducerKey</span>) =&gt;</span> <span class="hljs-built_in">Object</span>.assign(
+            initialState,
+            {[reducerKey]: Reducers[reducerKey](<span class="hljs-literal">undefined</span>, {})}
+          ),
+          {}
+        )
+      )
+}
+
+
+<span class="hljs-comment">/**
+ * Creates a special channel for redux reducers. The main differences between this and
+ * `createStores` are:
+ *
+ * 1. `createStores` assumes a single reducer per action type. `createReduxReducers`
+ *    passes all actions to *every* reducer, as per the redux style.
+ * 2. `createStores` maps each channel to a single top-level state property.
+ *    `createReduxReducers` maps every reducer to a top-level state property. But
+ *     internally, all messages flow through a single redux channel.
+ *
+ * ## Limitations
+ *
+ * Currently, `redux#combineReducers` is not supported.
+ *
+ * ## Message Dispatching
+ *
+ * To pass a message to a redux reducer from an rflux app, use this format:
+ * - channel:String = reduxChannelName (see ./reduxChannelName)
+ * - actionType:String
+ * - payload: {//actual redux action }
+ *
+ * @param {Map&lt;String,Function&gt;} Reducers
+ * @returns {Function} the redux reducers channel
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createReduxReducers</span>(<span class="hljs-params">{Reducers, AppDispatcher}</span>) </span>{
+
+  assert(Reducers, <span class="hljs-string">'Need Reducers'</span>)
+
+  <span class="hljs-keyword">const</span> combinedStateObservable =
+    _createReduxReducerStateObservable(reduxChannelName, Reducers)(AppDispatcher)
+
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.keys(Reducers)
+    .map(<span class="hljs-function"><span class="hljs-params">reducerKey</span> =&gt;</span> {
+      <span class="hljs-keyword">const</span> reducerStateObservable = combinedStateObservable
+        .map(<span class="hljs-function"><span class="hljs-params">combinedState</span> =&gt;</span> combinedState[reducerKey])</pre></div>
+        
+      
+        
+        <p>check that objects point to the same thing
+eslint-disable-next-line eqeqeq</p>
+
+        
+          <div class='highlight'><pre>        .skipDuplicates(<span class="hljs-function">(<span class="hljs-params">prev, next</span>) =&gt;</span> prev == next)
+
+      <span class="hljs-keyword">return</span> {
+        <span class="hljs-attr">name</span>: reducerKey,
+        <span class="hljs-attr">stateWithSideEffectsObservable</span>:
+          reducerStateObservable.map(<span class="hljs-function"><span class="hljs-params">reducerState</span> =&gt;</span> state(reducerState)),
+        <span class="hljs-attr">store</span>: {
+          [<span class="hljs-string">`<span class="hljs-subst">${reducerKey}</span>Observable`</span>]: reducerStateObservable
+        }
+      }
+    })
+}</pre></div>
+        
+      
+      <div class="fleur">h</div>
+    </div>
+  </div>
+</body>
+</html>

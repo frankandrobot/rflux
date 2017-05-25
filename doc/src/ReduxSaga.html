@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>ReduxSaga.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="page">
+
+      <div class="header">
+        
+          <h1>ReduxSaga.js</h1>
+        
+
+        
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
+              
+                
+                <li>
+                  <a class="source" href="appStateFactory.html">
+                    appStateFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createAppDispatcher.html">
+                    createAppDispatcher.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DangerouslySlowContainer.html">
+                    DangerouslySlowContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createContainer.html">
+                    createContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createDangerouslySlowContainer.html">
+                    createDangerouslySlowContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="index.html">
+                    index.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="ContainerHelpers.html">
+                    ContainerHelpers.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="assert.html">
+                    assert.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="cast.html">
+                    cast.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="checkUnique.html">
+                    checkUnique.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="isObservable.html">
+                    isObservable.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="uuid.html">
+                    uuid.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="ReduxSaga.html">
+                    ReduxSaga.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createReduxReducers.html">
+                    createReduxReducers.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="reduxChannelName.html">
+                    reduxChannelName.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="reduxMiddlewareFactory.html">
+                    reduxMiddlewareFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="StateWithSideEffects.html">
+                    StateWithSideEffects.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createSagas.html">
+                    createSagas.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createStores.html">
+                    createStores.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="sagaInterfaceFactory.html">
+                    sagaInterfaceFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="kefirEmitter.html">
+                    kefirEmitter.js
+                  </a>
+                </li>
+              
+            </ol>
+          </div>
+        
+      </div>
+
+      
+        
+        
+        
+          <div class='highlight'><pre><span class="hljs-keyword">import</span> assert <span class="hljs-keyword">from</span> <span class="hljs-string">'../internal/assert'</span>
+
+<span class="hljs-keyword">import</span> Kefir <span class="hljs-keyword">from</span> <span class="hljs-string">'kefir'</span>
+
+<span class="hljs-keyword">import</span> kefirEmitter <span class="hljs-keyword">from</span> <span class="hljs-string">'../utils/kefirEmitter'</span>
+<span class="hljs-keyword">import</span> isObservable <span class="hljs-keyword">from</span> <span class="hljs-string">'../internal/isObservable'</span>
+<span class="hljs-keyword">import</span> uuid <span class="hljs-keyword">from</span> <span class="hljs-string">'../internal/uuid'</span>
+
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> fakeAppDispatcher = kefirEmitter()
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> sagaMessageBus = kefirEmitter()
+
+<span class="hljs-comment">/**
+ * Call the action and return the result (as an observable)
+ */</span>
+<span class="hljs-keyword">const</span> callObservable = sagaMessageBus
+  .filter(<span class="hljs-function"><span class="hljs-params">action</span> =&gt;</span> action.action === <span class="hljs-string">'CALL'</span>)
+  .map(<span class="hljs-function"><span class="hljs-params">action</span> =&gt;</span> action.payload)
+  .flatMap(<span class="hljs-function"><span class="hljs-params">action</span> =&gt;</span> {
+
+    <span class="hljs-keyword">const</span> callId = action.callId
+    <span class="hljs-keyword">const</span> result = action.fn(...action.args)
+    <span class="hljs-keyword">const</span> resultObservable = isObservable(result) ? result : Kefir.constant(result)
+
+    <span class="hljs-keyword">return</span> resultObservable.map(<span class="hljs-function"><span class="hljs-params">rslt</span> =&gt;</span> ({callId, rslt}))
+  })
+  .onValue(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-literal">undefined</span>)
+
+<span class="hljs-comment">/**
+ * @param {String} channel
+ * @param {Map} ActionTypes - map whose keys are the names of the side effects
+ * @param {Map} SagaActionFunctions - (optional) map of action functions
+ * @param {Map} SagaHandlers - map of handler functions
+ * @returns {Object} redux middleware
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">reduxSagaMiddleware</span>(<span class="hljs-params">channel, {ActionTypes, SagaActionFunctions, SagaHandlers}</span>) </span>{
+
+  assert(<span class="hljs-keyword">typeof</span> channel === <span class="hljs-string">'string'</span>, <span class="hljs-string">'Needs a channel and it needs to be a string'</span>)
+  assert(ActionTypes, <span class="hljs-string">'Need ActionTypes'</span>)
+  assert(SagaHandlers, <span class="hljs-string">'Need SagaHandlers'</span>)</pre></div>
+        
+      
+        
+        <p>every side effect must map to an action function and handler</p>
+
+        
+          <div class='highlight'><pre>  <span class="hljs-built_in">Object</span>.keys(ActionTypes).forEach(<span class="hljs-function"><span class="hljs-params">action</span> =&gt;</span> {
+    <span class="hljs-keyword">if</span> (SagaActionFunctions) {
+      assert(SagaActionFunctions[action], <span class="hljs-string">`Channel <span class="hljs-subst">${channel}</span> is missing side effect action function "<span class="hljs-subst">${action}</span>"`</span>)
+    }
+    assert(SagaHandlers[action], <span class="hljs-string">`Channel <span class="hljs-subst">${channel}</span> is missing side effect handler "<span class="hljs-subst">${action}</span>"`</span>)
+  })
+
+  SagaActionFunctions = SagaActionFunctions || {}
+
+  <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> next =&gt; <span class="hljs-function"><span class="hljs-params">action</span> =&gt;</span> {
+
+    setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> SagaHandlers[action.type](action), <span class="hljs-number">0</span>)
+    setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> fakeAppDispatcher.emit(action), <span class="hljs-number">0</span>)
+
+    <span class="hljs-keyword">return</span> next(action)
+  }
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ReduxSaga</span> </span>{
+
+  <span class="hljs-keyword">constructor</span>(store) {
+
+    <span class="hljs-keyword">this</span>.store = store
+  }
+
+  put(action) {
+    setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>.store.dispatch(action), <span class="hljs-number">0</span>)
+
+    <span class="hljs-keyword">return</span> Kefir.constant(action) <span class="hljs-comment">// streamified so we can chain together</span>
+  }
+
+  call(fn, ...args) {
+
+    <span class="hljs-keyword">const</span> callId = uuid()
+
+    setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> sagaMessageBus.emit({<span class="hljs-attr">action</span>: <span class="hljs-string">'CALL'</span>, <span class="hljs-attr">payload</span>: {fn, args, callId}}), <span class="hljs-number">0</span>)
+
+    <span class="hljs-keyword">return</span> callObservable.filter(<span class="hljs-function"><span class="hljs-params">fn</span> =&gt;</span> fn.callId === callId).map(<span class="hljs-function"><span class="hljs-params">fn</span> =&gt;</span> fn.rslt).take(<span class="hljs-number">1</span>)
+  }
+
+  listen(channel, actionType) {
+
+    <span class="hljs-keyword">return</span> fakeAppDispatcher
+      .filter(<span class="hljs-function"><span class="hljs-params">action</span> =&gt;</span> action.channel === channel &amp;&amp; action.actionType === actionType)
+      .map(<span class="hljs-function"><span class="hljs-params">action</span> =&gt;</span> action.payload)
+  }
+}</pre></div>
+        
+      
+      <div class="fleur">h</div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>createStores.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="page">
+
+      <div class="header">
+        
+          <h1>createStores.js</h1>
+        
+
+        
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
+              
+                
+                <li>
+                  <a class="source" href="appStateFactory.html">
+                    appStateFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createAppDispatcher.html">
+                    createAppDispatcher.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DangerouslySlowContainer.html">
+                    DangerouslySlowContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createContainer.html">
+                    createContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createDangerouslySlowContainer.html">
+                    createDangerouslySlowContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="index.html">
+                    index.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="ContainerHelpers.html">
+                    ContainerHelpers.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="assert.html">
+                    assert.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="cast.html">
+                    cast.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="checkUnique.html">
+                    checkUnique.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="isObservable.html">
+                    isObservable.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="uuid.html">
+                    uuid.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="ReduxSaga.html">
+                    ReduxSaga.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createReduxReducers.html">
+                    createReduxReducers.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="reduxChannelName.html">
+                    reduxChannelName.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="reduxMiddlewareFactory.html">
+                    reduxMiddlewareFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="StateWithSideEffects.html">
+                    StateWithSideEffects.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createSagas.html">
+                    createSagas.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createStores.html">
+                    createStores.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="sagaInterfaceFactory.html">
+                    sagaInterfaceFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="kefirEmitter.html">
+                    kefirEmitter.js
+                  </a>
+                </li>
+              
+            </ol>
+          </div>
+        
+      </div>
+
+      
+        
+        
+        
+          <div class='highlight'><pre><span class="hljs-keyword">import</span> cast <span class="hljs-keyword">from</span> <span class="hljs-string">'../internal/cast'</span>
+<span class="hljs-keyword">import</span> assert <span class="hljs-keyword">from</span> <span class="hljs-string">'../internal/assert'</span>
+<span class="hljs-keyword">import</span> checkUnique <span class="hljs-keyword">from</span> <span class="hljs-string">'../internal/checkUnique'</span>
+
+<span class="hljs-keyword">import</span> StateWithSideEffects <span class="hljs-keyword">from</span> <span class="hljs-string">'./StateWithSideEffects'</span>
+<span class="hljs-keyword">import</span> {state} <span class="hljs-keyword">from</span> <span class="hljs-string">'./StateWithSideEffects'</span>
+
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_bindActionFunctionToAppDispatcher</span>(<span class="hljs-params">actionFunction</span>) </span>{
+
+  <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-params">AppDispatcher</span> =&gt;</span>
+    (...args) =&gt; AppDispatcher.emit({...actionFunction(...args)})
+}
+
+<span class="hljs-comment">/**
+ * Takes a map of ActionFunctions indexed by ActionType and binds each to the
+ * AppDispatcher. That is, when a bound function is called, it automatically
+ * dispatches its message to the store.
+ *
+ * **Note:**
+ * 1. This method is actually a higher order function. It returns a function
+ *    that accepts the AppDispatcher object as a parameter. This way, the
+ *    AppDispatcher is not hard-coded dependency.
+ *
+ * @param {Map&lt;String,Boolean&gt;} ActionTypes
+ * @param {Map&lt;ActionType,Function&gt;} ActionFunctions
+ * @returns {Function} a function that binds the action functions to the app dispatcher
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">bindActionFunctions</span>(<span class="hljs-params">ActionTypes, ActionFunctions</span>) </span>{
+
+  <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-params">AppDispatcher</span> =&gt;</span>
+
+    <span class="hljs-built_in">Object</span>.keys(ActionTypes).reduce(
+      <span class="hljs-function">(<span class="hljs-params">storeActions, action</span>) =&gt;</span> ({
+        ...storeActions,
+        [action]: _bindActionFunctionToAppDispatcher(ActionFunctions[action])(AppDispatcher)
+      }),
+      {}
+    )
+}
+
+<span class="hljs-comment">/**
+ * @deprecated You rarely (really) need a *pre-bound* selector (emphasis:
+ * "pre-bound"). For this reason, these are deprecated.
+ *
+ * Takes a map of ActionObservables *not necessarily indexed by ActionType* and binds each
+ * to the StoreStateObservable. The StoreStateObservable is the store's state, wrapped in a
+ * Kefir stream (otherwise known as an *observable*).
+ *
+ * Since the StoreStateObservable represents the state, an ActionObservable is a way of
+ * observing (aka "selecting") arbitrary parts of the state tree.
+ *
+ * **Note:**
+ * 1. This method is actually a higher order function. It returns a function
+ *    that accepts a StoreStateObservable object as a parameter. This way, the
+ *    StoreStateObservable is not hard-coded dependency.
+ *
+ * TODO global rename StateObservable =&gt; StateObservable
+ * TODO global rename ActionObservable =&gt; SelectionObservable
+ *
+ * @param {Map&lt;String,Observable&gt;} ActionObservables
+ * @returns {Function} a function that binds the action observables to the store observable
+ * @private
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_bindActionObservables</span>(<span class="hljs-params">ActionObservables</span>) </span>{
+
+  <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-params">storeObservable</span> =&gt;</span>
+
+    <span class="hljs-built_in">Object</span>.keys(ActionObservables).reduce(
+      <span class="hljs-function">(<span class="hljs-params">total, observable</span>) =&gt;</span> <span class="hljs-built_in">Object</span>.assign(
+        total,
+        {[observable]: ActionObservables[observable](storeObservable)}
+      ),
+      {}
+    )
+}
+
+<span class="hljs-comment">/**
+ * Creates the store's state observable using the given channel name.
+ *
+ * When an action comes in, it will call the corresponding reducer with the payload,
+ * and pass the new state to the observable.
+ *
+ * Every reducer is called with these parameters:
+ * 1. the current state
+ * 2. the action payload
+ * 3. a `endOfSideEffects` function that can be used to report the end of all the
+ * side effects.
+ *
+ * In addition to updating the state, every reducer can also dispatch side
+ * effects---which are just messages that are handled by other reducers or sagas. By
+ * using the result of the `endOfSideEffects` function as the last side effect, it is
+ * possible to tell when the entire reducer workflow completes... or so that's the
+ * idea.
+ *
+ * Each reducer has this signature:
+ *
+ * ```
+ * (state:StoreState, payload:Payload, endOfSideEffects:Payload =&gt; Message)
+ * =&gt; StateWithSideEffects
+ * ```
+ *
+ * TODO sideEffectResult may not actually fire correctly, specially when side effects
+ * are handled by async sagas.
+ *
+ * **Notes:**
+ * 1. Every ActionType must have a corresponding Reducer.
+ * 2. This method is actually a higher order function. It returns a function
+ *    that accepts an AppDispatcher object as a parameter. This way, the
+ *    AppDispatcher is not hard-coded dependency.
+ *
+ * @param {String} channel
+ * @param {Map&lt;ActionType,Function&gt;} Reducers
+ * @returns {Function} a function that creates the store's state observable.
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_createStoreStateObservable</span>(<span class="hljs-params">channel, Reducers</span>) </span>{
+
+  <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-params">AppDispatcher</span> =&gt;</span>
+
+    AppDispatcher
+      .filter(<span class="hljs-function"><span class="hljs-params">x</span> =&gt;</span> x &amp;&amp; x.channel === channel)
+      .scan(
+        <span class="hljs-function">(<span class="hljs-params">stateWithSideEffects, action</span>) =&gt;</span> {
+
+          <span class="hljs-keyword">const</span> reducer = Reducers[action.actionType]
+
+          <span class="hljs-keyword">if</span> (!reducer) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">`Channel <span class="hljs-subst">${channel}</span> does not support <span class="hljs-subst">${action.actionType}</span>`</span>)
+          }
+
+          <span class="hljs-keyword">const</span> endOfSideEffects = <span class="hljs-function"><span class="hljs-params">payload</span> =&gt;</span> ({
+            <span class="hljs-attr">channel</span>: <span class="hljs-string">`<span class="hljs-subst">${channel}</span>Result`</span>,
+            <span class="hljs-attr">actionType</span>: <span class="hljs-string">`<span class="hljs-subst">${action.actionType}</span>Result`</span>,
+            payload
+          })</pre></div>
+        
+      
+        
+        <p>always return a StateWithSideEffects (code hardening)</p>
+
+        
+          <div class='highlight'><pre>          <span class="hljs-keyword">return</span> cast(
+            reducer(stateWithSideEffects.state, action.payload, endOfSideEffects),
+            StateWithSideEffects
+          )
+        },
+        state(Reducers.initialState || {})
+        )
+}
+
+
+<span class="hljs-comment">/**
+ * The idea is that you can use these observables to observe the end of a reducer +
+ * side effects.
+ * @param {String} channel
+ * @param {Map&lt;String,*&gt;} ActionTypes
+ * @returns {Function} function that binds AppDispatcher to the observables
+ * @private
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_createEndOfActionsObservables</span>(<span class="hljs-params">channel, ActionTypes</span>) </span>{
+
+  <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-params">AppDispatcher</span> =&gt;</span>
+
+    <span class="hljs-built_in">Object</span>.keys(ActionTypes).reduce(
+      <span class="hljs-function">(<span class="hljs-params">observables, action</span>) =&gt;</span> <span class="hljs-built_in">Object</span>.assign(
+        observables,
+        {
+          [<span class="hljs-string">`<span class="hljs-subst">${action}</span>ResultObservable`</span>]:
+            AppDispatcher
+              .filter(<span class="hljs-function"><span class="hljs-params">x</span> =&gt;</span>
+              x.channel === <span class="hljs-string">`<span class="hljs-subst">${channel}</span>Result`</span> &amp;&amp; x.actionType === <span class="hljs-string">`<span class="hljs-subst">${action}</span>Result`</span>)
+              .map(<span class="hljs-function"><span class="hljs-params">x</span> =&gt;</span> x.payload)
+        }
+      ),
+      {}
+    )
+}
+
+<span class="hljs-comment">/* eslint-disable no-console */</span>
+<span class="hljs-comment">/**
+ * The store consists of
+ * - the channel name
+ * - the state observable
+ * - bound (aka "live") action functions
+ * - bound state selectors (which will probably be deprecated in a future release)
+ *
+ * It is created from a map of the ActionTypes. Each ActionType has a corresponding
+ * reducer, which handles incoming messages. Each ActionType also has a corresponding
+ * ActionFunction that's used to dispatch messages.
+ *
+ * One catch is that the *names* of the ActionFunctions and the ActionObservables must
+ * be globally unique. This isn't hard to achieve as long as you:
+ *
+ * 1. use the channel name in the action/observable. Ex: createDoc
+ * 2. use the word "observable" in the observables. Ex: docObservable
+ *
+ * @param {String} channel
+ * @param {Map&lt;String,*&gt;} ActionTypes - map of action type constants
+ * @param {Map&lt;ActionType,Function&gt;} Reducers - map of reducers, indexed by ActionType.
+ * Additionally, reducers have an `initialState` property.
+ * @param {Map&lt;ActionType,Function&gt;} ActionFunctions - map of action functions, indexed by
+ * ActionType
+ * @param {Map&lt;String,Function&gt;} ActionObservables (optional) - higher order functions
+ * that take the StoreStateObservable as input and return an observable that selects parts
+ * of the state tree. **This will probably be deprecated.**
+ * @returns {Function} that binds the store to the app dispatcher
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_createStore</span>(<span class="hljs-params">
+  {channel, ActionTypes, Reducers, ActionFunctions, ActionObservables}</span>) </span>{
+
+  ActionObservables = ActionObservables || {}
+
+  assert(<span class="hljs-keyword">typeof</span> channel === <span class="hljs-string">'string'</span>, <span class="hljs-string">'Needs a channel and it needs to be a string'</span>)
+  assert(ActionTypes, <span class="hljs-string">'Need ActionTypes'</span>)
+  assert(Reducers, <span class="hljs-string">'Need Reducers'</span>)
+  assert(ActionFunctions, <span class="hljs-string">'Need action functions'</span>)</pre></div>
+        
+      
+        
+        <p>every action must have an action function and a reducer</p>
+
+        
+          <div class='highlight'><pre>  <span class="hljs-built_in">Object</span>.keys(ActionTypes).forEach(<span class="hljs-function"><span class="hljs-params">action</span> =&gt;</span> {
+    assert(
+      ActionFunctions[action],
+      <span class="hljs-string">`Channel <span class="hljs-subst">${channel}</span> is missing action function "<span class="hljs-subst">${action}</span>"`</span>
+    )
+    assert(Reducers[action], <span class="hljs-string">`Channel <span class="hljs-subst">${channel}</span> is missing reducer "<span class="hljs-subst">${action}</span>"`</span>)
+  })</pre></div>
+        
+      
+        
+        <p>need an initial state; otherwise defaults to {}</p>
+
+        
+          <div class='highlight'><pre>  <span class="hljs-keyword">if</span> (!Reducers.initialState) {
+    <span class="hljs-built_in">console</span>.warn(<span class="hljs-string">`Channel <span class="hljs-subst">${channel}</span> doesn't have initialState`</span>)
+  }
+
+  <span class="hljs-keyword">return</span> <span class="hljs-function">(<span class="hljs-params">{AppDispatcher}</span>) =&gt;</span> {
+
+    <span class="hljs-keyword">const</span> stateWithSideEffectsObservable =
+      _createStoreStateObservable(channel, Reducers)(AppDispatcher)
+    <span class="hljs-keyword">const</span> stateObservable = stateWithSideEffectsObservable.map(<span class="hljs-function"><span class="hljs-params">x</span> =&gt;</span> x.state)
+
+    <span class="hljs-keyword">return</span> {
+      <span class="hljs-attr">name</span>: channel,
+      stateWithSideEffectsObservable,
+      <span class="hljs-attr">store</span>: {
+        ...bindActionFunctions(ActionTypes, ActionFunctions)(AppDispatcher),
+        ..._bindActionObservables(ActionObservables)(stateObservable),
+        <span class="hljs-comment">/**
+         * @deprecated
+         */</span>
+        ..._createEndOfActionsObservables(channel, ActionTypes)(AppDispatcher),
+        [<span class="hljs-string">`<span class="hljs-subst">${channel}</span>Observable`</span>]: stateObservable
+      }
+    }
+  }
+}
+
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createStores</span>(<span class="hljs-params">{rawStores, ...args}</span>) </span>{
+  checkUnique(rawStores, <span class="hljs-string">'channel'</span>, <span class="hljs-string">'Cannot have two stores with the same name'</span>);
+  <span class="hljs-keyword">return</span> rawStores.map(<span class="hljs-function"><span class="hljs-params">s</span> =&gt;</span> _createStore(s)({...args}))
+}</pre></div>
+        
+      
+      <div class="fleur">h</div>
+    </div>
+  </div>
+</body>
+</html>

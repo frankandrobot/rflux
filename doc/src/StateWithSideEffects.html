@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>StateWithSideEffects.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="page">
+
+      <div class="header">
+        
+          <h1>StateWithSideEffects.js</h1>
+        
+
+        
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
+              
+                
+                <li>
+                  <a class="source" href="appStateFactory.html">
+                    appStateFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createAppDispatcher.html">
+                    createAppDispatcher.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DangerouslySlowContainer.html">
+                    DangerouslySlowContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createContainer.html">
+                    createContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createDangerouslySlowContainer.html">
+                    createDangerouslySlowContainer.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="index.html">
+                    index.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="ContainerHelpers.html">
+                    ContainerHelpers.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="assert.html">
+                    assert.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="cast.html">
+                    cast.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="checkUnique.html">
+                    checkUnique.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="isObservable.html">
+                    isObservable.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="uuid.html">
+                    uuid.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="ReduxSaga.html">
+                    ReduxSaga.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createReduxReducers.html">
+                    createReduxReducers.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="reduxChannelName.html">
+                    reduxChannelName.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="reduxMiddlewareFactory.html">
+                    reduxMiddlewareFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="StateWithSideEffects.html">
+                    StateWithSideEffects.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createSagas.html">
+                    createSagas.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createStores.html">
+                    createStores.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="sagaInterfaceFactory.html">
+                    sagaInterfaceFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="kefirEmitter.html">
+                    kefirEmitter.js
+                  </a>
+                </li>
+              
+            </ol>
+          </div>
+        
+      </div>
+
+      
+        
+        
+        
+          <div class='highlight'><pre><span class="hljs-comment">/**
+ * Hey, look! Something like a monad (dang, forget I said the "m" word.)
+ *
+ * `StateWithSideEffects` is basically state plus an array of messages (the side
+ * effects to be executed).
+ *
+ * You can combine it with State or with another StateWithSideEffects, or add side
+ * effects to an existing StateWithSideEffects.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">StateWithSideEffects</span> </span>{
+
+  <span class="hljs-comment">/**
+   * @param {State} state
+   * @param {Message[]} sideEffects
+   */</span>
+  <span class="hljs-keyword">constructor</span>(state, sideEffects) {
+
+    <span class="hljs-keyword">this</span>.state = state || {}
+    <span class="hljs-keyword">this</span>.sideEffects = sideEffects || []
+  }
+
+  <span class="hljs-comment">/**
+   * Can combine `StateWithSideEffects` with another `StateWithSideEffects` or with state.
+   * @param {StateWithSideEffects|State} b
+   * @returns {StateWithSideEffects} the result
+   */</span>
+  combine(b) {
+
+    <span class="hljs-keyword">return</span> b <span class="hljs-keyword">instanceof</span> StateWithSideEffects ?
+
+      <span class="hljs-keyword">new</span> StateWithSideEffects(
+        {...this.state, ...b.state},
+        <span class="hljs-keyword">this</span>.sideEffects.concat(b.sideEffects)
+      ) :
+
+      <span class="hljs-keyword">new</span> StateWithSideEffects(({...this.state, ...b}, <span class="hljs-keyword">this</span>.sideEffects))
+  }
+
+  addSideEffects(...sideEffects) {
+
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> StateWithSideEffects(
+      {...this.state},
+      <span class="hljs-keyword">this</span>.sideEffects.concat(sideEffects)
+    )
+  }
+}
+
+<span class="hljs-comment">/**
+ * Constructor helper
+ *
+ * @param {*} state
+ * @param {Message[]} sideEffects - array of side effects
+ * @returns {StateWithSideEffects} instance
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">state</span>(<span class="hljs-params">state = {}</span>) </span>{
+
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> StateWithSideEffects(state)
+}</pre></div>
+        
+      
+      <div class="fleur">h</div>
+    </div>
+  </div>
+</body>
+</html>
