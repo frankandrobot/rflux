@@ -113,7 +113,7 @@ function appStateFactory(_ref) {
 
   var AppState = _extends({
     appStateObservable: appStateObservable
-  }, _storesToState({ stores: stores }), _sagasToState({ sagas: sagas }));
+  }, _storesToState({ stores: [].concat(_toConsumableArray(stores), _toConsumableArray(reduxStore)) }), _sagasToState({ sagas: sagas }));
   /* eslint-enable */
 
   return {
