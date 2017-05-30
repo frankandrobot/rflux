@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>createStores.js</title>
+  <title>createChannels.js</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -13,7 +13,7 @@
 
       <div class="header">
         
-          <h1>createStores.js</h1>
+          <h1>createChannels.js</h1>
         
 
         
@@ -150,7 +150,7 @@
                 
                 <li>
                   <a class="source" href="createStores.html">
-                    createStores.js
+                    createChannels.js
                   </a>
                 </li>
               
@@ -292,7 +292,7 @@
  * @param {Map&lt;ActionType,Function&gt;} Reducers
  * @returns {Function} a function that creates the store's state observable.
  */</span>
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_createStoreStateObservable</span>(<span class="hljs-params">channel, Reducers</span>) </span>{
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_createChannelStateObservable</span>(<span class="hljs-params">channel, Reducers</span>) </span>{
 
   <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-params">AppDispatcher</span> =&gt;</span>
 
@@ -384,7 +384,7 @@
  * of the state tree. **This will probably be deprecated.**
  * @returns {Function} that binds the store to the app dispatcher
  */</span>
-<span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_createStore</span>(<span class="hljs-params">
+<span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_createChannel</span>(<span class="hljs-params">
   {channel, ActionTypes, Reducers, ActionFunctions, ActionObservables}</span>) </span>{
 
   ActionObservables = ActionObservables || {}
@@ -419,7 +419,7 @@
   <span class="hljs-keyword">return</span> <span class="hljs-function">(<span class="hljs-params">{AppDispatcher}</span>) =&gt;</span> {
 
     <span class="hljs-keyword">const</span> stateWithSideEffectsObservable =
-      _createStoreStateObservable(channel, Reducers)(AppDispatcher)
+      _createChannelStateObservable(channel, Reducers)(AppDispatcher)
     <span class="hljs-keyword">const</span> stateObservable = stateWithSideEffectsObservable.map(<span class="hljs-function"><span class="hljs-params">x</span> =&gt;</span> x.state)
 
     <span class="hljs-keyword">return</span> {
@@ -441,7 +441,7 @@
 
 <span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createStores</span>(<span class="hljs-params">{rawStores, ...args}</span>) </span>{
   checkUnique(rawStores, <span class="hljs-string">'channel'</span>, <span class="hljs-string">'Cannot have two stores with the same name'</span>);
-  <span class="hljs-keyword">return</span> rawStores.map(<span class="hljs-function"><span class="hljs-params">s</span> =&gt;</span> _createStore(s)({...args}))
+  <span class="hljs-keyword">return</span> rawStores.map(<span class="hljs-function"><span class="hljs-params">s</span> =&gt;</span> _createChannel(s)({...args}))
 }</pre></div>
         
       

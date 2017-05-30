@@ -63,7 +63,9 @@ export default function reduxMiddlewareFactory({AppDispatcher, rawMiddleware}) {
                     // transform action (if requested)
                     .map(() => transformedReduxAction)
                 },
-                kefir.constant(rfluxAction.payload || {})
+                kefir.constant(
+                  typeof rfluxAction.payload === 'undefined' ? {} : rfluxAction.payload
+                )
               )
               .map(reduxAction => ({...rfluxAction, payload: reduxAction}))
           )
