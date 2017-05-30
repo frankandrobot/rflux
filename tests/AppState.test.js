@@ -52,20 +52,22 @@ test('AppState has appStateObservable', function(t) {
 
 
 test('AppState has action functions', function(t) {
-  t.plan(2)
+  t.plan(3)
   const {AppState} = objectUnderTestFn()
 
-  t.ok(!!AppState.action1)
-  t.ok(!!AppState.action2)
+  t.ok(!!AppState.actions)
+  t.ok(!!AppState.actions.action1)
+  t.ok(!!AppState.actions.action2)
 })
 
 
 test('AppState has individual channel state observables', function(t) {
-  t.plan(2)
+  t.plan(3)
   const {AppState} = objectUnderTestFn()
 
-  t.ok(!!AppState.channel1Observable)
-  t.ok(!!AppState.channel2Observable)
+  t.ok(!!AppState.observables)
+  t.ok(!!AppState.observables.channel1)
+  t.ok(!!AppState.observables.channel2)
 })
 
 
@@ -98,7 +100,7 @@ test('AppState observable works', function(t) {
     .onValue(() => t.end())
     .onError(() => t.fail())
 
-  AppState.action1({msg: 'new state'})
+  AppState.actions.action1({msg: 'new state'})
 })
 
 
@@ -106,13 +108,13 @@ test('AppState has individual working observables', function(t) {
   t.plan(1)
   const {AppState} = objectUnderTestFn()
 
-  AppState.channel1Observable.skip(1).onValue(state =>
+  AppState.observables.channel1.skip(1).onValue(state =>
     t.deepEqual(state, {msg: 'new state'})
   )
   // this one shouldn't fire
-  AppState.channel2Observable.skip(1).onValue(state =>
+  AppState.observables.channel2.skip(1).onValue(state =>
     t.equal(0, 1)
   )
-  AppState.action1({msg: 'new state'})
+  AppState.actions.action1({msg: 'new state'})
 })
 

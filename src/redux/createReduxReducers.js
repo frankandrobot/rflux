@@ -85,9 +85,10 @@ export default function createReduxReducers({Reducers, AppDispatcher}) {
         name: reducerKey,
         stateWithSideEffectsObservable:
           reducerStateObservable.map(reducerState => state(reducerState)),
-        store: {
-          [`${reducerKey}Observable`]: reducerStateObservable
-        }
+        observable: {
+          [reducerKey]: reducerStateObservable,
+        },
+        channel: {}
       }
     })
 }

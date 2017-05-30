@@ -233,14 +233,17 @@ export function _createChannel(
     return {
       name: channel,
       stateWithSideEffectsObservable,
-      store: {
+      actions: {
         ...bindActionFunctions(ActionTypes, ActionFunctions)(AppDispatcher),
+      },
+      observable: {
+        [channel]: stateObservable,
+      },
+      channel: {
+        // @deprecated
         ..._bindActionObservables(ActionObservables)(stateObservable),
-        /**
-         * @deprecated
-         */
+        // @deprecated
         ..._createEndOfActionsObservables(channel, ActionTypes)(AppDispatcher),
-        [`${channel}Observable`]: stateObservable
       }
     }
   }

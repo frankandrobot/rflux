@@ -75,8 +75,17 @@ export default function appStateFactory(
 
   const AppState = {
     appStateObservable,
+    // the pre-bound actions
+    actions: {
+      ..._channelActions([...channels, ...reduxStore]),
+      ..._sagaActions(sagas)
+    },
+    observables: {
+      ..._channelObservables([...channels, ...reduxStore]),
+      ..._sagaObservables(sagas)
+    },
+    // @deprecated
     ..._channelsToState({channels: [...channels, ...reduxStore]}),
-    ..._sagasToState({sagas})
   }
   /* eslint-enable */
 
@@ -106,13 +115,30 @@ function _createAppStateObservable({channels}) {
   )
 }
 
-function _channelsToState({channels}) {
-  return channels.reduce((state, channel) => ({...state, ...channel.store}), {})
+function _channelActions(channels) {
+  return channels.reduce((state, channel) => ({...state, ...channel.actions}), {})
 }
 
-function _sagasToState({sagas}) {
-  // add action functions and result observables to app state
-  return sagas.reduce((state, saga) => ({...state, ...saga.actionFunctions, ...saga.resultObservables}), {})
+function _sagaActions(sagas) {
+  return sagas.reduce((state, saga) => ({...state, ...saga.actionFunctions}), {})
+}
+
+function _channelObservables(channels) {
+  return channels.reduce((state, channel) => ({...state, ...channel.observable}), {})
+}
+
+function _sagaObservables(sagas) {
+  return sagas.reduce((state, saga) => ({...state, ...saga.resultObservables}), {})
+}
+
+/**
+ * @deprecated
+ * @param channels
+ * @returns {*}
+ * @private
+ */
+function _channelsToState({channels}) {
+  return channels.reduce((state, channel) => ({...state, ...channel.channel}), {})
 }
 
 function _setupChannelObs({channels, AppDispatcher}) {
