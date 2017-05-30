@@ -37,6 +37,34 @@
               
                 
                 <li>
+                  <a class="source" href="StateWithSideEffects.html">
+                    StateWithSideEffects.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createChannels.html">
+                    createChannels.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createSagas.html">
+                    createSagas.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="sagaInterfaceFactory.html">
+                    sagaInterfaceFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
                   <a class="source" href="DangerouslySlowContainer.html">
                     DangerouslySlowContainer.js
                   </a>
@@ -135,29 +163,8 @@
               
                 
                 <li>
-                  <a class="source" href="StateWithSideEffects.html">
-                    StateWithSideEffects.js
-                  </a>
-                </li>
-              
-                
-                <li>
-                  <a class="source" href="createSagas.html">
-                    createSagas.js
-                  </a>
-                </li>
-              
-                
-                <li>
-                  <a class="source" href="createStores.html">
-                    createChannels.js
-                  </a>
-                </li>
-              
-                
-                <li>
-                  <a class="source" href="sagaInterfaceFactory.html">
-                    sagaInterfaceFactory.js
+                  <a class="source" href="rfluxMessage.html">
+                    rfluxMessage.js
                   </a>
                 </li>
               
@@ -181,21 +188,21 @@
 
 <span class="hljs-keyword">import</span> checkUnique <span class="hljs-keyword">from</span> <span class="hljs-string">'./internal/checkUnique'</span>
 <span class="hljs-keyword">import</span> createAppDispatcher <span class="hljs-keyword">from</span> <span class="hljs-string">'./appdispatcher/createAppDispatcher'</span>
-<span class="hljs-keyword">import</span> createStores <span class="hljs-keyword">from</span> <span class="hljs-string">'./stores/createStores'</span>
-<span class="hljs-keyword">import</span> createSagas <span class="hljs-keyword">from</span> <span class="hljs-string">'./stores/createSagas'</span>
-<span class="hljs-keyword">import</span> sagaInterfaceFactory <span class="hljs-keyword">from</span> <span class="hljs-string">'./stores/sagaInterfaceFactory'</span>
+<span class="hljs-keyword">import</span> createChannels <span class="hljs-keyword">from</span> <span class="hljs-string">'./channels/createChannels'</span>
+<span class="hljs-keyword">import</span> createSagas <span class="hljs-keyword">from</span> <span class="hljs-string">'./channels/createSagas'</span>
+<span class="hljs-keyword">import</span> sagaInterfaceFactory <span class="hljs-keyword">from</span> <span class="hljs-string">'./channels/sagaInterfaceFactory'</span>
 <span class="hljs-keyword">import</span> reduxMiddlewareFactory <span class="hljs-keyword">from</span> <span class="hljs-string">'./redux/reduxMiddlewareFactory'</span>
 <span class="hljs-keyword">import</span> createReduxReducers <span class="hljs-keyword">from</span> <span class="hljs-string">'./redux/createReduxReducers'</span>
 
 
 <span class="hljs-comment">/**
- * A store consists of:
+ * A channel consists of:
  * - a name (channel)
  * - map of ActionTypes
  * - map of Reducers indexed by ActionType
  * - map of ActionFunctions indexed by ActionType
  *
- * See `createStore` for more details.
+ * See `createChannels` for more details.
  *
  * A saga consists of:
  * - a name (channel)
@@ -208,14 +215,14 @@
  * A middleware is function with the following signature:
  * store =&gt; next =&gt; action
  *
- * @param {Stores[]} stores
+ * @param {Channels[]} channels
  * @param {Sagas[]} sagas
  * @param {Middleware[]} middleware
  * @returns {{AppState, AppDispatcher}} the AppState and its dispatcher to send messages.
  */</span>
 <span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">appStateFactory</span>(<span class="hljs-params">
   {
-    stores: rawStores = [],
+    channels: rawChannels = [],
     sagas: rawSagas = [],
     redux: {middleware = [], reducers = {}} = {redux: {middleware: [], reducers: {}}}
   }</span>) </span>{
@@ -239,9 +246,9 @@
 
         
           <div class='highlight'><pre>  <span class="hljs-keyword">const</span> reduxStore = createReduxReducers({<span class="hljs-attr">Reducers</span>: reducers, AppDispatcher})
-  <span class="hljs-keyword">const</span> stores = createStores({rawStores, AppDispatcher})
+  <span class="hljs-keyword">const</span> channels = createChannels({rawChannels, AppDispatcher})
   <span class="hljs-keyword">const</span> appStateObservable =
-    _createAppStateObservable({<span class="hljs-attr">stores</span>: [...stores, ...reduxStore]})</pre></div>
+    _createAppStateObservable({<span class="hljs-attr">channels</span>: [...channels, ...reduxStore]})</pre></div>
         
       
         
@@ -258,18 +265,37 @@ we use <code>map</code> for side effects (which is technically an antipattern).<
   <span class="hljs-keyword">const</span> sagas = createSagas({rawSagas, AppDispatcher, sagaInterface})
 
   checkUnique(
-    [...rawStores, ...rawSagas, ...reducers],
+    [...rawChannels, ...rawSagas, ...reducers],
     <span class="hljs-string">'channel'</span>,
-    <span class="hljs-string">'Cannot have a store, saga, or redux reducer with the same name'</span>
+    <span class="hljs-string">'Cannot have a channel, saga, or redux reducer with the same name'</span>
   )
 
-  _setupStoreObs({<span class="hljs-attr">stores</span>: [...stores, ...reduxStore], AppDispatcher})
+  _setupChannelObs({<span class="hljs-attr">channels</span>: [...channels, ...reduxStore], AppDispatcher})
   _setupSagaObs({sagas})
 
   <span class="hljs-keyword">const</span> AppState = {
-    appStateObservable,
-    ..._storesToState({<span class="hljs-attr">stores</span>: [...stores, ...reduxStore]}),
-    ..._sagasToState({sagas})
+    appStateObservable,</pre></div>
+        
+      
+        
+        <p>the pre-bound actions</p>
+
+        
+          <div class='highlight'><pre>    actions: {
+      ..._channelActions([...channels, ...reduxStore]),
+      ..._sagaActions(sagas)
+    },
+    <span class="hljs-attr">observables</span>: {
+      ..._channelObservables([...channels, ...reduxStore]),
+      ..._sagaObservables(sagas)
+    },</pre></div>
+        
+      
+        
+        <p>@deprecated</p>
+
+        
+          <div class='highlight'><pre>    ..._channelsToState({<span class="hljs-attr">channels</span>: [...channels, ...reduxStore]}),
   }
   <span class="hljs-comment">/* eslint-enable */</span>
 
@@ -279,15 +305,15 @@ we use <code>map</code> for side effects (which is technically an antipattern).<
   }
 }
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_createAppStateObservable</span>(<span class="hljs-params">{stores}</span>) </span>{</pre></div>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_createAppStateObservable</span>(<span class="hljs-params">{channels}</span>) </span>{</pre></div>
         
       
         
         <p>first create the new appStateObservable</p>
 
         
-          <div class='highlight'><pre>  <span class="hljs-keyword">const</span> storeStatesWithSideEffectsObservables =
-    stores.map(<span class="hljs-function"><span class="hljs-params">x</span> =&gt;</span> x.stateWithSideEffectsObservable)</pre></div>
+          <div class='highlight'><pre>  <span class="hljs-keyword">const</span> channelStatesWithSideEffectsObservables =
+    channels.map(<span class="hljs-function"><span class="hljs-params">x</span> =&gt;</span> x.stateWithSideEffectsObservable)</pre></div>
         
       
         
@@ -298,48 +324,60 @@ we use <code>map</code> for side effects (which is technically an antipattern).<
         
       
         
-        <p>this fires when any of the store state observables change</p>
+        <p>this fires when any of the channel state observables change</p>
 
         
-          <div class='highlight'><pre>    storeStatesWithSideEffectsObservables,</pre></div>
+          <div class='highlight'><pre>    channelStatesWithSideEffectsObservables,</pre></div>
         
       
         
-        <p>this combines all the store states into a single state</p>
+        <p>this combines all the channel states into a single state</p>
 
         
           <div class='highlight'><pre>    (...observables) =&gt; observables.reduce(
       <span class="hljs-function">(<span class="hljs-params">appStateObservable, state, i</span>) =&gt;</span> <span class="hljs-built_in">Object</span>.assign(
         appStateObservable,
-        {[<span class="hljs-string">`<span class="hljs-subst">${stores[i].name}</span>`</span>]: state.state}
+        {[<span class="hljs-string">`<span class="hljs-subst">${channels[i].name}</span>`</span>]: state.state}
       ),
       {}
     )
   )
 }
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_storesToState</span>(<span class="hljs-params">{stores}</span>) </span>{
-  <span class="hljs-keyword">return</span> stores.reduce(<span class="hljs-function">(<span class="hljs-params">state, store</span>) =&gt;</span> ({...state, ...store.store}), {})
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_channelActions</span>(<span class="hljs-params">channels</span>) </span>{
+  <span class="hljs-keyword">return</span> channels.reduce(<span class="hljs-function">(<span class="hljs-params">state, channel</span>) =&gt;</span> ({...state, ...channel.actions}), {})
 }
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_sagasToState</span>(<span class="hljs-params">{sagas}</span>) </span>{</pre></div>
-        
-      
-        
-        <p>add action functions and result observables to app state</p>
-
-        
-          <div class='highlight'><pre>  <span class="hljs-keyword">return</span> sagas.reduce(<span class="hljs-function">(<span class="hljs-params">state, saga</span>) =&gt;</span> ({...state, ...saga.actionFunctions, ...saga.resultObservables}), {})
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_sagaActions</span>(<span class="hljs-params">sagas</span>) </span>{
+  <span class="hljs-keyword">return</span> sagas.reduce(<span class="hljs-function">(<span class="hljs-params">state, saga</span>) =&gt;</span> ({...state, ...saga.actionFunctions}), {})
 }
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_setupStoreObs</span>(<span class="hljs-params">{stores, AppDispatcher}</span>) </span>{</pre></div>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_channelObservables</span>(<span class="hljs-params">channels</span>) </span>{
+  <span class="hljs-keyword">return</span> channels.reduce(<span class="hljs-function">(<span class="hljs-params">state, channel</span>) =&gt;</span> ({...state, ...channel.observable}), {})
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_sagaObservables</span>(<span class="hljs-params">sagas</span>) </span>{
+  <span class="hljs-keyword">return</span> sagas.reduce(<span class="hljs-function">(<span class="hljs-params">state, saga</span>) =&gt;</span> ({...state, ...saga.resultObservables}), {})
+}
+
+<span class="hljs-comment">/**
+ * @deprecated
+ * @param channels
+ * @returns {*}
+ * @private
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_channelsToState</span>(<span class="hljs-params">{channels}</span>) </span>{
+  <span class="hljs-keyword">return</span> channels.reduce(<span class="hljs-function">(<span class="hljs-params">state, channel</span>) =&gt;</span> ({...state, ...channel.channel}), {})
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_setupChannelObs</span>(<span class="hljs-params">{channels, AppDispatcher}</span>) </span>{</pre></div>
         
       
         
         <p>setup one-way data flow + side effects</p>
 
         
-          <div class='highlight'><pre>  stores.forEach(<span class="hljs-function"><span class="hljs-params">store</span> =&gt;</span> store.stateWithSideEffectsObservable.onValue(<span class="hljs-function"><span class="hljs-params">state</span> =&gt;</span>
+          <div class='highlight'><pre>  channels.forEach(<span class="hljs-function"><span class="hljs-params">channel</span> =&gt;</span> channel.stateWithSideEffectsObservable.onValue(<span class="hljs-function"><span class="hljs-params">state</span> =&gt;</span>
     (state.sideEffects || []).forEach(
       <span class="hljs-function"><span class="hljs-params">sideEffect</span> =&gt;</span> setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> AppDispatcher.emit(sideEffect), <span class="hljs-number">0</span>)
     )

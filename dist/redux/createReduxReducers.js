@@ -9,7 +9,7 @@ var _assert = require('../internal/assert');
 
 var _assert2 = _interopRequireDefault(_assert);
 
-var _StateWithSideEffects = require('../stores/StateWithSideEffects');
+var _StateWithSideEffects = require('../channels/StateWithSideEffects');
 
 var _reduxChannelName = require('./reduxChannelName');
 
@@ -51,11 +51,11 @@ function _createReduxReducerStateObservable(channel, Reducers) {
 
 /**
  * Creates a special channel for redux reducers. The main differences between this and
- * `createStores` are:
+ * `createChannels` are:
  *
- * 1. `createStores` assumes a single reducer per action type. `createReduxReducers`
+ * 1. `createChannels` assumes a single reducer per action type. `createReduxReducers`
  *    passes all actions to *every* reducer, as per the redux style.
- * 2. `createStores` maps each channel to a single top-level state property.
+ * 2. `createChannels` maps each channel to a single top-level state property.
  *    `createReduxReducers` maps every reducer to a top-level state property. But
  *     internally, all messages flow through a single redux channel.
  *
@@ -97,7 +97,8 @@ function createReduxReducers(_ref) {
       stateWithSideEffectsObservable: reducerStateObservable.map(function (reducerState) {
         return (0, _StateWithSideEffects.state)(reducerState);
       }),
-      store: _defineProperty({}, reducerKey + 'Observable', reducerStateObservable)
+      observable: _defineProperty({}, reducerKey, reducerStateObservable),
+      channel: {}
     };
   });
 }

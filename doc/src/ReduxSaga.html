@@ -37,6 +37,34 @@
               
                 
                 <li>
+                  <a class="source" href="StateWithSideEffects.html">
+                    StateWithSideEffects.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createChannels.html">
+                    createChannels.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createSagas.html">
+                    createSagas.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="sagaInterfaceFactory.html">
+                    sagaInterfaceFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
                   <a class="source" href="DangerouslySlowContainer.html">
                     DangerouslySlowContainer.js
                   </a>
@@ -135,29 +163,8 @@
               
                 
                 <li>
-                  <a class="source" href="StateWithSideEffects.html">
-                    StateWithSideEffects.js
-                  </a>
-                </li>
-              
-                
-                <li>
-                  <a class="source" href="createSagas.html">
-                    createSagas.js
-                  </a>
-                </li>
-              
-                
-                <li>
-                  <a class="source" href="createStores.html">
-                    createChannels.js
-                  </a>
-                </li>
-              
-                
-                <li>
-                  <a class="source" href="sagaInterfaceFactory.html">
-                    sagaInterfaceFactory.js
+                  <a class="source" href="rfluxMessage.html">
+                    rfluxMessage.js
                   </a>
                 </li>
               
@@ -243,13 +250,13 @@
 
 <span class="hljs-keyword">export</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ReduxSaga</span> </span>{
 
-  <span class="hljs-keyword">constructor</span>(store) {
+  <span class="hljs-keyword">constructor</span>(channel) {
 
-    <span class="hljs-keyword">this</span>.store = store
+    <span class="hljs-keyword">this</span>.channel = channel
   }
 
   put(action) {
-    setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>.store.dispatch(action), <span class="hljs-number">0</span>)
+    setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>.channel.dispatch(action), <span class="hljs-number">0</span>)
 
     <span class="hljs-keyword">return</span> Kefir.constant(action) <span class="hljs-comment">// streamified so we can chain together</span>
   }

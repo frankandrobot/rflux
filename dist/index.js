@@ -17,11 +17,11 @@ var _DangerouslySlowContainer = require('./components/DangerouslySlowContainer')
 
 var _DangerouslySlowContainer2 = _interopRequireDefault(_DangerouslySlowContainer);
 
-var _StateWithSideEffects = require('./stores/StateWithSideEffects');
+var _StateWithSideEffects = require('./channels/StateWithSideEffects');
 
 var _StateWithSideEffects2 = _interopRequireDefault(_StateWithSideEffects);
 
-var _sagaInterfaceFactory = require('./stores/sagaInterfaceFactory');
+var _sagaInterfaceFactory = require('./channels/sagaInterfaceFactory');
 
 var _sagaInterfaceFactory2 = _interopRequireDefault(_sagaInterfaceFactory);
 

@@ -37,6 +37,34 @@
               
                 
                 <li>
+                  <a class="source" href="StateWithSideEffects.html">
+                    StateWithSideEffects.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createChannels.html">
+                    createChannels.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createSagas.html">
+                    createSagas.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="sagaInterfaceFactory.html">
+                    sagaInterfaceFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
                   <a class="source" href="DangerouslySlowContainer.html">
                     DangerouslySlowContainer.js
                   </a>
@@ -135,29 +163,8 @@
               
                 
                 <li>
-                  <a class="source" href="StateWithSideEffects.html">
-                    StateWithSideEffects.js
-                  </a>
-                </li>
-              
-                
-                <li>
-                  <a class="source" href="createSagas.html">
-                    createSagas.js
-                  </a>
-                </li>
-              
-                
-                <li>
-                  <a class="source" href="createStores.html">
-                    createChannels.js
-                  </a>
-                </li>
-              
-                
-                <li>
-                  <a class="source" href="sagaInterfaceFactory.html">
-                    sagaInterfaceFactory.js
+                  <a class="source" href="rfluxMessage.html">
+                    rfluxMessage.js
                   </a>
                 </li>
               
@@ -180,7 +187,7 @@
           <div class='highlight'><pre><span class="hljs-keyword">import</span> assert <span class="hljs-keyword">from</span> <span class="hljs-string">'../internal/assert'</span>
 <span class="hljs-keyword">import</span> checkUnique <span class="hljs-keyword">from</span> <span class="hljs-string">'../internal/checkUnique'</span>
 
-<span class="hljs-keyword">import</span> {bindActionFunctions} <span class="hljs-keyword">from</span> <span class="hljs-string">'./createStores'</span>
+<span class="hljs-keyword">import</span> {bindActionFunctions} <span class="hljs-keyword">from</span> <span class="hljs-string">'./createChannels'</span>
 
 
 <span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">bindSagaHandler</span>(<span class="hljs-params">channel, sagaName, sagaHandler</span>) </span>{
@@ -232,7 +239,7 @@
  * @param {String} channel - the name of the saga collection
  * @param {Map&lt;String,*&gt;} ActionTypes - the names of the action types (aka side effects) these sagas handle
  * @param {Map&lt;ActionType,Function&gt;} SagaActionFunctions - (optional) map of action functions indexed by
- * ActionType. Like a store's action functions, these functions can be used to initiate a saga. Note
+ * ActionType. Like a channel's action functions, these functions can be used to initiate a saga. Note
  * that if you include one action function, then every ActionType must have a corresponding action function.
  * @param {Function} SagaHandlersFn - higher order function with signature
  * `({...sagaInterface})=&gt;SagaHandlers` that accepts the `sagas` interface object and returns the
