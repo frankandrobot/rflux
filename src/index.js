@@ -2,9 +2,9 @@ import createContainer from './components/createContainer'
 import createDangerouslySlowContainer from './components/createDangerouslySlowContainer'
 import DangerouslySlowContainer from './components/DangerouslySlowContainer'
 
-import StateWithSideEffects from './stores/StateWithSideEffects'
-import {state} from './stores/StateWithSideEffects'
-import sagaFactory from './stores/sagaInterfaceFactory'
+import StateWithSideEffects from './channels/StateWithSideEffects'
+import {state} from './channels/StateWithSideEffects'
+import sagaFactory from './channels/sagaInterfaceFactory'
 
 import appStateFactory from './appStateFactory'
 

@@ -87,7 +87,7 @@ function reduxMiddlewareFactory(_ref) {
           .map(function () {
             return transformedReduxAction;
           });
-        }, _kefir2.default.constant(rfluxAction.payload || {})).map(function (reduxAction) {
+        }, _kefir2.default.constant(typeof rfluxAction.payload === 'undefined' ? {} : rfluxAction.payload)).map(function (reduxAction) {
           return _extends({}, rfluxAction, { payload: reduxAction });
         });
       });

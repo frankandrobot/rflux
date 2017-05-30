@@ -18,7 +18,7 @@ var _checkUnique = require('../internal/checkUnique');
 
 var _checkUnique2 = _interopRequireDefault(_checkUnique);
 
-var _createStores = require('./createStores');
+var _createChannels = require('./createChannels');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -69,7 +69,7 @@ function _bindSagaResultObservables(sagas) {
  * @param {String} channel - the name of the saga collection
  * @param {Map<String,*>} ActionTypes - the names of the action types (aka side effects) these sagas handle
  * @param {Map<ActionType,Function>} SagaActionFunctions - (optional) map of action functions indexed by
- * ActionType. Like a store's action functions, these functions can be used to initiate a saga. Note
+ * ActionType. Like a channel's action functions, these functions can be used to initiate a saga. Note
  * that if you include one action function, then every ActionType must have a corresponding action function.
  * @param {Function} SagaHandlersFn - higher order function with signature
  * `({...sagaInterface})=>SagaHandlers` that accepts the `sagas` interface object and returns the
@@ -111,7 +111,7 @@ function _createSagas(_ref) {
     return {
       name: channel,
       observables: observables,
-      actionFunctions: (0, _createStores.bindActionFunctions)(ActionTypes, SagaActionFunctions)(AppDispatcher),
+      actionFunctions: (0, _createChannels.bindActionFunctions)(ActionTypes, SagaActionFunctions)(AppDispatcher),
       resultObservables: _bindSagaResultObservables(observables)
     };
   };

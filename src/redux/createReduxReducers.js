@@ -1,6 +1,6 @@
 import assert from '../internal/assert'
 
-import {state} from '../stores/StateWithSideEffects'
+import {state} from '../channels/StateWithSideEffects'
 
 import reduxChannelName from './reduxChannelName'
 
@@ -44,11 +44,11 @@ function _createReduxReducerStateObservable(channel, Reducers) {
 
 /**
  * Creates a special channel for redux reducers. The main differences between this and
- * `createStores` are:
+ * `createChannels` are:
  *
- * 1. `createStores` assumes a single reducer per action type. `createReduxReducers`
+ * 1. `createChannels` assumes a single reducer per action type. `createReduxReducers`
  *    passes all actions to *every* reducer, as per the redux style.
- * 2. `createStores` maps each channel to a single top-level state property.
+ * 2. `createChannels` maps each channel to a single top-level state property.
  *    `createReduxReducers` maps every reducer to a top-level state property. But
  *     internally, all messages flow through a single redux channel.
  *
@@ -85,9 +85,10 @@ export default function createReduxReducers({Reducers, AppDispatcher}) {
         name: reducerKey,
         stateWithSideEffectsObservable:
           reducerStateObservable.map(reducerState => state(reducerState)),
-        store: {
-          [`${reducerKey}Observable`]: reducerStateObservable
-        }
+        observable: {
+          [reducerKey]: reducerStateObservable,
+        },
+        channel: {}
       }
     })
 }

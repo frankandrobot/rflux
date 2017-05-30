@@ -37,6 +37,34 @@
               
                 
                 <li>
+                  <a class="source" href="StateWithSideEffects.html">
+                    StateWithSideEffects.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createChannels.html">
+                    createChannels.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="createSagas.html">
+                    createSagas.js
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="sagaInterfaceFactory.html">
+                    sagaInterfaceFactory.js
+                  </a>
+                </li>
+              
+                
+                <li>
                   <a class="source" href="DangerouslySlowContainer.html">
                     DangerouslySlowContainer.js
                   </a>
@@ -135,29 +163,8 @@
               
                 
                 <li>
-                  <a class="source" href="StateWithSideEffects.html">
-                    StateWithSideEffects.js
-                  </a>
-                </li>
-              
-                
-                <li>
-                  <a class="source" href="createSagas.html">
-                    createSagas.js
-                  </a>
-                </li>
-              
-                
-                <li>
-                  <a class="source" href="createStores.html">
-                    createChannels.js
-                  </a>
-                </li>
-              
-                
-                <li>
-                  <a class="source" href="sagaInterfaceFactory.html">
-                    sagaInterfaceFactory.js
+                  <a class="source" href="rfluxMessage.html">
+                    rfluxMessage.js
                   </a>
                 </li>
               
@@ -194,7 +201,7 @@
 <span class="hljs-comment">/**
  * Takes a map of ActionFunctions indexed by ActionType and binds each to the
  * AppDispatcher. That is, when a bound function is called, it automatically
- * dispatches its message to the store.
+ * dispatches its message to the channel.
  *
  * **Note:**
  * 1. This method is actually a higher order function. It returns a function
@@ -210,8 +217,8 @@
   <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-params">AppDispatcher</span> =&gt;</span>
 
     <span class="hljs-built_in">Object</span>.keys(ActionTypes).reduce(
-      <span class="hljs-function">(<span class="hljs-params">storeActions, action</span>) =&gt;</span> ({
-        ...storeActions,
+      <span class="hljs-function">(<span class="hljs-params">channelActions, action</span>) =&gt;</span> ({
+        ...channelActions,
         [action]: _bindActionFunctionToAppDispatcher(ActionFunctions[action])(AppDispatcher)
       }),
       {}
@@ -223,39 +230,38 @@
  * "pre-bound"). For this reason, these are deprecated.
  *
  * Takes a map of ActionObservables *not necessarily indexed by ActionType* and binds each
- * to the StoreStateObservable. The StoreStateObservable is the store's state, wrapped in a
- * Kefir stream (otherwise known as an *observable*).
+ * to the ChannelStateObservable. The ChannelStateObservable is the channel's state,
+ * wrapped in a Kefir stream (otherwise known as an *observable*).
  *
- * Since the StoreStateObservable represents the state, an ActionObservable is a way of
- * observing (aka "selecting") arbitrary parts of the state tree.
+ * Since the ChannelStateObservable represents the state, an ActionObservable is a
+ * way of observing (aka "selecting") arbitrary parts of the state tree.
  *
  * **Note:**
  * 1. This method is actually a higher order function. It returns a function
- *    that accepts a StoreStateObservable object as a parameter. This way, the
- *    StoreStateObservable is not hard-coded dependency.
+ *    that accepts a ChannelStateObservable object as a parameter. This way, the
+ *    ChannelStateObservable is not hard-coded dependency.
  *
- * TODO global rename StateObservable =&gt; StateObservable
  * TODO global rename ActionObservable =&gt; SelectionObservable
  *
  * @param {Map&lt;String,Observable&gt;} ActionObservables
- * @returns {Function} a function that binds the action observables to the store observable
+ * @returns {Function} a function that binds the action observables to the channel observable
  * @private
  */</span>
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_bindActionObservables</span>(<span class="hljs-params">ActionObservables</span>) </span>{
 
-  <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-params">storeObservable</span> =&gt;</span>
+  <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-params">channelObservable</span> =&gt;</span>
 
     <span class="hljs-built_in">Object</span>.keys(ActionObservables).reduce(
       <span class="hljs-function">(<span class="hljs-params">total, observable</span>) =&gt;</span> <span class="hljs-built_in">Object</span>.assign(
         total,
-        {[observable]: ActionObservables[observable](storeObservable)}
+        {[observable]: ActionObservables[observable](channelObservable)}
       ),
       {}
     )
 }
 
 <span class="hljs-comment">/**
- * Creates the store's state observable using the given channel name.
+ * Creates the channel's state observable using the given channel name.
  *
  * When an action comes in, it will call the corresponding reducer with the payload,
  * and pass the new state to the observable.
@@ -275,7 +281,7 @@
  * Each reducer has this signature:
  *
  * ```
- * (state:StoreState, payload:Payload, endOfSideEffects:Payload =&gt; Message)
+ * (state:ChannelState, payload:Payload, endOfSideEffects:Payload =&gt; Message)
  * =&gt; StateWithSideEffects
  * ```
  *
@@ -290,7 +296,7 @@
  *
  * @param {String} channel
  * @param {Map&lt;ActionType,Function&gt;} Reducers
- * @returns {Function} a function that creates the store's state observable.
+ * @returns {Function} a function that creates the channel's state observable.
  */</span>
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_createChannelStateObservable</span>(<span class="hljs-params">channel, Reducers</span>) </span>{
 
@@ -357,7 +363,7 @@
 
 <span class="hljs-comment">/* eslint-disable no-console */</span>
 <span class="hljs-comment">/**
- * The store consists of
+ * The channel consists of
  * - the channel name
  * - the state observable
  * - bound (aka "live") action functions
@@ -380,9 +386,9 @@
  * @param {Map&lt;ActionType,Function&gt;} ActionFunctions - map of action functions, indexed by
  * ActionType
  * @param {Map&lt;String,Function&gt;} ActionObservables (optional) - higher order functions
- * that take the StoreStateObservable as input and return an observable that selects parts
- * of the state tree. **This will probably be deprecated.**
- * @returns {Function} that binds the store to the app dispatcher
+ * that take the ChannelStateObservable as input and return an observable that
+ * selects parts of the state tree. **This will probably be deprecated.**
+ * @returns {Function} that binds the channel to the app dispatcher
  */</span>
 <span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_createChannel</span>(<span class="hljs-params">
   {channel, ActionTypes, Reducers, ActionFunctions, ActionObservables}</span>) </span>{
@@ -425,23 +431,36 @@
     <span class="hljs-keyword">return</span> {
       <span class="hljs-attr">name</span>: channel,
       stateWithSideEffectsObservable,
-      <span class="hljs-attr">store</span>: {
+      <span class="hljs-attr">actions</span>: {
         ...bindActionFunctions(ActionTypes, ActionFunctions)(AppDispatcher),
-        ..._bindActionObservables(ActionObservables)(stateObservable),
-        <span class="hljs-comment">/**
-         * @deprecated
-         */</span>
-        ..._createEndOfActionsObservables(channel, ActionTypes)(AppDispatcher),
-        [<span class="hljs-string">`<span class="hljs-subst">${channel}</span>Observable`</span>]: stateObservable
+      },
+      <span class="hljs-attr">observable</span>: {
+        [channel]: stateObservable,
+      },
+      <span class="hljs-attr">channel</span>: {</pre></div>
+        
+      
+        
+        <p>@deprecated</p>
+
+        
+          <div class='highlight'><pre>        ..._bindActionObservables(ActionObservables)(stateObservable),</pre></div>
+        
+      
+        
+        <p>@deprecated</p>
+
+        
+          <div class='highlight'><pre>        ..._createEndOfActionsObservables(channel, ActionTypes)(AppDispatcher),
       }
     }
   }
 }
 
 
-<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createStores</span>(<span class="hljs-params">{rawStores, ...args}</span>) </span>{
-  checkUnique(rawStores, <span class="hljs-string">'channel'</span>, <span class="hljs-string">'Cannot have two stores with the same name'</span>);
-  <span class="hljs-keyword">return</span> rawStores.map(<span class="hljs-function"><span class="hljs-params">s</span> =&gt;</span> _createChannel(s)({...args}))
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createChannels</span>(<span class="hljs-params">{rawChannels, ...args}</span>) </span>{
+  checkUnique(rawChannels, <span class="hljs-string">'channel'</span>, <span class="hljs-string">'Cannot have two channels with the same name'</span>);
+  <span class="hljs-keyword">return</span> rawChannels.map(<span class="hljs-function"><span class="hljs-params">s</span> =&gt;</span> _createChannel(s)({...args}))
 }</pre></div>
         
       

@@ -9,6 +9,7 @@ const objectUnderTestFn = () => {
     if (action % 2 === 0) {
       return next(action)
     }
+    return null
   }
   const redispatchSecond = store => next => action => {
     if (action === 2) {

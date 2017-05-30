@@ -1,7 +1,7 @@
 import assert from '../internal/assert'
 import checkUnique from '../internal/checkUnique'
 
-import {bindActionFunctions} from './createStores'
+import {bindActionFunctions} from './createChannels'
 
 
 export function bindSagaHandler(channel, sagaName, sagaHandler) {
@@ -48,7 +48,7 @@ function _bindSagaResultObservables(sagas) {
  * @param {String} channel - the name of the saga collection
  * @param {Map<String,*>} ActionTypes - the names of the action types (aka side effects) these sagas handle
  * @param {Map<ActionType,Function>} SagaActionFunctions - (optional) map of action functions indexed by
- * ActionType. Like a store's action functions, these functions can be used to initiate a saga. Note
+ * ActionType. Like a channel's action functions, these functions can be used to initiate a saga. Note
  * that if you include one action function, then every ActionType must have a corresponding action function.
  * @param {Function} SagaHandlersFn - higher order function with signature
  * `({...sagaInterface})=>SagaHandlers` that accepts the `sagas` interface object and returns the

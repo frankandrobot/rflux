@@ -60,13 +60,13 @@ export function reduxSagaMiddleware(channel, {ActionTypes, SagaActionFunctions, 
 
 export class ReduxSaga {
 
-  constructor(store) {
+  constructor(channel) {
 
-    this.store = store
+    this.channel = channel
   }
 
   put(action) {
-    setTimeout(() => this.store.dispatch(action), 0)
+    setTimeout(() => this.channel.dispatch(action), 0)
 
     return Kefir.constant(action) // streamified so we can chain together
   }

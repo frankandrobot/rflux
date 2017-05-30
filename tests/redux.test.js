@@ -2,6 +2,7 @@
 import test from 'tape'
 
 import reduxChannelName from '../src/redux/reduxChannelName'
+import rfluxMessage from '../src/redux/rfluxMessage'
 
 import appStateFactory from '../src/appStateFactory'
 
@@ -63,9 +64,5 @@ test('Redux reducers can receive actions', function(t) {
     })
     .onError(() => t.fail())
 
-  AppDispatcher.emit({
-    channel: reduxChannelName,
-    actionType: 'action1',
-    payload: {type: 'action1'}
-  })
+  AppDispatcher.emit(rfluxMessage({type: 'action1'}))
 })

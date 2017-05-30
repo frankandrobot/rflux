@@ -7,8 +7,8 @@ Object.defineProperty(exports, "__esModule", {
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 exports.bindActionFunctions = bindActionFunctions;
-exports._createStore = _createStore;
-exports.default = createStores;
+exports._createChannel = _createChannel;
+exports.default = createChannels;
 
 var _cast = require('../internal/cast');
 
@@ -44,7 +44,7 @@ function _bindActionFunctionToAppDispatcher(actionFunction) {
 /**
  * Takes a map of ActionFunctions indexed by ActionType and binds each to the
  * AppDispatcher. That is, when a bound function is called, it automatically
- * dispatches its message to the store.
+ * dispatches its message to the channel.
  *
  * **Note:**
  * 1. This method is actually a higher order function. It returns a function
@@ -58,8 +58,8 @@ function _bindActionFunctionToAppDispatcher(actionFunction) {
 function bindActionFunctions(ActionTypes, ActionFunctions) {
 
   return function (AppDispatcher) {
-    return Object.keys(ActionTypes).reduce(function (storeActions, action) {
-      return _extends({}, storeActions, _defineProperty({}, action, _bindActionFunctionToAppDispatcher(ActionFunctions[action])(AppDispatcher)));
+    return Object.keys(ActionTypes).reduce(function (channelActions, action) {
+      return _extends({}, channelActions, _defineProperty({}, action, _bindActionFunctionToAppDispatcher(ActionFunctions[action])(AppDispatcher)));
     }, {});
   };
 }
@@ -69,35 +69,34 @@ function bindActionFunctions(ActionTypes, ActionFunctions) {
  * "pre-bound"). For this reason, these are deprecated.
  *
  * Takes a map of ActionObservables *not necessarily indexed by ActionType* and binds each
- * to the StoreStateObservable. The StoreStateObservable is the store's state, wrapped in a
- * Kefir stream (otherwise known as an *observable*).
+ * to the ChannelStateObservable. The ChannelStateObservable is the channel's state,
+ * wrapped in a Kefir stream (otherwise known as an *observable*).
  *
- * Since the StoreStateObservable represents the state, an ActionObservable is a way of
- * observing (aka "selecting") arbitrary parts of the state tree.
+ * Since the ChannelStateObservable represents the state, an ActionObservable is a
+ * way of observing (aka "selecting") arbitrary parts of the state tree.
  *
  * **Note:**
  * 1. This method is actually a higher order function. It returns a function
- *    that accepts a StoreStateObservable object as a parameter. This way, the
- *    StoreStateObservable is not hard-coded dependency.
+ *    that accepts a ChannelStateObservable object as a parameter. This way, the
+ *    ChannelStateObservable is not hard-coded dependency.
  *
- * TODO global rename StateObservable => StateObservable
  * TODO global rename ActionObservable => SelectionObservable
  *
  * @param {Map<String,Observable>} ActionObservables
- * @returns {Function} a function that binds the action observables to the store observable
+ * @returns {Function} a function that binds the action observables to the channel observable
  * @private
  */
 function _bindActionObservables(ActionObservables) {
 
-  return function (storeObservable) {
+  return function (channelObservable) {
     return Object.keys(ActionObservables).reduce(function (total, observable) {
-      return Object.assign(total, _defineProperty({}, observable, ActionObservables[observable](storeObservable)));
+      return Object.assign(total, _defineProperty({}, observable, ActionObservables[observable](channelObservable)));
     }, {});
   };
 }
 
 /**
- * Creates the store's state observable using the given channel name.
+ * Creates the channel's state observable using the given channel name.
  *
  * When an action comes in, it will call the corresponding reducer with the payload,
  * and pass the new state to the observable.
@@ -117,7 +116,7 @@ function _bindActionObservables(ActionObservables) {
  * Each reducer has this signature:
  *
  * ```
- * (state:StoreState, payload:Payload, endOfSideEffects:Payload => Message)
+ * (state:ChannelState, payload:Payload, endOfSideEffects:Payload => Message)
  * => StateWithSideEffects
  * ```
  *
@@ -132,9 +131,9 @@ function _bindActionObservables(ActionObservables) {
  *
  * @param {String} channel
  * @param {Map<ActionType,Function>} Reducers
- * @returns {Function} a function that creates the store's state observable.
+ * @returns {Function} a function that creates the channel's state observable.
  */
-function _createStoreStateObservable(channel, Reducers) {
+function _createChannelStateObservable(channel, Reducers) {
 
   return function (AppDispatcher) {
     return AppDispatcher.filter(function (x) {
@@ -184,7 +183,7 @@ function _createEndOfActionsObservables(channel, ActionTypes) {
 
 /* eslint-disable no-console */
 /**
- * The store consists of
+ * The channel consists of
  * - the channel name
  * - the state observable
  * - bound (aka "live") action functions
@@ -207,11 +206,11 @@ function _createEndOfActionsObservables(channel, ActionTypes) {
  * @param {Map<ActionType,Function>} ActionFunctions - map of action functions, indexed by
  * ActionType
  * @param {Map<String,Function>} ActionObservables (optional) - higher order functions
- * that take the StoreStateObservable as input and return an observable that selects parts
- * of the state tree. **This will probably be deprecated.**
- * @returns {Function} that binds the store to the app dispatcher
+ * that take the ChannelStateObservable as input and return an observable that
+ * selects parts of the state tree. **This will probably be deprecated.**
+ * @returns {Function} that binds the channel to the app dispatcher
  */
-function _createStore(_ref) {
+function _createChannel(_ref) {
   var channel = _ref.channel,
       ActionTypes = _ref.ActionTypes,
       Reducers = _ref.Reducers,
@@ -241,7 +240,7 @@ function _createStore(_ref) {
     var AppDispatcher = _ref2.AppDispatcher;
 
 
-    var stateWithSideEffectsObservable = _createStoreStateObservable(channel, Reducers)(AppDispatcher);
+    var stateWithSideEffectsObservable = _createChannelStateObservable(channel, Reducers)(AppDispatcher);
     var stateObservable = stateWithSideEffectsObservable.map(function (x) {
       return x.state;
     });
@@ -249,18 +248,20 @@ function _createStore(_ref) {
     return {
       name: channel,
       stateWithSideEffectsObservable: stateWithSideEffectsObservable,
-      store: _extends({}, bindActionFunctions(ActionTypes, ActionFunctions)(AppDispatcher), _bindActionObservables(ActionObservables)(stateObservable), _createEndOfActionsObservables(channel, ActionTypes)(AppDispatcher), _defineProperty({}, channel + 'Observable', stateObservable))
+      actions: _extends({}, bindActionFunctions(ActionTypes, ActionFunctions)(AppDispatcher)),
+      observable: _defineProperty({}, channel, stateObservable),
+      channel: _extends({}, _bindActionObservables(ActionObservables)(stateObservable), _createEndOfActionsObservables(channel, ActionTypes)(AppDispatcher))
     };
   };
 }
 
-function createStores(_ref3) {
-  var rawStores = _ref3.rawStores,
-      args = _objectWithoutProperties(_ref3, ['rawStores']);
+function createChannels(_ref3) {
+  var rawChannels = _ref3.rawChannels,
+      args = _objectWithoutProperties(_ref3, ['rawChannels']);
 
-  (0, _checkUnique2.default)(rawStores, 'channel', 'Cannot have two stores with the same name');
-  return rawStores.map(function (s) {
-    return _createStore(s)(_extends({}, args));
+  (0, _checkUnique2.default)(rawChannels, 'channel', 'Cannot have two channels with the same name');
+  return rawChannels.map(function (s) {
+    return _createChannel(s)(_extends({}, args));
   });
 }
-//# sourceMappingURL=createStores.js.map
+//# sourceMappingURL=createChannels.js.map

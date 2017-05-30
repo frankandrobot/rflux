@@ -7,8 +7,8 @@ import appStateFactory from '../src/appStateFactory'
 
 
 const objectUnderTestFn = () => {
-  const store1 = {
-    channel: 'store1',
+  const channel1 = {
+    channel: 'channel1',
     ActionTypes: keyMirror({
       action1: true
     }),
@@ -17,11 +17,11 @@ const objectUnderTestFn = () => {
       initialState: {}
     },
     ActionFunctions: {
-      action1: x => ({channel: 'store1', actionType: 'action1', payload: {...x}})
+      action1: x => ({channel: 'channel1', actionType: 'action1', payload: {...x}})
     }
   }
-  const store2 = {
-    channel: 'store2',
+  const channel2 = {
+    channel: 'channel2',
     ActionTypes: keyMirror({
       action2: true
     }),
@@ -30,11 +30,11 @@ const objectUnderTestFn = () => {
       initialState: {}
     },
     ActionFunctions: {
-      action2: x => ({channel: 'store2', actionType: 'action2', payload: {...x}})
+      action2: x => ({channel: 'channel2', actionType: 'action2', payload: {...x}})
     }
   }
   const {AppState} = appStateFactory({
-    stores: [store1, store2]
+    channels: [channel1, channel2]
   })
 
   return {
@@ -52,20 +52,22 @@ test('AppState has appStateObservable', function(t) {
 
 
 test('AppState has action functions', function(t) {
-  t.plan(2)
+  t.plan(3)
   const {AppState} = objectUnderTestFn()
 
-  t.ok(!!AppState.action1)
-  t.ok(!!AppState.action2)
+  t.ok(!!AppState.actions)
+  t.ok(!!AppState.actions.action1)
+  t.ok(!!AppState.actions.action2)
 })
 
 
-test('AppState has individual store state observables', function(t) {
-  t.plan(2)
+test('AppState has individual channel state observables', function(t) {
+  t.plan(3)
   const {AppState} = objectUnderTestFn()
 
-  t.ok(!!AppState.store1Observable)
-  t.ok(!!AppState.store2Observable)
+  t.ok(!!AppState.observables)
+  t.ok(!!AppState.observables.channel1)
+  t.ok(!!AppState.observables.channel2)
 })
 
 
@@ -75,8 +77,8 @@ test('AppState observable autofires initial state', function(t) {
   AppState.appStateObservable
     .onValue(state => {
       t.deepEqual(state, {
-        store1: {},
-        store2: {}
+        channel1: {},
+        channel2: {}
       })
       t.end()
     })
@@ -91,14 +93,14 @@ test('AppState observable works', function(t) {
     .skip(1) // skip initial state
     .onValue(state =>
       t.deepEqual(state, {
-        store1: {msg: 'new state'},
-        store2: {}
+        channel1: {msg: 'new state'},
+        channel2: {}
       })
     )
     .onValue(() => t.end())
     .onError(() => t.fail())
 
-  AppState.action1({msg: 'new state'})
+  AppState.actions.action1({msg: 'new state'})
 })
 
 
@@ -106,13 +108,13 @@ test('AppState has individual working observables', function(t) {
   t.plan(1)
   const {AppState} = objectUnderTestFn()
 
-  AppState.store1Observable.skip(1).onValue(state =>
+  AppState.observables.channel1.skip(1).onValue(state =>
     t.deepEqual(state, {msg: 'new state'})
   )
   // this one shouldn't fire
-  AppState.store2Observable.skip(1).onValue(state =>
+  AppState.observables.channel2.skip(1).onValue(state =>
     t.equal(0, 1)
   )
-  AppState.action1({msg: 'new state'})
+  AppState.actions.action1({msg: 'new state'})
 })
 

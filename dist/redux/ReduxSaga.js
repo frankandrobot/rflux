@@ -103,10 +103,10 @@ function reduxSagaMiddleware(channel, _ref) {
 }
 
 var ReduxSaga = exports.ReduxSaga = function () {
-  function ReduxSaga(store) {
+  function ReduxSaga(channel) {
     _classCallCheck(this, ReduxSaga);
 
-    this.store = store;
+    this.channel = channel;
   }
 
   _createClass(ReduxSaga, [{
@@ -115,7 +115,7 @@ var ReduxSaga = exports.ReduxSaga = function () {
       var _this = this;
 
       setTimeout(function () {
-        return _this.store.dispatch(action);
+        return _this.channel.dispatch(action);
       }, 0);
 
       return _kefir2.default.constant(action); // streamified so we can chain together
