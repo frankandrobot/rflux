@@ -1,6 +1,10 @@
 import React from 'react'
 
-import {removeObservables, setupNonObservables, setupObservables} from '../internal/ContainerHelpers'
+import {
+  removeObservables,
+  setupNonObservables,
+  setupObservables
+} from '../internal/ContainerHelpers'
 
 
 /**
@@ -12,11 +16,13 @@ import {removeObservables, setupNonObservables, setupObservables} from '../inter
  * Since container props and state both get mapped as child props,
  * state overriddes props with the same name.
  *
- * Do NOT use anonymous functions to define getInitialState, getObservableState, getDefaultProps!
+ * Do NOT use anonymous functions to define getInitialState, getObservableState,
+ * getDefaultProps!
  *
  * @param {Function} getDefaultProps - container default props. Passed to child as props.
  * @param {Function} getInitialState - container initial state. Passed to child as props.
- * @param {Function} getObservableState - pass observables here. Observable *values* passed to child as props
+ * @param {Function} getObservableState - pass observables here. Observable *values*
+ * passed to child as props
  * @param {*} propTypes - container propTypes.
  * @returns {Function} that returns the container
  */

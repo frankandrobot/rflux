@@ -1,6 +1,6 @@
 import createContainer from './components/createContainer'
 import createDangerouslySlowContainer from './components/createDangerouslySlowContainer'
-import DangerouslySlowContainer from './components/DangerouslySlowContainer'
+import Container from './components/Container'
 
 import StateWithSideEffects from './channels/StateWithSideEffects'
 import {state} from './channels/StateWithSideEffects'
@@ -12,7 +12,7 @@ import appStateFactory from './appStateFactory'
 export {
   createContainer,
   createDangerouslySlowContainer,
-  DangerouslySlowContainer,
+  Container,
   state,
   StateWithSideEffects
 }
