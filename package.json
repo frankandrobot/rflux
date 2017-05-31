@@ -2,7 +2,7 @@
   "name": "react-rflux",
   "version": "0.13.1",
   "description": "",
-  "main": "dist/rflux.min.js",
+  "main": false,
   "devDependencies": {
     "babel": "^6.3.26",
     "babel-cli": "^6.3.17",
