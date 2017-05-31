@@ -1,1 +1,0 @@
-{"version":3,"sources":["redux/reduxChannelName.js"],"names":[],"mappings":";;;;;AAAA;;;;kBAIe,U","file":"reduxChannelName.js","sourcesContent":["/**\n * This is the reserved redux channel name used internally. Do NOT use this as a\n * channel name.\n */\nexport default '@@/redux'\n"]}
