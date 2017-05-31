@@ -29,10 +29,10 @@ jspm install npm:react-rflux
 
 ## Why Epics?
 
-*Epics* can be thought of as observable-based [sagas]
-(https://github.com/redux-saga/redux-saga). (If you don't know what sagas are, think of
-these as a way to handle async workflows.) The main advantage to epics is that 
-observables are [s32tandards based](https://github.com/tc39/proposal-observable). Both 
+*Epics* can be thought of as observable-based 
+[sagas](https://github.com/redux-saga/redux-saga). (If you don't know what sagas are, 
+think of these as a way to handle async workflows.) The main advantage to epics is that 
+observables are [standards based](https://github.com/tc39/proposal-observable). Both 
 describe a language on top of Javascript. However, I strongly suspect that functional 
 reactive programming with observables is *more powerful* than sagas. 
 
@@ -89,6 +89,7 @@ import appStateFactory from 'react-rflux'
 const {AppState} = appStateFactory({
   channels: [CounterChannel]
 })
+```
 
 Hook up the component
 
