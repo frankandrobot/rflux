@@ -16,6 +16,7 @@
     "blue-tape": "^1.0.0",
     "del": "^2.2.0",
     "dependo": "^0.1.6",
+    "docco": "^0.7.0",
     "documentation": "^4.0.0-rc.1",
     "eslint": "^3.19.0",
     "eslint-plugin-react": "^3.15.0",
@@ -37,7 +38,7 @@
   "scripts": {
     "dependo": "node node_modules/dependo/bin/dependo -f es6 src/rflux > dependencies.html",
     "doc:src": "node node_modules/.bin/docco -l linear -o ./doc/src/ src/*.js src/**/*.js",
-    "dist": "gulp build",
+    "dist": "gulp build:prod",
     "release": "npm run doc:src && npm run dist && git add doc dist && git commit -m \"[dist\"",
     "test": "node node_modules/.bin/tape -r babel-register -r kefir 'tests/**/*.js' | node node_modules/.bin/tap-notify | node node_modules/.bin/tap-diff",
     "test:simple": "node node_modules/.bin/tape -r babel-register -r kefir 'tests/**/*.js'",
