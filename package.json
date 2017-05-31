@@ -53,6 +53,7 @@
     "directories": {
       "lib": "src"
     },
+    "format": "esm",
     "dependencies": {
       "kefir": "npm:kefir@^3.2.0"
     },
