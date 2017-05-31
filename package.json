@@ -2,7 +2,7 @@
   "name": "react-rflux",
   "version": "0.13.3",
   "description": "",
-  "main": "dist/rflux.min.js",
+  "main": "dist/index.js",
   "devDependencies": {
     "babel": "^6.3.26",
     "babel-cli": "^6.3.17",
@@ -38,7 +38,7 @@
   "scripts": {
     "dependo": "node node_modules/dependo/bin/dependo -f es6 src/rflux > dependencies.html",
     "doc:src": "node node_modules/.bin/docco -l linear -o ./doc/src/ src/*.js src/**/*.js",
-    "dist": "gulp build:prod",
+    "dist": "gulp build",
     "release": "npm run doc:src && npm run dist && git add doc dist && git commit -m \"[dist\"",
     "test": "node node_modules/.bin/tape -r babel-register -r kefir 'tests/**/*.js' | node node_modules/.bin/tap-notify | node node_modules/.bin/tap-diff",
     "test:simple": "node node_modules/.bin/tape -r babel-register -r kefir 'tests/**/*.js'",
@@ -51,7 +51,7 @@
   "jspm": {
     "main": "index",
     "directories": {
-      "lib": "src"
+      "lib": "dist"
     },
     "format": "esm",
     "dependencies": {
