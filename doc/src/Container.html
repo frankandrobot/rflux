@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>kefirEmitter.js</title>
+  <title>Container.js</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -13,7 +13,7 @@
 
       <div class="header">
         
-          <h1>kefirEmitter.js</h1>
+          <h1>Container.js</h1>
         
 
         
@@ -184,14 +184,55 @@
         
         
         
-          <div class='highlight'><pre><span class="hljs-keyword">import</span> Kefir <span class="hljs-keyword">from</span> <span class="hljs-string">'kefir'</span>
+          <div class='highlight'><pre><span class="hljs-comment">/* eslint no-use-before-define:0 */</span>
+<span class="hljs-keyword">import</span> React <span class="hljs-keyword">from</span> <span class="hljs-string">'react'</span>
+
+<span class="hljs-keyword">import</span> {setupNonObservables, setupObservables, removeObservables} <span class="hljs-keyword">from</span> <span class="hljs-string">'../internal/ContainerHelpers'</span>
 
 
-<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">kefirEmitter</span>(<span class="hljs-params"></span>) </span>{
+<span class="hljs-comment">/**
+ * Natural interface---just wrap a child view in this container class and pass values via props.
+ * No complex state functions.
+ * Because it supports parent React props, it can be inefficient for arbitrary prop changes.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DangerouslySlowContainer</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
 
-  <span class="hljs-keyword">const</span> emitter = Kefir.pool()
+  <span class="hljs-keyword">constructor</span>(props, __dangerouslyEnableSlowness) {
 
-  <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.assign(emitter, {<span class="hljs-attr">emit</span>: <span class="hljs-function"><span class="hljs-params">message</span> =&gt;</span> emitter.plug(Kefir.constant(message))})
+    <span class="hljs-keyword">super</span>(props)
+
+    <span class="hljs-keyword">this</span>.__dangerouslyEnableSlowness = __dangerouslyEnableSlowness || <span class="hljs-literal">true</span>
+  }
+
+  componentWillMount() {
+
+    setupNonObservables(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.props, <span class="hljs-literal">false</span>)
+    setupObservables(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.props, <span class="hljs-keyword">this</span>.props.children.type.defaultProps)
+  }
+
+  componentWillReceiveProps(nextProps) {
+
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.__dangerouslyEnableSlowness) {
+
+      removeObservables(<span class="hljs-keyword">this</span>)
+      setupNonObservables(<span class="hljs-keyword">this</span>, nextProps, <span class="hljs-literal">false</span>)
+      setupObservables(<span class="hljs-keyword">this</span>, nextProps, <span class="hljs-keyword">this</span>.props.children.type.defaultProps)
+    }
+  }
+
+  componentWillUnmount() {
+
+    removeObservables(<span class="hljs-keyword">this</span>)
+  }
+
+  render() {
+
+    <span class="hljs-keyword">return</span> {
+      <span class="hljs-attr">type</span>: <span class="hljs-keyword">this</span>.props.children.type,
+      [<span class="hljs-string">'$$typeof'</span>]: <span class="hljs-built_in">Symbol</span>.for(<span class="hljs-string">'react.element'</span>),
+      <span class="hljs-attr">props</span>: {...this._nonObservables, ...this.state}
+    }
+  }
 }</pre></div>
         
       

@@ -81,4 +81,4 @@ var DangerouslySlowContainer = function (_React$Component) {
 }(_react2.default.Component);
 
 exports.default = DangerouslySlowContainer;
-//# sourceMappingURL=DangerouslySlowContainer.js.map
+//# sourceMappingURL=Container.js.map
