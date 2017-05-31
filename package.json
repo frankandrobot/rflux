@@ -49,6 +49,7 @@
   "author": "Uriel Avalos <uri@frankandrobot.com>",
   "license": "ISC",
   "jspm": {
+    "main": "src/index",
     "directories": {
       "lib": "src"
     },
