@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.StateWithSideEffects = exports.state = exports.Container = exports.createDangerouslySlowContainer = exports.createContainer = undefined;
+exports.kefirEmitter = exports.StateWithSideEffects = exports.state = exports.Container = exports.createDangerouslySlowContainer = exports.createContainer = undefined;
 
 var _createContainer = require('./components/createContainer');
 
@@ -25,6 +25,10 @@ var _sagaInterfaceFactory = require('./channels/sagaInterfaceFactory');
 
 var _sagaInterfaceFactory2 = _interopRequireDefault(_sagaInterfaceFactory);
 
+var _kefirEmitter = require('./utils/kefirEmitter');
+
+var _kefirEmitter2 = _interopRequireDefault(_kefirEmitter);
+
 var _appStateFactory = require('./appStateFactory');
 
 var _appStateFactory2 = _interopRequireDefault(_appStateFactory);
@@ -36,5 +40,6 @@ exports.createDangerouslySlowContainer = _createDangerouslySlowContainer2.defaul
 exports.Container = _Container2.default;
 exports.state = _StateWithSideEffects.state;
 exports.StateWithSideEffects = _StateWithSideEffects2.default;
+exports.kefirEmitter = _kefirEmitter2.default;
 exports.default = _appStateFactory2.default;
 //# sourceMappingURL=index.js.map

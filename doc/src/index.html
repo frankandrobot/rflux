@@ -192,6 +192,8 @@
 <span class="hljs-keyword">import</span> {state} <span class="hljs-keyword">from</span> <span class="hljs-string">'./channels/StateWithSideEffects'</span>
 <span class="hljs-keyword">import</span> sagaFactory <span class="hljs-keyword">from</span> <span class="hljs-string">'./channels/sagaInterfaceFactory'</span>
 
+<span class="hljs-keyword">import</span> kefirEmitter <span class="hljs-keyword">from</span> <span class="hljs-string">'./utils/kefirEmitter'</span>
+
 <span class="hljs-keyword">import</span> appStateFactory <span class="hljs-keyword">from</span> <span class="hljs-string">'./appStateFactory'</span>
 
 
@@ -200,7 +202,8 @@
   createDangerouslySlowContainer,
   Container,
   state,
-  StateWithSideEffects
+  StateWithSideEffects,
+  kefirEmitter
 }
 
 <span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> appStateFactory</pre></div>
