@@ -6,6 +6,8 @@ import StateWithSideEffects from './channels/StateWithSideEffects'
 import {state} from './channels/StateWithSideEffects'
 import sagaFactory from './channels/sagaInterfaceFactory'
 
+import kefirEmitter from './utils/kefirEmitter'
+
 import appStateFactory from './appStateFactory'
 
 
@@ -14,7 +16,8 @@ export {
   createDangerouslySlowContainer,
   Container,
   state,
-  StateWithSideEffects
+  StateWithSideEffects,
+  kefirEmitter
 }
 
 export default appStateFactory
