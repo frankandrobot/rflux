@@ -17,6 +17,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+/**
+ * Extracts the properties that are observables
+ * @param {state} stateOrProps
+ * @returns {Array} of observables
+ * @private
+ */
 function observables(stateOrProps) {
 
   return Object.keys(stateOrProps).filter(function (prop) {
@@ -26,6 +32,12 @@ function observables(stateOrProps) {
   }) || [];
 }
 
+/**
+ * Extracts the properties that are not observables
+ * @param {state} stateOrProps
+ * @returns {Map<string,*>} map of non-observables
+ * @private
+ */
 function nonObservables(stateOrProps) {
 
   return Object.keys(stateOrProps).filter(function (prop) {

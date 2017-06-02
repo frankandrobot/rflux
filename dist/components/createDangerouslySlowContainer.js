@@ -27,11 +27,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Do NOT use anonymous functions to define getInitialState, getObservableState,
  * getDefaultProps!
  *
- * @param {Function} getDefaultProps - container default props. Passed to child as props.
- * @param {Function} getInitialState - container initial state. Passed to child as props.
- * @param {Function} getObservableState - pass observables here. Observable *values*
+ * @param {Object} opts
+ * @param {Function} opts.getDefaultProps - container default props. Passed to child as
+ * props.
+ * @param {Function} opts.getInitialState - container initial state. Passed to child as
+ * props.
+ * @param {Function} opts.getObservableState - pass observables here. Observable *values*
  * passed to child as props
- * @param {*} propTypes - container propTypes.
+ * @param {*} opts.propTypes - container propTypes.
  * @returns {Function} that returns the container
  */
 function createDangerouslySlowContainer(_ref) {

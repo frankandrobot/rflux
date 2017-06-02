@@ -66,9 +66,10 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
  * A middleware is function with the following signature:
  * store => next => action
  *
- * @param {Channels[]} channels
- * @param {Sagas[]} sagas
- * @param {Middleware[]} middleware
+ * @param {Object} opts
+ * @param {Channels[]} opts.channels
+ * @param {Sagas[]} opts.sagas
+ * @param {Middleware[]} opts.middleware
  * @returns {{AppState, AppDispatcher}} the AppState and its dispatcher to send messages.
  */
 function appStateFactory(_ref) {
