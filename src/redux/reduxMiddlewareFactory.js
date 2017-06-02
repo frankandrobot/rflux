@@ -9,6 +9,7 @@ import reduxChannelName from './reduxChannelName'
  * This injects the middleware into the AppDispatcher. Middleware can stop propagation
  * of events to observables by not calling "next(action)". Middleware can also
  * transform actions or dispatch their own actions.
+ * @param {Object} opts
  * @param {kefirEmitter} opts.AppDispatcher
  * @param {middleware[]} opts.rawMiddleware
  * @returns {MiddlewareFactory} factory

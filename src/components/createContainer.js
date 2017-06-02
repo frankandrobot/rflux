@@ -7,6 +7,7 @@ import createDangerouslySlowContainer from './createDangerouslySlowContainer'
  *
  * Do NOT use anonymous functions to define getInitialState, getObservableState, getDefaultProps!
  *
+ * @param {Object} opts
  * @param {Function} opts.getDefaultProps - container default props. Passed to child as
  * props.
  * @param {Function} opts.getInitialState - container initial state. Passed to child as

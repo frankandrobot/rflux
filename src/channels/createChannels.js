@@ -191,6 +191,7 @@ function _createEndOfActionsObservables(channel, ActionTypes) {
  * 1. use the channel name in the action/observable. Ex: createDoc
  * 2. use the word "observable" in the observables. Ex: docObservable
  *
+ * @param {Object} opts
  * @param {string} opts.channel
  * @param {Map<string,*>} opts.ActionTypes - map of action type constants
  * @param {Map<ActionType,Function>} opts.Reducers - map of reducers, indexed by

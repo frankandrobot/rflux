@@ -28,6 +28,7 @@ const callObservable = sagaMessageBus
 
 /**
  * @param {string} channel
+ * @param {Object} opts
  * @param {Map} opts.ActionTypes - map whose keys are the names of the side effects
  * @param {Map} opts.SagaActionFunctions - (optional) map of action functions
  * @param {Map} opts.SagaHandlers - map of handler functions

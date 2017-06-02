@@ -45,6 +45,7 @@ function _bindSagaResultObservables(sagas) {
 /**
  * Sagas are primarily used for handling ajax workflows.
  *
+ * @param {Object} opts
  * @param {string} opts.channel - the name of the saga collection
  * @param {Map<string,*>} opts.ActionTypes - the names of the action types (aka side
  * effects) these sagas handle

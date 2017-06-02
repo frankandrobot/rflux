@@ -29,6 +29,7 @@ import createReduxReducers from './redux/createReduxReducers'
  * A middleware is function with the following signature:
  * store => next => action
  *
+ * @param {Object} opts
  * @param {Channels[]} opts.channels
  * @param {Sagas[]} opts.sagas
  * @param {Middleware[]} opts.middleware
