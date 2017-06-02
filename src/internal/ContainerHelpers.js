@@ -1,6 +1,12 @@
 import isObservable from '../internal/isObservable'
 
 
+/**
+ * Extracts the properties that are observables
+ * @param {state} stateOrProps
+ * @returns {Array} of observables
+ * @private
+ */
 export function observables(stateOrProps) {
 
   return Object.keys(stateOrProps)
@@ -8,6 +14,12 @@ export function observables(stateOrProps) {
       .map(prop => ({name: prop, observable: stateOrProps[prop]})) || []
 }
 
+/**
+ * Extracts the properties that are not observables
+ * @param {state} stateOrProps
+ * @returns {Map<string,*>} map of non-observables
+ * @private
+ */
 export function nonObservables(stateOrProps) {
 
   return Object.keys(stateOrProps)

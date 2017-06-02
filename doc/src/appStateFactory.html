@@ -215,9 +215,10 @@
  * A middleware is function with the following signature:
  * store =&gt; next =&gt; action
  *
- * @param {Channels[]} channels
- * @param {Sagas[]} sagas
- * @param {Middleware[]} middleware
+ * @param {Object} opts
+ * @param {Channels[]} opts.channels
+ * @param {Sagas[]} opts.sagas
+ * @param {Middleware[]} opts.middleware
  * @returns {{AppState, AppDispatcher}} the AppState and its dispatcher to send messages.
  */</span>
 <span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">appStateFactory</span>(<span class="hljs-params">

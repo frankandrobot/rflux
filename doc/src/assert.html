@@ -184,7 +184,13 @@
         
         
         
-          <div class='highlight'><pre><span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">assert</span>(<span class="hljs-params">condition, message</span>) </span>{
+          <div class='highlight'><pre><span class="hljs-comment">/**
+ * @param {expresson} condition boolean expression
+ * @param {string} message
+ * @returns {void}
+ * @private
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">assert</span>(<span class="hljs-params">condition, message</span>) </span>{
 
   <span class="hljs-keyword">if</span> (!condition) { <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(message) }
 }</pre></div>

@@ -26,8 +26,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * This injects the middleware into the AppDispatcher. Middleware can stop propagation
  * of events to observables by not calling "next(action)". Middleware can also
  * transform actions or dispatch their own actions.
- * @param {kefirEmitter} AppDispatcher
- * @param {middleware[]} rawMiddleware
+ * @param {Object} opts
+ * @param {kefirEmitter} opts.AppDispatcher
+ * @param {middleware[]} opts.rawMiddleware
  * @returns {MiddlewareFactory} factory
  */
 function reduxMiddlewareFactory(_ref) {

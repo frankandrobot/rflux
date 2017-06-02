@@ -1,11 +1,13 @@
 # Table Of Contents
 
-- [Read Me](./README.md)
-- [Introduction to FRP](./01-fp-overview.md)
-- Motivation
-  - [Stores](./02-stores.md)
-  - [Dispatcher](./03-dispatcher.md)
-  - [Action Functions](./04-action-functions.md)
-  - [Immutability](./05-immutability.md)
-  - [Side Effects](./06-sideeffects.md)
-  - [Action Streams](./07-action-streams.md)
+- [API](./api)
+- [src](./src)
+- [Motivation](./motivation/README.md)
+  - [Intro to FRP](./motivation/01-fp-overview.md)
+  - [Stores](./motivation/02-stores.md)
+  - [Dispatcher](./motivation/03-dispatcher.md)
+  - [Action Functions](./motivation/04-action-functions.md)
+  - [Immutability](./motivation/05-immutability.md)
+  - [Side Effects](./motivation/06-sideeffects.md)
+  - [Action Streams](./motivation/07-action-streams.md)
+

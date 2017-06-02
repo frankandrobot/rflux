@@ -1,8 +1,9 @@
 /**
  * Checks that the given prop occurs only once in the array of objects
  * @param {[]} arrayOfObjs
- * @param {String} prop
- * @param {String} msg
+ * @param {string} prop
+ * @param {string} msg
+ * @private
  */
 export default function checkUnique(arrayOfObjs = [], prop, msg) {
   const hist = {}

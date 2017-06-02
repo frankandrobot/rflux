@@ -22,9 +22,10 @@ function _bindActionFunctionToAppDispatcher(actionFunction) {
  *    that accepts the AppDispatcher object as a parameter. This way, the
  *    AppDispatcher is not hard-coded dependency.
  *
- * @param {Map<String,Boolean>} ActionTypes
+ * @param {Map<string,boolean>} ActionTypes
  * @param {Map<ActionType,Function>} ActionFunctions
  * @returns {Function} a function that binds the action functions to the app dispatcher
+ * @private
  */
 export function bindActionFunctions(ActionTypes, ActionFunctions) {
 
@@ -57,7 +58,7 @@ export function bindActionFunctions(ActionTypes, ActionFunctions) {
  *
  * TODO global rename ActionObservable => SelectionObservable
  *
- * @param {Map<String,Observable>} ActionObservables
+ * @param {Map<string,Observable>} ActionObservables
  * @returns {Function} a function that binds the action observables to the channel observable
  * @private
  */
@@ -108,9 +109,10 @@ function _bindActionObservables(ActionObservables) {
  *    that accepts an AppDispatcher object as a parameter. This way, the
  *    AppDispatcher is not hard-coded dependency.
  *
- * @param {String} channel
+ * @param {string} channel
  * @param {Map<ActionType,Function>} Reducers
  * @returns {Function} a function that creates the channel's state observable.
+ * @private
  */
 function _createChannelStateObservable(channel, Reducers) {
 
@@ -147,8 +149,8 @@ function _createChannelStateObservable(channel, Reducers) {
 /**
  * The idea is that you can use these observables to observe the end of a reducer +
  * side effects.
- * @param {String} channel
- * @param {Map<String,*>} ActionTypes
+ * @param {string} channel
+ * @param {Map<string,*>} ActionTypes
  * @returns {Function} function that binds AppDispatcher to the observables
  * @private
  */
@@ -189,16 +191,18 @@ function _createEndOfActionsObservables(channel, ActionTypes) {
  * 1. use the channel name in the action/observable. Ex: createDoc
  * 2. use the word "observable" in the observables. Ex: docObservable
  *
- * @param {String} channel
- * @param {Map<String,*>} ActionTypes - map of action type constants
- * @param {Map<ActionType,Function>} Reducers - map of reducers, indexed by ActionType.
- * Additionally, reducers have an `initialState` property.
- * @param {Map<ActionType,Function>} ActionFunctions - map of action functions, indexed by
- * ActionType
- * @param {Map<String,Function>} ActionObservables (optional) - higher order functions
- * that take the ChannelStateObservable as input and return an observable that
+ * @param {Object} opts
+ * @param {string} opts.channel
+ * @param {Map<string,*>} opts.ActionTypes - map of action type constants
+ * @param {Map<ActionType,Function>} opts.Reducers - map of reducers, indexed by
+ * ActionType. Additionally, reducers have an `initialState` property.
+ * @param {Map<ActionType,Function>} opts.ActionFunctions - map of action functions,
+ * indexed by ActionType
+ * @param {Map<string,Function>} opts.ActionObservables (optional) - higher order
+ * functions that take the ChannelStateObservable as input and return an observable that
  * selects parts of the state tree. **This will probably be deprecated.**
  * @returns {Function} that binds the channel to the app dispatcher
+ * @private
  */
 export function _createChannel(
   {channel, ActionTypes, Reducers, ActionFunctions, ActionObservables}) {

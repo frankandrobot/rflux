@@ -195,8 +195,9 @@
  * This injects the middleware into the AppDispatcher. Middleware can stop propagation
  * of events to observables by not calling "next(action)". Middleware can also
  * transform actions or dispatch their own actions.
- * @param {kefirEmitter} AppDispatcher
- * @param {middleware[]} rawMiddleware
+ * @param {Object} opts
+ * @param {kefirEmitter} opts.AppDispatcher
+ * @param {middleware[]} opts.rawMiddleware
  * @returns {MiddlewareFactory} factory
  */</span>
 <span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">reduxMiddlewareFactory</span>(<span class="hljs-params">{AppDispatcher, rawMiddleware}</span>) </span>{

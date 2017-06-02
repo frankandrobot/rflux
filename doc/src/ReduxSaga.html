@@ -213,10 +213,11 @@
   .onValue(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-literal">undefined</span>)
 
 <span class="hljs-comment">/**
- * @param {String} channel
- * @param {Map} ActionTypes - map whose keys are the names of the side effects
- * @param {Map} SagaActionFunctions - (optional) map of action functions
- * @param {Map} SagaHandlers - map of handler functions
+ * @param {string} channel
+ * @param {Object} opts
+ * @param {Map} opts.ActionTypes - map whose keys are the names of the side effects
+ * @param {Map} opts.SagaActionFunctions - (optional) map of action functions
+ * @param {Map} opts.SagaHandlers - map of handler functions
  * @returns {Object} redux middleware
  */</span>
 <span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">reduxSagaMiddleware</span>(<span class="hljs-params">channel, {ActionTypes, SagaActionFunctions, SagaHandlers}</span>) </span>{

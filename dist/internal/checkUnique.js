@@ -7,8 +7,9 @@ exports.default = checkUnique;
 /**
  * Checks that the given prop occurs only once in the array of objects
  * @param {[]} arrayOfObjs
- * @param {String} prop
- * @param {String} msg
+ * @param {string} prop
+ * @param {string} msg
+ * @private
  */
 function checkUnique() {
   var arrayOfObjs = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];

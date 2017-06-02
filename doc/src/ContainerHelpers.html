@@ -187,6 +187,12 @@
           <div class='highlight'><pre><span class="hljs-keyword">import</span> isObservable <span class="hljs-keyword">from</span> <span class="hljs-string">'../internal/isObservable'</span>
 
 
+<span class="hljs-comment">/**
+ * Extracts the properties that are observables
+ * @param {state} stateOrProps
+ * @returns {Array} of observables
+ * @private
+ */</span>
 <span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">observables</span>(<span class="hljs-params">stateOrProps</span>) </span>{
 
   <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.keys(stateOrProps)
@@ -194,6 +200,12 @@
       .map(<span class="hljs-function"><span class="hljs-params">prop</span> =&gt;</span> ({<span class="hljs-attr">name</span>: prop, <span class="hljs-attr">observable</span>: stateOrProps[prop]})) || []
 }
 
+<span class="hljs-comment">/**
+ * Extracts the properties that are not observables
+ * @param {state} stateOrProps
+ * @returns {Map&lt;string,*&gt;} map of non-observables
+ * @private
+ */</span>
 <span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">nonObservables</span>(<span class="hljs-params">stateOrProps</span>) </span>{
 
   <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.keys(stateOrProps)

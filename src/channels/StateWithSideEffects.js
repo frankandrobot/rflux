@@ -48,8 +48,7 @@ export default class StateWithSideEffects {
 /**
  * Constructor helper
  *
- * @param {*} state
- * @param {Message[]} sideEffects - array of side effects
+ * @param {State} state
  * @returns {StateWithSideEffects} instance
  */
 export function state(state = {}) {
