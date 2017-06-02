@@ -27,10 +27,10 @@ const callObservable = sagaMessageBus
   .onValue(() => undefined)
 
 /**
- * @param {String} channel
- * @param {Map} ActionTypes - map whose keys are the names of the side effects
- * @param {Map} SagaActionFunctions - (optional) map of action functions
- * @param {Map} SagaHandlers - map of handler functions
+ * @param {string} channel
+ * @param {Map} opts.ActionTypes - map whose keys are the names of the side effects
+ * @param {Map} opts.SagaActionFunctions - (optional) map of action functions
+ * @param {Map} opts.SagaHandlers - map of handler functions
  * @returns {Object} redux middleware
  */
 export function reduxSagaMiddleware(channel, {ActionTypes, SagaActionFunctions, SagaHandlers}) {

@@ -184,7 +184,13 @@
         
         
         
-          <div class='highlight'><pre><span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">cast</span>(<span class="hljs-params">obj, Class</span>) </span>{
+          <div class='highlight'><pre><span class="hljs-comment">/**
+ * @param {Object} obj
+ * @param {Class} Class
+ * @returns {Class} instance of class
+ * @private
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">cast</span>(<span class="hljs-params">obj, Class</span>) </span>{
 
   <span class="hljs-keyword">return</span> obj <span class="hljs-keyword">instanceof</span> Class ? obj : <span class="hljs-keyword">new</span> Class(obj)
 }</pre></div>

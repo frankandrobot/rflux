@@ -211,6 +211,7 @@
  * @param {Map&lt;String,Boolean&gt;} ActionTypes
  * @param {Map&lt;ActionType,Function&gt;} ActionFunctions
  * @returns {Function} a function that binds the action functions to the app dispatcher
+ * @private
  */</span>
 <span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">bindActionFunctions</span>(<span class="hljs-params">ActionTypes, ActionFunctions</span>) </span>{
 
@@ -297,6 +298,7 @@
  * @param {String} channel
  * @param {Map&lt;ActionType,Function&gt;} Reducers
  * @returns {Function} a function that creates the channel's state observable.
+ * @private
  */</span>
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_createChannelStateObservable</span>(<span class="hljs-params">channel, Reducers</span>) </span>{
 
@@ -389,6 +391,7 @@
  * that take the ChannelStateObservable as input and return an observable that
  * selects parts of the state tree. **This will probably be deprecated.**
  * @returns {Function} that binds the channel to the app dispatcher
+ * @private
  */</span>
 <span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_createChannel</span>(<span class="hljs-params">
   {channel, ActionTypes, Reducers, ActionFunctions, ActionObservables}</span>) </span>{

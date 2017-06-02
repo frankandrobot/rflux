@@ -29,9 +29,9 @@ import createReduxReducers from './redux/createReduxReducers'
  * A middleware is function with the following signature:
  * store => next => action
  *
- * @param {Channels[]} channels
- * @param {Sagas[]} sagas
- * @param {Middleware[]} middleware
+ * @param {Channels[]} opts.channels
+ * @param {Sagas[]} opts.sagas
+ * @param {Middleware[]} opts.middleware
  * @returns {{AppState, AppDispatcher}} the AppState and its dispatcher to send messages.
  */
 export default function appStateFactory(

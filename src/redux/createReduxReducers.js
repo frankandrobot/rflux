@@ -63,7 +63,7 @@ function _createReduxReducerStateObservable(channel, Reducers) {
  * - actionType:String
  * - payload: {//actual redux action }
  *
- * @param {Map<String,Function>} Reducers
+ * @param {Map<string,Function>} Reducers
  * @returns {Function} the redux reducers channel
  */
 export default function createReduxReducers({Reducers, AppDispatcher}) {

@@ -45,15 +45,19 @@ function _bindSagaResultObservables(sagas) {
 /**
  * Sagas are primarily used for handling ajax workflows.
  *
- * @param {String} channel - the name of the saga collection
- * @param {Map<String,*>} ActionTypes - the names of the action types (aka side effects) these sagas handle
- * @param {Map<ActionType,Function>} SagaActionFunctions - (optional) map of action functions indexed by
- * ActionType. Like a channel's action functions, these functions can be used to initiate a saga. Note
- * that if you include one action function, then every ActionType must have a corresponding action function.
- * @param {Function} SagaHandlersFn - higher order function with signature
- * `({...sagaInterface})=>SagaHandlers` that accepts the `sagas` interface object and returns the
- * SagaHandlers. The SagaHandlers are a map of functions indexed by ActionType i.e, Map<ActionType,Function>.
+ * @param {string} opts.channel - the name of the saga collection
+ * @param {Map<string,*>} opts.ActionTypes - the names of the action types (aka side
+ * effects) these sagas handle
+ * @param {Map<ActionType,Function>} opts.SagaActionFunctions - (optional) map of action
+ * functions indexed by ActionType. Like a channel's action functions, these functions
+ * can be used to initiate a saga. Note that if you include one action function, then
+ * every ActionType must have a corresponding action function.
+ * @param {Function} opts.SagaHandlersFn - higher order function with signature
+ * `({...sagaInterface})=>SagaHandlers` that accepts the `sagas` interface object and
+ * returns the SagaHandlers. The SagaHandlers are a map of functions indexed by
+ * ActionType i.e, Map<ActionType,Function>.
  * @return {Saga} higher order function that creates the saga.
+ * @private
  */
 export function _createSagas({channel, ActionTypes, SagaActionFunctions = {}, SagaHandlersFn}) {
 
